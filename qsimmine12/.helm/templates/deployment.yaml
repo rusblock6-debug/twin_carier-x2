@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backend.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    {{- toYaml .Values.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "backend.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "backend.fullname" . }}
+      {{- else if .Values.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- end }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      containers:
+        - name: web
+          image: "{{ required "set .Values.image.repository" .Values.image.repository }}/{{ required "set .Values.image.name" .Values.image.name }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/bash", "-c"]
+          args: ["/project/app/web_entrypoint.sh"]
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: APP_MODE
+              value: {{ .Values.env.APP_MODE | quote }}
+            - name: APP_MODULE
+              value: {{ .Values.env.APP_MODULE | quote }}
+            - name: GUNICORN_CONF
+              value: {{ .Values.env.GUNICORN_CONF | quote }}
+            - name: UVICORN_HOST
+              value: {{ .Values.env.UVICORN_HOST | quote }}
+            - name: UVICORN_PORT
+              value: {{ .Values.env.UVICORN_PORT | quote }}
+            - name: ALEMIBC_INI
+              value: {{ .Values.env.ALEMIBC_INI | quote }}
+            - name: REDIS_URL
+              value: {{ .Values.env.REDIS_URL | quote }}
+            - name: SECRET_KEY
+              value: {{ .Values.env.SECRET_KEY | quote }}
+            - name: DB_HOST
+              value: {{ .Values.env.DB_HOST | quote }}
+            - name: DB_USER
+              value: {{ .Values.env.DB_USER | quote }}
+            - name: DB_PWD
+              value: {{ .Values.env.DB_PWD | quote }}
+            - name: DB_NAME
+              value: {{ .Values.env.DB_NAME | quote }}
+            - name: TZ
+              value: {{ .Values.env.TZ | quote }}
+            - name: STORED_RESULTS_NUMBER
+              value: {{ .Values.env.STORED_RESULTS_NUMBER | quote }}
+            - name: MQTT_RELAY_DB_NAME
+              value: {{ .Values.env.MQTT_RELAY_DB_NAME | quote }}
+            - name: MQTT_RELAY_REDIS_URL_TASK_MGR
+              value: {{ .Values.env.MQTT_RELAY_REDIS_URL_TASK_MGR | quote }}
+            - name: BASE_DOMAIN
+              value: {{ printf "%s" (trimPrefix "api." (required "set .Values.ingress.hosts[0].host" ((index .Values.ingress.hosts 0).host))) | quote }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.probes.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.path }}
+              port: 8000
+              scheme: {{ .Values.probes.scheme }}
+            initialDelaySeconds: {{ .Values.probes.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.periodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.path }}
+              port: 8000
+              scheme: {{ .Values.probes.scheme }}
+            initialDelaySeconds: {{ add .Values.probes.initialDelaySeconds 10 }}
+            periodSeconds: {{ .Values.probes.periodSeconds }}
+          {{- end }}
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: upload-storage
+              mountPath: /project/upload
+          {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-lc", "sleep {{ .Values.lifecycle.preStopSleepSeconds }}"]
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: upload-storage
+          persistentVolumeClaim:
+            claimName: {{ include "backend.fullname" . }}-upload
+      {{- end }}

@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Симулятор сценариев</title>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/static/onest.font.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .empty-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #6c757d;
+        }
+
+        .form-grid-container {
+            width: 100%;
+        }
+
+        .form-grid-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-grid-label {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding-right: 15px;
+            box-sizing: border-box;
+        }
+
+        .form-grid-control {
+            flex: 0 0 50%;
+            max-width: 50%;
+            box-sizing: border-box;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        .form-control:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .btn-orange {
+            background-color: #ea8b47;
+            border-color: #ea8b47;
+            color: white;
+        }
+
+        .btn-orange:hover {
+            background-color: #e07d35;
+            border-color: #d9752b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-orange:active {
+            background-color: #d9752b;
+            transform: translateY(0);
+        }
+
+        .btn-orange.active {
+            background-color: #d9752b;
+            box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .d-flex.align-items-center {
+            gap: 8px;
+        }
+
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            border-radius: 0.3rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .quarry-info-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .quarry-info-label {
+            font-weight: 500;
+        }
+
+        .quarry-info-count {
+            color: #6c757d;
+            margin-left: 10px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 0.2em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .manual-truck-assignment {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .manual-truck-assignment h5 {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 8px;
+        }
+
+        .list-group-item.selected-truck {
+            background-color: #e9ecef;
+        }
+
+        .list-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 5px 0;
+        }
+
+        .list-container h6 {
+            margin: 0 0 8px 10px;
+            font-weight: 500;
+        }
+
+        .list-group {
+            margin-bottom: 0;
+        }
+
+        .list-group-item {
+            padding: 0.5rem 1rem;
+        }
+
+        #simulation-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #simulation-loader.show {
+            display: flex;
+        }
+
+        .loader-content {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .route {
+            margin: 0 0 8px 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+<div id="root"></div>
+
+<!-- React и ReactDOM -->
+<script src="https://unpkg.com/react@18/umd/react.development.js  "></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js  "></script>
+<!-- Babel для JSX -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js  "></script>
+<script src="/static/bootstrap.bundle.min.js"></script>
+<script src="/static/js/tz_utils.js" type="module"></script>
+
+<script type="text/babel">
+    const {useState, useEffect} = React;
+
+    function App() {
+        const [scenarios, setScenarios] = useState([]);
+        const [selectedTrailId, setSelectedTrailId] = useState(null);
+
+        const [selectedScenarioId, setSelectedScenarioId] = useState(null);
+        const [scenarioToRun, setScenarioToRun] = useState(null);
+        const [startTime, setStartTime] = useState("");
+        const [endTime, setEndTime] = useState("");
+        const [showQuarryInfo, setShowQuarryInfo] = useState(false);
+        const [quarries, setQuarries] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+        const [selectedQuarry, setSelectedQuarry] = useState(null);
+        const [tempScenarioName, setTempScenarioName] = useState("");
+
+        const truckPlacementOptions = [
+            {value: "auto", label: "Автоматически"},
+            {value: "manual", label: "Вручную"}
+        ];
+
+        useEffect(() => {
+            async function fetchData() {
+                try {
+                    const quarryResponse = await fetch('/api/quarry-data');
+                    if (!quarryResponse.ok) throw new Error('Ошибка загрузки карьеров');
+                    const quarryData = await quarryResponse.json();
+                    const quarryList = Array.isArray(quarryData) ? quarryData : quarryData.quarry_list || [];
+                    setQuarries(quarryList);
+                    if (quarryList.length > 0) {
+                        setSelectedQuarry(quarryList[0]);
+                    }
+
+                    const scenarioResponse = await fetch('/api/scenarios');
+                    if (!scenarioResponse.ok) throw new Error(`HTTP ${scenarioResponse.status}`);
+                    const scenarioData = await scenarioResponse.json();
+
+                    const normalizedScenarios = scenarioData.map(scenario => ({
+                        ...scenario,
+                        trails: scenario.trails?.map(trail => ({
+                            ...trail,
+                            trucks: trail.trucks || []
+                        })) || []
+                    }));
+
+                    const sortedScenarios = normalizedScenarios.sort((a, b) => b.id - a.id);
+                    setScenarios(sortedScenarios);
+
+                    if (sortedScenarios.length > 0) {
+                        const lastScenario = sortedScenarios[0];
+
+                        setSelectedScenarioId(lastScenario.id);
+                        setTempScenarioName(lastScenario.name);
+                        setStartTime(TimeUtils.utcToLocal(lastScenario.start_time));
+                        setEndTime(TimeUtils.utcToLocal(lastScenario.end_time));
+
+                        const quarry = quarryList.find(q => q.id === lastScenario.quarry_id);
+                        if (quarry) {
+                            setSelectedQuarry(quarry);
+                        }
+                    }
+
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            }
+
+            fetchData();
+        }, []);
+
+        useEffect(() => {
+            if (selectedScenarioId) {
+                const scenario = scenarios.find(s => s.id === selectedScenarioId);
+                if (scenario && scenario.trails && scenario.trails.length > 0) {
+                    if (!selectedTrailId || !scenario.trails.some(t => t.id === selectedTrailId)) {
+                        setSelectedTrailId(scenario.trails[0].id);
+                    }
+                } else {
+                    setSelectedTrailId(null);
+                }
+            }
+        }, [selectedScenarioId, scenarios, selectedTrailId]);
+
+        useEffect(() => {
+            if (scenarioToRun && selectedScenarioId === scenarioToRun.id) {
+                runSimulation();
+                setScenarioToRun(null);
+            }
+        }, [selectedScenarioId, scenarioToRun]);
+
+        const selectScenario = (id) => {
+            const scenario = scenarios.find(s => s.id === id);
+            if (!scenario) return;
+
+            setSelectedScenarioId(id);
+            setTempScenarioName(scenario.name);
+
+            const quarry = quarries.find(q => q.id === scenario.quarry_id);
+            if (quarry) {
+                setSelectedQuarry(quarry);
+            }
+
+            if (scenario.trails && scenario.trails.length > 0) {
+                setSelectedTrailId(scenario.trails[0].id);
+            } else {
+                setSelectedTrailId(null);
+            }
+
+            setStartTime(TimeUtils.utcToLocal(scenario.start_time));
+            setEndTime(TimeUtils.utcToLocal(scenario.end_time));
+        };
+
+        const createScenario = () => {
+            const newName = `Сценарий ${scenarios.length + 1}`;
+
+            const startDate = new Date();
+            startDate.setHours(10, 0, 0, 0);
+
+            const endDate = new Date(startDate);
+            endDate.setHours(18, 0, 0, 0);
+
+            const quarry = selectedQuarry || quarries[0];
+            if (!quarry) {
+                showMessage('Ошибка', 'Нет доступных карьеров');
+                return;
+            }
+
+            const trails = quarry.trail_list.map(trail => ({
+                ...trail,
+                trucks: []
+            }));
+
+            const newScenario = {
+                id: -Date.now(),
+                name: newName,
+                start_time: startDate.toISOString(),
+                end_time: endDate.toISOString(),
+                is_auto_truck_distribution: true,
+                quarry_id: quarry.id,
+                trails: trails,
+                isNew: true
+            };
+
+            const updatedScenarios = [newScenario, ...scenarios];
+            setScenarios(updatedScenarios);
+            selectScenario(newScenario.id);
+            setSelectedQuarry(quarry);
+        };
+
+        const updateScenario = async () => {
+            if (!selectedScenarioId) return;
+
+            const scenario = scenarios.find(s => s.id === selectedScenarioId);
+            if (!scenario) return;
+
+            const action = scenario.isNew ? 'create' : 'update';
+
+            const data = {
+                ...(!scenario.isNew && {id: scenario.id}),
+                name: tempScenarioName,
+                start_time: startTime ? new Date(startTime).toISOString() : scenario.start_time,
+                end_time: endTime ? new Date(endTime).toISOString() : scenario.end_time,
+                is_auto_truck_distribution: scenario.is_auto_truck_distribution,
+                quarry_id: selectedQuarry?.id || scenario.quarry_id,
+                trails: scenario.trails
+            };
+
+            try {
+                const response = await fetch('/api/object', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        action,
+                        type: 'scenario',
+                        data
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    let updatedScenarios;
+
+                    if (action === 'create') {
+                        const savedScenario = {
+                            ...scenario,
+                            ...data,
+                            id: result.id,
+                            isNew: false
+                        };
+
+                        updatedScenarios = scenarios.map(s =>
+                            s.id === scenario.id ? savedScenario : s
+                        );
+
+                        setSelectedScenarioId(result.id);
+                    } else {
+                        updatedScenarios = scenarios.map(s =>
+                            s.id === scenario.id ? {...s, ...data} : s
+                        );
+                    }
+
+                    setScenarios(updatedScenarios);
+                    showMessage('Успех', 'Сценарий сохранён');
+                } else {
+                    showMessage('Ошибка', result.error || 'Не удалось сохранить сценарий');
+                }
+            } catch (err) {
+                showMessage('Ошибка', 'Не удалось сохранить: ' + err.message);
+            }
+        };
+
+        const deleteScenario = async () => {
+            if (!selectedScenarioId) return;
+            const scenario = scenarios.find(s => s.id === selectedScenarioId);
+            const confirmed = await showConfirm('Удалить?', `Удалить "${scenario.name}"?`);
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch('/api/object', {
+                    method: 'DELETE',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({type: 'scenario', id: scenario.id})
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const updated = scenarios.filter(s => s.id !== scenario.id);
+                    setScenarios(updated);
+                    if (updated.length > 0) {
+                        selectScenario(updated[0].id);
+                    } else {
+                        setSelectedScenarioId(null);
+                        setTempScenarioName("");
+                        setStartTime("");
+                        setEndTime("");
+                    }
+                    showMessage('Удалено', 'Сценарий удалён');
+                }
+            } catch (err) {
+                showMessage('Ошибка', 'Не удалось удалить');
+            }
+        };
+
+        const handleQuarryChange = (e) => {
+            const quarryId = parseInt(e.target.value);
+            const quarry = quarries.find(q => q.id === quarryId);
+            if (!quarry) return;
+
+            if (selectedScenarioId !== null) {
+                const updatedScenarios = scenarios.map(s => {
+                    if (s.id === selectedScenarioId) {
+                        const trails = quarry.trail_list.map(newTrail => {
+                            const existingTrail = s.trails.find(t => t.id === newTrail.id);
+                            return {
+                                ...newTrail,
+                                trucks: existingTrail?.trucks || []
+                            };
+                        });
+
+                        return {
+                            ...s,
+                            quarry_id: quarryId,
+                            trails: trails
+                        };
+                    }
+                    return s;
+                });
+
+                setScenarios(updatedScenarios);
+            }
+            setSelectedQuarry(quarry);
+            if (quarry.trail_list && quarry.trail_list.length > 0) {
+                setSelectedTrailId(quarry.trail_list[0].id);
+            } else {
+                setSelectedTrailId(null);
+            }
+        };
+
+        const openQuarryEditor = () => {
+            if (selectedQuarry) {
+                window.location.href = `/?quarryId=${selectedQuarry.id}`;
+            }
+        };
+
+        const handleTruckClick = (truckId) => {
+            if (selectedTrailId === null) {
+                showMessage('Ошибка', 'Сначала выберите маршрут');
+                return;
+            }
+
+            const scenario = scenarios.find(s => s.id === selectedScenarioId);
+            if (!scenario) return;
+
+            const trailIndex = scenario.trails.findIndex(t => t.id === selectedTrailId);
+            if (trailIndex === -1) return;
+
+            const updatedTrail = {...scenario.trails[trailIndex]};
+            const truckIndex = updatedTrail.trucks.indexOf(truckId);
+
+            if (truckIndex === -1) {
+                updatedTrail.trucks = [...updatedTrail.trucks, truckId];
+            } else {
+                updatedTrail.trucks = updatedTrail.trucks.filter(id => id !== truckId);
+            }
+
+            const updatedScenarios = scenarios.map(s => {
+                if (s.id === selectedScenarioId) {
+                    const updatedTrails = [...s.trails];
+                    updatedTrails[trailIndex] = updatedTrail;
+                    return {...s, trails: updatedTrails};
+                }
+                return s;
+            });
+
+            setScenarios(updatedScenarios);
+        };
+        if (loading) {
+            return (
+                <div className="container-fluid mt-3 text-center">
+                    <span className="loading-spinner"></span> Загрузка данных...
+                </div>
+            );
+        }
+
+        const currentScenario = scenarios.find(s => s.id === selectedScenarioId);
+
+        const runSimulation = () => {
+            if (!startTime || !endTime) {
+                showMessage('Ошибка', 'Укажите время начала и окончания симуляции');
+                return;
+            }
+            if (!selectedQuarry || !selectedQuarry.id) {
+                showMessage('Ошибка', 'Не выбран карьер для симуляции');
+                return;
+            }
+
+            document.getElementById('simulation-loader').classList.add('show');
+
+            selectedQuarry.trail_list = currentScenario?.trails || [];
+
+            fetch('/run-simulation', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    start_time: TimeUtils.localToUtc(startTime),
+                    end_time: TimeUtils.localToUtc(endTime),
+                    quarry: selectedQuarry,
+                    scenario: selectedScenarioId
+                })
+            })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        return response.json().then(data => {
+                            if (data.redirect_url) {
+                                window.location.href = data.redirect_url;
+                            }
+                        });
+                    } else {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Ошибка запуска симуляции');
+                        });
+                    }
+                })
+                .catch(error => {
+                    showMessage('Ошибка', error.message);
+                })
+                .finally(() => {
+                    document.getElementById('simulation-loader').classList.remove('show');
+                });
+        };
+
+        const getRouteDisplayName = (trail) => {
+            if (!selectedQuarry || !trail) return `Маршрут ${trail?.id || '?'}`;
+
+            const {shovel_list, unload_list} = selectedQuarry;
+
+            const shovelId = trail.shovel_id;
+            const unloadId = trail.unload_id;
+
+            const shovel = shovel_list.find(s => s.id == shovelId);
+            const unload = unload_list.find(u => u.id == unloadId);
+
+            const shovelName = shovel ? shovel.name : `Экскаватор ${shovelId}`;
+            const unloadName = unload ? unload.name : `Площадка разгрузки ${unloadId}`;
+
+            return `Маршрут ${trail.id} (${shovelName} - ${unloadName})`;
+        };
+
+        const showMessage = (arg1, arg2) => {
+            const modalElement = document.getElementById('messageModal');
+            const titleEl = document.getElementById('messageModalTitle');
+            const bodyEl = document.getElementById('messageModalBody');
+
+            if (!modalElement || !titleEl || !bodyEl) {
+                console.error("Элементы модального окна не найдены!");
+                return;
+            }
+
+            if (typeof arg2 !== 'undefined') {
+                titleEl.textContent = arg1 || 'Сообщение';
+                bodyEl.textContent = arg2 || '';
+                bodyEl.style.display = arg2 ? 'block' : 'none';
+            } else if (typeof arg1 === 'object' && arg1 !== null) {
+                const response = arg1;
+                titleEl.textContent = response.error || 'Ошибка';
+
+                if (response.errors_dict && Object.keys(response.errors_dict).length > 0) {
+                    let errorsHtml = '<ul>';
+                    for (const [field, errors] of Object.entries(response.errors_dict)) {
+                        const fieldName = field.replace(/_/g, ' ');
+                        const errorMessages = Array.isArray(errors) ? errors : [String(errors)];
+                        errorsHtml += `<li><strong>${fieldName}:</strong> ${errorMessages.join(', ')}</li>`;
+                    }
+                    bodyEl.innerHTML = errorsHtml + '</ul>';
+                    bodyEl.style.display = 'block';
+                } else {
+                    bodyEl.textContent = response.error || 'Неизвестная ошибка';
+                    bodyEl.style.display = response.error ? 'block' : 'none';
+                }
+            } else {
+                console.error("Неправильные аргументы для showMessage!");
+                return;
+            }
+
+            new bootstrap.Modal(modalElement).show();
+        };
+
+        const showConfirm = (title, message) => {
+            return new Promise((resolve) => {
+                const modalElement = document.getElementById('confirmModal');
+                const titleEl = document.getElementById('confirmModalTitle');
+                const bodyEl = document.getElementById('confirmModalBody');
+                const okButton = document.getElementById('confirmModalOk');
+
+                if (!modalElement || !titleEl || !bodyEl || !okButton) {
+                    resolve(false);
+                    return;
+                }
+
+                titleEl.textContent = title || 'Подтверждение';
+                bodyEl.textContent = message;
+                bodyEl.style.display = message ? 'block' : 'none';
+
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+
+                const handler = () => {
+                    resolve(true);
+                    modal.hide();
+                    okButton.removeEventListener('click', handler);
+                };
+
+                okButton.addEventListener('click', handler);
+
+                const onHidden = () => {
+                    resolve(false);
+                    okButton.removeEventListener('click', handler);
+                    modalElement.removeEventListener('hidden.bs.modal', onHidden);
+                };
+
+                modalElement.addEventListener('hidden.bs.modal', onHidden);
+            });
+        };
+
+        return (
+            <>
+                <div className="header">
+                    <h1
+                        className="quarry__title"
+                    >
+                        Цифровой двойник
+                    </h1>
+                    <img src="/static/images/logo.svg" alt="Логотип" className="logo"/>
+                </div>
+
+                <button
+                    className="btn btn-outline-primary back-button"
+                    onClick={() => window.location.href = '/handbook'}
+                >
+                    <i className="bi bi-arrow-left"></i> К справочникам
+                </button>
+
+                <div className="container-fluid mt-3">
+                    <div className="split-container">
+                        <div className="tree-container col-3">
+                            <button className="btn btn-success mb-3" onClick={createScenario}>
+                                Создать сценарий
+                            </button>
+
+                            {scenarios.length === 0 ? (
+                                <p className="text-muted">Нет сценариев</p>
+                            ) : (
+                                scenarios.map((scenario) => (
+                                    <div key={scenario.id} className="d-flex align-items-center mb-2">
+                                        <button
+                                            className={`btn btn-orange ${selectedScenarioId === scenario.id ? 'active' : ''}`}
+                                            onClick={() => selectScenario(scenario.id)}
+                                        >
+                                            {scenario.name}
+                                        </button>
+                                        <button
+                                            className="btn btn-orange"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setScenarioToRun(scenario);
+                                                selectScenario(scenario.id);
+                                            }}
+                                        >
+                                            <i className="bi bi-play-fill"></i>
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="col-9 object-form">
+                            {selectedScenarioId !== null ? (
+                                <>
+                                    <h4>Настройка параметров моделирования</h4>
+                                    <h4>Период моделирования</h4>
+
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        <div className="w-50">
+                                            <div className="row g-3">
+                                                <div className="col-md-6">
+                                                    <label className="form-label">Начало:</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        className="form-control"
+                                                        value={startTime}
+                                                        onChange={(e) => setStartTime(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <label className="form-label">Окончание:</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        className="form-control"
+                                                        value={endTime}
+                                                        onChange={(e) => setEndTime(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Название сценария:</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={tempScenarioName}
+                                            onChange={(e) => setTempScenarioName(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="form-grid-container">
+                                        <div className="form-grid-row">
+                                            <div className="form-grid-label">
+                                                <label>Конфигурация моделирования</label>
+                                            </div>
+                                            <div className="form-grid-control">
+                                                <select
+                                                    className="form-control"
+                                                    value={selectedQuarry?.id || ''}
+                                                    onChange={handleQuarryChange}
+                                                >
+                                                    {quarries.map(quarry => (
+                                                        <option key={quarry.id} value={quarry.id}>{quarry.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <button
+                                                className="btn btn-link"
+                                                onClick={() => setShowQuarryInfo(true)}
+                                                title="Информация о карьере"
+                                            >
+                                                <i className="bi bi-info-circle"></i>
+                                            </button>
+                                        </div>
+
+                                        <div className="form-grid-row">
+                                            <div className="form-grid-label">
+                                                <label>Режим расстановки самосвалов по маршрутам</label>
+                                            </div>
+                                            <div className="form-grid-control">
+                                                <select
+                                                    className="form-control"
+                                                    value={
+                                                        currentScenario?.is_auto_truck_distribution
+                                                            ? "auto" : "manual"
+                                                    }
+                                                    onChange={(e) => {
+                                                        const isAuto = e.target.value === "auto";
+                                                        const updatedScenarios = scenarios.map(s =>
+                                                            s.id === selectedScenarioId
+                                                                ? {...s, is_auto_truck_distribution: isAuto}
+                                                                : s
+                                                        );
+                                                        setScenarios(updatedScenarios);
+                                                        if (isAuto) {
+                                                            setSelectedTrailId(null);
+                                                        }
+                                                    }}
+                                                >
+                                                    {truckPlacementOptions.map(option => (
+                                                        <option key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {currentScenario && !currentScenario.is_auto_truck_distribution && (
+                                        <div className="manual-truck-assignment mt-3">
+                                            <h5>Ручная расстановка самосвалов по маршрутам</h5>
+                                            <div className="row align-items-start">
+
+                                                <div className="col-md-3">
+                                                    <div className="list-container">
+                                                        <h6>Маршруты</h6>
+                                                        {currentScenario.trails && currentScenario.trails.length > 0 ? (
+                                                            <ul className="list-group">
+                                                                {currentScenario.trails.map(trail => (
+                                                                    <li
+                                                                        key={trail.id}
+                                                                        className={`list-group-item clickable ${selectedTrailId === trail.id ? 'active' : ''}`}
+                                                                        onClick={() => setSelectedTrailId(trail.id)}
+                                                                    >
+                                                                        {getRouteDisplayName(trail)}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <div className="alert alert-info m-2">
+                                                                Нет доступных маршрутов
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div key={selectedTrailId} className="col-md-9">
+                                                    <div className="list-container">
+                                                        <>
+                                                            {selectedTrailId && (
+                                                                <div className="mb-1 route text-muted">
+                                                                    {getRouteDisplayName(
+                                                                        currentScenario.trails.find(t => t.id === selectedTrailId)
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            <h6>Самосвалы</h6>
+                                                        </>
+                                                        {selectedQuarry?.truck_list && selectedQuarry.truck_list.length > 0 ? (
+                                                            <div className="p-2 d-flex flex-wrap gap-3">
+                                                                {selectedQuarry.truck_list.map(truck => {
+                                                                    const isSelected = selectedTrailId && currentScenario?.trails
+                                                                        ? currentScenario.trails.some(trail =>
+                                                                            trail.id === selectedTrailId && trail.trucks?.includes(truck.id)
+                                                                        ) : false;
+
+                                                                    return (
+                                                                        <div key={truck.id}
+                                                                             className="form-check form-check-inline">
+                                                                            <input
+                                                                                className="form-check-input"
+                                                                                type="checkbox"
+                                                                                id={`truck-checkbox-${truck.id}`}
+                                                                                checked={!!isSelected}
+                                                                                onChange={() => handleTruckClick(truck.id)}
+                                                                            />
+                                                                            <label className="form-check-label"
+                                                                                   htmlFor={`truck-checkbox-${truck.id}`}>
+                                                                                {truck.name || `Самосвал ${truck.id}`}
+                                                                            </label>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="alert alert-info m-2">Нет доступных
+                                                                самосвалов</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="btn-container form-buttons-container">
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={updateScenario}
+                                        >
+                                            Сохранить настройки сценария
+                                        </button>
+
+                                        {currentScenario && !currentScenario.isNew && (
+                                            <button className="btn btn-danger" onClick={deleteScenario}>
+                                                Удалить
+                                            </button>
+                                        )}
+
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <button className="btn btn-primary mb-2" onClick={runSimulation}>
+                                            Запустить симуляцию
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="empty-state">
+                                    <p>Выберите или создайте сценарий для редактирования</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={`modal fade ${showQuarryInfo ? 'show d-block' : ''}`} tabIndex="-1">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        {selectedQuarry?.name || "Карьер"}
+                                    </h5>
+                                </div>
+                                <div className="modal-body">
+                                    {loading ? (
+                                        <div className="text-center">
+                                            <span className="loading-spinner"></span> Загрузка данных карьера...
+                                        </div>
+                                    ) : error ? (
+                                        <div className="alert alert-danger">{error}</div>
+                                    ) : selectedQuarry ? (
+                                        <>
+                                            <ul className="list-group mb-2">
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-truck me-2"></i>
+                                                        Самосвалы
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.truck_list?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-truck-front me-2"></i>
+                                                        Экскаваторы
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.shovel_list?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-box-arrow-down me-2"></i>
+                                                        Площадки разгрузки
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.unload_list?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-signpost-split me-2"></i>
+                                                        Маршруты
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.trail_list?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-fuel-pump me-2"></i>
+                                                        Заправки
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.fuel_station_list?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-people me-2"></i>
+                                                        Площадки пересменки
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.shift_change_area_list?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-cloud-sun me-2"></i>
+                                                        Погода
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.weather?.length || 0})</span>
+                                                </li>
+                                                <li className="list-group-item quarry-info-item">
+                                                    <span className="quarry-info-label">
+                                                        <i className="bi bi-tools me-2"></i>
+                                                        Расписание поломок
+                                                    </span>
+                                                    <span
+                                                        className="quarry-info-count">({selectedQuarry.failure_schedule?.length || 0})</span>
+                                                </li>
+                                            </ul>
+                                        </>
+                                    ) : (
+                                        <p>Данные о карьере не загружены</p>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-success"
+                                        onClick={openQuarryEditor}
+                                    >
+                                        Редактирование параметров
+                                    </button>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => setShowQuarryInfo(false)}
+                                    >
+                                        Закрыть
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="messageModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="messageModalTitle">Сообщение</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body" id="messageModalBody"></div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="confirmModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="confirmModalTitle">Подтверждение</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body" id="confirmModalBody"></div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Отмена
+                                </button>
+                                <button type="button" className="btn btn-primary" id="confirmModalOk">Подтвердить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="simulation-loader">
+                    <div className="loader-content">
+                        <span className="loading-spinner"></span>
+                        Запуск симуляции...
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+</script>
+</body>
+</html>

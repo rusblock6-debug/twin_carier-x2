@@ -1,0 +1,3514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Симулятор карьера</title>
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/static/onest.font.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="header">
+    <div class="header-left">
+        <h1 class="quarry__title">Цифровой двойник</h1>
+    </div>
+    <img src="/static/images/logo.svg" alt="Логотип" class="logo">
+</div>
+
+<button class="btn btn-outline-primary mt-2" @click="goToScenarios">
+    <i class="bi bi-arrow-left"></i> К списку сценариев
+</button>
+
+<div class="container-fluid mt-3">
+
+    <div class="split-container">
+        <div class="tree-container col-3">
+            <!-- Шаблоны (родительский узел) -->
+            <div class="tree-node" :class="{ collapsed: !nodeStates.templates.expanded }">
+                <div class="tree-node-header" @click="toggleNode('templates')">
+        <span class="tree-node-icon">
+            <i class="bi" :class="nodeStates.templates.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+        </span>
+                    <span>Шаблоны</span>
+                </div>
+                <span class="tree-node-toggle" @click.stop="toggleNode('templates')">
+        <i class="bi" :class="nodeStates.templates.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+    </span>
+            </div>
+
+            <!-- Дочерние элементы -->
+            <div class="tree-children" v-if="nodeStates.templates.expanded">
+                <!-- Шаблоны самосвалов -->
+                <div class="tree-node" :class="{ collapsed: !nodeStates.truck_template_list.expanded }">
+                    <div class="tree-node-header" @click="selectCategory('truck_template_list')">
+            <span class="tree-node-icon">
+                <i class="bi" :class="nodeStates.truck_template_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+            </span>
+                        <span>Шаблоны самосвалов</span>
+                    </div>
+                    <span class="tree-node-toggle" @click.stop="toggleNode('truck_template_list')">
+         <i class="bi bi-chevron-down"></i>
+        </span>
+                </div>
+                <div class="tree-children" v-if="nodeStates.truck_template_list.expanded">
+                    <div v-for="t in appData.truck_template_list" :key="t.id"
+                         class="tree-node leaf"
+                         :class="{'bg-light': selectedObject === t}"
+                         @click="selectObject(t)">
+                        <span class="tree-node-icon"><i class="bi bi-file-earmark"></i></span>
+                        {{ t.name }}
+                    </div>
+                </div>
+
+                <!-- Шаблоны экскаваторов -->
+                <div class="tree-node" :class="{ collapsed: !nodeStates.shovel_template_list.expanded }">
+                    <div class="tree-node-header" @click="selectCategory('shovel_template_list')">
+            <span class="tree-node-icon">
+                <i class="bi" :class="nodeStates.shovel_template_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+            </span>
+                        <span>Шаблоны экскаваторов</span>
+                    </div>
+                    <span class="tree-node-toggle" @click.stop="toggleNode('shovel_template_list')">
+            <i class="bi bi-chevron-down"></i>
+        </span>
+                </div>
+                <div class="tree-children" v-if="nodeStates.shovel_template_list.expanded">
+                    <div v-for="e in appData.shovel_template_list" :key="e.id"
+                         class="tree-node leaf"
+                         :class="{'bg-light': selectedObject === e}"
+                         @click="selectObject(e)">
+                        <span class="tree-node-icon"><i class="bi bi-file-earmark"></i></span>
+                        {{ e.name }}
+                    </div>
+                </div>
+
+                <!-- Шаблоны площадок разгрузки -->
+                <div class="tree-node" :class="{ collapsed: !nodeStates.unload_template_list.expanded }">
+                    <div class="tree-node-header" @click="selectCategory('unload_template_list')">
+            <span class="tree-node-icon">
+                <i class="bi" :class="nodeStates.unload_template_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+            </span>
+                        <span>Шаблоны площадок</span>
+                    </div>
+                    <span class="tree-node-toggle" @click.stop="toggleNode('unload_template_list')">
+            <i class="bi bi-chevron-down"></i>
+        </span>
+                </div>
+                <div class="tree-children" v-if="nodeStates.unload_template_list.expanded">
+                    <div v-for="u in appData.unload_template_list" :key="u.id"
+                         class="tree-node leaf"
+                         :class="{'bg-light': selectedObject === u}"
+                         @click="selectObject(u)">
+                        <span class="tree-node-icon"><i class="bi bi-file-earmark"></i></span>
+                        {{ u.name }}
+                    </div>
+                </div>
+
+                <div class="tree-children">
+                    <div v-for="u in nodeStates.unload_template" :key="u.id"
+                         class="tree-node leaf"
+                         :class="{'bg-light': selectedObject === u}"
+                         @click="selectObject(u)">
+                        <span class="tree-node-icon"><i class="bi bi-file-earmark"></i></span>
+                        {{ u.name }}
+                    </div>
+                </div>
+
+                <!-- Шаблоны заправок -->
+                <div class="tree-node" :class="{ collapsed: !nodeStates.fuel_station_template_list.expanded }">
+                    <div class="tree-node-header" @click="selectCategory('fuel_station_template_list')">
+                        <span class="tree-node-icon">
+                            <i class="bi"
+                               :class="nodeStates.fuel_station_template_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+                        </span>
+                        <span>Шаблоны заправок</span>
+                    </div>
+                    <span class="tree-node-toggle" @click.stop="toggleNode('fuel_station_template_list')">
+                        <i class="bi bi-chevron-down"></i>
+                    </span>
+                </div>
+                <div class="tree-children" v-if="nodeStates.fuel_station_template_list.expanded">
+                    <div v-for="fst in appData.fuel_station_template_list" :key="fst.id"
+                         class="tree-node leaf"
+                         :class="{'bg-light': selectedObject === fst}"
+                         @click="selectObject(fst)">
+                        <span class="tree-node-icon"><i class="bi bi-file-earmark"></i></span>
+                        {{ fst.name }}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Карьер (родительский узел) -->
+            <div v-for="quarry in appData.quarries" :key="quarry.id">
+                <div class="tree-node" :class="{ collapsed: !nodeStates[`quarry_${quarry.id}`]?.expanded }">
+                    <div class="tree-node-header" @click="selectQuarry(quarry)">
+            <span class="tree-node-icon">
+                <i class="bi"
+                   :class="nodeStates[`quarry_${quarry.id}`]?.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+            </span>
+                        <span>{{ quarry.name }}</span>
+                    </div>
+                    <span class="tree-node-toggle" @click.stop="toggleNode(`quarry_${quarry.id}`)">
+            <i class="bi"
+               :class="nodeStates[`quarry_${quarry.id}`]?.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+        </span>
+                </div>
+
+                <div class="tree-children" v-if="nodeStates[`quarry_${quarry.id}`]?.expanded">
+                    <!-- Самосвалы -->
+                    <div class="tree-node" :class="{ collapsed: !nodeStates[`truck_list_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('truck_list', quarry)">
+
+                        <span class="tree-node-icon">
+                                           <i class="bi"
+                                              :class="nodeStates[`truck_list_${quarry.id}`]?.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+
+                        </span>
+                            <span>Самосвалы ({{ quarry.truck_list.length }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`truck_list_${quarry.id}`)">
+                            <i class="bi bi-chevron-down"></i>
+                    </span>
+                    </div>
+                    <div class="tree-children">
+                        <div v-for="t in selectedQuarry.truck_list" :key="t.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === t}"
+                             @click="selectObject(t)">
+                            <span class="tree-node-icon"><i class="bi bi-truck"></i></span>
+                            {{ t.name }}
+                        </div>
+                    </div>
+
+                    <!-- Экскаваторы -->
+                    <div class="tree-node" :class="{ collapsed: !nodeStates[`shovel_list_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('shovel_list', quarry)">
+                        <span class="tree-node-icon">
+                                            <i class="bi"
+                                               :class="nodeStates[`shovel_list_${quarry.id}`]?.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+
+                        </span>
+                            <span>Экскаваторы ({{ quarry.shovel_list.length }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`shovel_list_${quarry.id}`)">
+                <i class="bi bi-chevron-down"></i>
+            </span>
+                    </div>
+                    <div class="tree-children">
+                        <div v-for="e in selectedQuarry.shovel_list" :key="e.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === e}"
+                             @click="selectObject(e)">
+                            <span class="tree-node-icon"><i class="bi bi-truck-front"></i></span>
+                            {{ e.name }}
+                        </div>
+                    </div>
+
+                    <!-- Площадки разгрузки -->
+                    <div class="tree-node" :class="{ collapsed: !nodeStates[`unload_list_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('unload_list', quarry)">
+                        <span class="tree-node-icon">
+                            <i class="bi"
+                               :class="nodeStates[`unload_list_${quarry.id}`]?.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+                        </span>
+                            <span>Площадки разгрузки ({{ quarry.unload_list.length }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`unload_list_${quarry.id}`)">
+                        <i class="bi bi-chevron-down"></i>
+                    </span>
+                    </div>
+                    <div class="tree-children">
+                        <div v-for="u in selectedQuarry.unload_list" :key="u.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === u}"
+                             @click="selectObject(u)">
+                            <span class="tree-node-icon"><i class="bi bi-box-arrow-down"></i></span>
+                            {{ u.name }}
+                        </div>
+                    </div>
+
+                    <!-- Маршруты -->
+                    <div class="tree-node" :class="{ collapsed: !nodeStates[`trail_list_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('routes', quarry)">
+                        <span class="tree-node-icon">
+                            <i class="bi"
+                               :class="nodeStates.trail_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+                        </span>
+                            <span>Маршруты ({{ quarry.trail_list.length }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`trail_list_${quarry.id}`)">
+                        <i class="bi bi-chevron-down"></i>
+                    </span>
+                    </div>
+                    <div class="tree-children">
+                        <div v-for="r in selectedQuarry.trail_list" :key="r.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === r}"
+                             @click="selectObject(r)">
+                            <span class="tree-node-icon"><i class="bi bi-signpost-split"></i></span>
+                            Маршрут {{ r.id }} ({{ getObjectNameById(r.shovel_id) }} - {{ getObjectNameById(r.unload_id)
+                            }})
+                        </div>
+                    </div>
+
+                    <!-- Заправки -->
+                    <div class="tree-node"
+                         :class="{ collapsed: !nodeStates[`fuel_station_list_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('fuel_station_list', quarry)">
+        <span class="tree-node-icon">
+            <i class="bi"
+               :class="nodeStates.fuel_station_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+        </span>
+                            <span>Заправки ({{ quarry.fuel_station_list?.length || 0 }})</span>
+
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`fuel_station_list_${quarry.id}`)">
+            <i class="bi bi-chevron-down"></i>
+    </span>
+                    </div>
+                    <div class="tree-children">
+                        <div v-for="fs in selectedQuarry.fuel_station_list" :key="fs.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === fs}"
+                             @click="selectObject(fs)">
+                            <span class="tree-node-icon"><i class="bi bi-signpost-split"></i></span>
+                            {{ fs.name }}
+                        </div>
+                    </div>
+
+                    <!-- Площадки пересменки -->
+                    <div class="tree-node"
+                         :class="{ collapsed: !nodeStates[`shift_change_area_list_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('shift_change_area_list', quarry)">
+        <span class="tree-node-icon">
+            <i class="bi"
+               :class="nodeStates.shift_change_area_list.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+        </span>
+                            <span>Площадки пересменки ({{ quarry.shift_change_area_list?.length || 0 }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`shift_change_area_list_${quarry.id}`)">
+           <i class="bi bi-chevron-down"></i>
+    </span>
+                    </div>
+                    <div class="tree-children">
+                        <div v-for="sca in selectedQuarry.shift_change_area_list" :key="sca.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === sca}"
+                             @click="selectObject(sca)">
+                            <span class="tree-node-icon"><i class="bi bi-signpost-split"></i></span>
+                            {{ sca.name }}
+                        </div>
+                    </div>
+
+                    <!-- Погода TODO-->
+                    <div class="tree-node" :class="{ collapsed: !nodeStates[`weather_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('weather', quarry)">
+                    <span class="tree-node-icon">
+                        <i class="bi" :class="nodeStates.weather.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+                    </span>
+                            <span>Погода ({{ quarry.weather ? selectedQuarry.weather.length : 0 }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`weather_${quarry.id}`)">
+                    <i class="bi bi-chevron-down"></i>
+                </span>
+                    </div>
+
+                    <div class="tree-children">
+                        <div v-for="w in selectedQuarry.weather" :key="w.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === w}"
+                             @click="selectObject(w)">
+                            <span class="tree-node-icon"><i class="bi bi-cloud-sun"></i></span>
+                            {{ w.name }}
+                        </div>
+                    </div>
+
+                    <!-- Расписание поломок TODO-->
+                    <div class="tree-node"
+                         :class="{ collapsed: !nodeStates[`failure_schedule_${quarry.id}`]?.expanded }">
+                        <div class="tree-node-header" @click="selectCategory('failure_schedule', quarry)">
+                        <span class="tree-node-icon">
+                            <i class="bi"
+                               :class="nodeStates.failure_schedule.expanded ? 'bi-folder2-open' : 'bi-folder2'"></i>
+                        </span>
+                            <span>Расписание поломок ({{ quarry.failure_schedule ? selectedQuarry.failure_schedule.length : 0
+                                }})</span>
+                        </div>
+                        <span class="tree-node-toggle" @click.stop="toggleNode(`failure_schedule_${quarry.id}`)">
+                        <i class="bi bi-chevron-down"></i>
+                    </span>
+                    </div>
+
+                    <div class="tree-children">
+                        <div v-for="w in selectedQuarry.failure_schedule" :key="w.id"
+                             class="tree-node leaf"
+                             :class="{'bg-light': selectedObject === w}"
+                             @click="selectObject(w)">
+                            <span class="tree-node-icon"><i class="bi bi-cloud-sun"></i></span>
+                            {{ w.name }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-9 object-form">
+            <div v-if="selectedObject?.type === 'quarry'">
+                <h4>Настройки карьера</h4>
+                <div class="d-flex flex-column gap-3 mt-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Ввод плана в эксплуатацию:</label>
+                            <input type="datetime-local" class="form-control" v-model="startTime">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Вывод плана из эксплуатации:</label>
+                            <input type="datetime-local" class="form-control" v-model="endTime">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Название карьера:</label>
+                        <input type="text" class="form-control" v-model="selectedObject.name">
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <h5>Географические координаты</h5>
+                    <div class="d-flex gap-3">
+                        <div class="flex-grow-1">
+                            <label class="form-label">Широта центра (°):</label>
+                            <input type="number" class="form-control" v-model="selectedObject.center_lat"
+                                   step="0.000001">
+                        </div>
+                        <div class="flex-grow-1">
+                            <label class="form-label">Долгота центра (°):</label>
+                            <input type="number" class="form-control" v-model="selectedObject.center_lon"
+                                   step="0.000001">
+                        </div>
+                        <div class="flex-grow-1">
+                            <label class="form-label">Высота центра (м):</label>
+                            <input type="number" class="form-control" v-model="selectedObject.center_height" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <h5>Настройки времени</h5>
+                    <div class="d-flex gap-3">
+                        <div class="flex-grow-1">
+                            <label class="form-label">Часовой пояс:</label>
+                            <select class="form-select" v-model="selectedObject.timezone">
+                                <option value="Europe/Moscow">Москва (Europe/Moscow)</option>
+                                <option value="Asia/Yekaterinburg">Екатеринбург (Asia/Yekaterinburg)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <h5>Настройки работы</h5>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="form-label">Сдвиг обеденного перерыва от начала смены:</label>
+                            <input
+                                    type="time"
+                                    class="form-control"
+                                    min="00:00"
+                                    max="23:59"
+                                    :value="selectedObject.lunch_break_offset_time"
+                                    @input="updateLunchBreakOffset($event.target.value)"
+                            />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Продолжительность обеденного перерыва (мин):</label>
+                            <input
+                                    type="number"
+                                    class="form-control"
+                                    v-model="selectedObject.lunch_break_duration"
+                                    @input="validateAndUpdateLunchDuration"
+                                    min="1"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <h5>Настройки смен</h5>
+
+                    <div v-for="(shift, index) in selectedObject.shift_config" :key="index"
+                         class="row shift-settings mb-2">
+                        <div class="col-md-5">
+                            <label class="form-label">Начало смены:</label>
+                            <input
+                                    type="time"
+                                    class="form-control"
+                                    min="00:00"
+                                    max="23:59"
+                                    :value="shift.begin_offset_time"
+                                    @input="updateShiftTime(index, 'begin', $event.target.value)"
+                            />
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Окончание смены:</label>
+                            <input
+                                    type="time"
+                                    class="form-control"
+                                    min="00:00"
+                                    max="23:59"
+                                    :value="shift.end_offset_time"
+                                    @input="updateShiftTime(index, 'end', $event.target.value)"
+                            />
+                        </div>
+                        <div class="col-md-2">
+                            <button
+                                    class="btn btn-outline-danger"
+                                    @click="removeShift(index)"
+                                    :disabled="selectedObject.shift_config.length <= 1"
+                                    title="Удалить смену"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="validationStatus" class="alert col-md-10"
+                         :class="validationStatus.isValid ? 'alert-success' : 'alert-warning'">
+                        <i class="bi"
+                           :class="validationStatus.isValid ? 'bi-check-circle' : 'bi-exclamation-triangle'"></i>
+                        {{ validationStatus.message }}
+                    </div>
+
+                    <div class="row mt-2 mb-2">
+                        <div class="col-md-12">
+                            <button class="btn btn-success" @click="addShift">
+                                Добавить смену
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Таймлайн -->
+                    <div id="visualization"></div>
+                </div>
+
+                <div class="btn-container form-buttons-container mt-4">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <div v-if="currentCategory && (!selectedObject || selectedObject.type !== 'quarry')">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-success" @click="addObject">
+                        <span v-if="currentCategory === 'routes' || currentCategory === 'trail_list'">Добавить маршрут</span>
+                        <span v-else>Добавить {{ getCategoryName(currentCategory) }}</span>
+                    </button>
+
+                    <!-- Селект для шаблонов -->
+                    <div v-if="['truck_list', 'shovel_list', 'unload_list'].includes(currentCategory)"
+                         class="template-selector">
+                        <select class="form-select" v-model="selectedTemplate[currentCategory]"
+                                @change="applyTemplate(currentCategory)">
+                            <option value="">Выберите шаблон...</option>
+                            <option v-for="template in templatesForCategory(currentCategory)" :value="template.id">
+                                {{ template.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="selectedObject && selectedObject.type === 'truck'">
+                <h4>Редактирование самосвала {{ selectedObject.id }}</h4>
+                <div class="mb-3" hidden>
+                    <label class="form-label">ID:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.id">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Широта:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lat" step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Долгота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lon" step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Исходная высота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_height" step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Грузоподъемность кузова (т):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.body_capacity" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость порожним (км/ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.speed_empty" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость гружёным (км/ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.speed_loaded" step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Продолжительность безотказной работы (на начало моделирования),
+                            час:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_operating_time"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Зафиксировано отказов (на начало моделирования), шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_failure_count"
+                               min="0">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Средняя продолжительность ремонта, мин:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.average_repair_duration"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Объем бака (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_capacity" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Критический уровень топлива (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_threshold_critical"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Порог плановой заправки (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_threshold_planned"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Стартовый уровень топлива (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_level" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Холостой расход топлива (л/ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_idle_lph" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Удельный расход топлива (г/кВт*ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_specific_consumption"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Плотность топлива (кг/л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_density" step="0.01">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Мощность двигателя (кВт):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.engine_power_kw"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <div v-if="selectedObject && selectedObject.type === 'shovel'">
+                <h4>Редактирование экскаватора {{ selectedObject.id }}</h4>
+                <div class="mb-3" hidden>
+                    <label class="form-label">ID:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.id">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Широта:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lat"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Долгота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lon"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Исходная высота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_height"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Объем ковша (м³):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_volume" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость подъема ковша (м/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_lift_speed"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Количество градусов в одном обороте:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.arm_turn_angle"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость поворота стрелы (град/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.arm_turn_speed"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость копания (м³/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_dig_speed"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Скорость наполнения ковша (м³/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_fill_speed"
+                               step="0.01">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Коэффициент наполнения ковша:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_fill_coef" min="0"
+                               max="1" step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Коэффициент инерции стрелы:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.arm_inertia_coef"
+                               step="0.01">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Коэффициент возвратного движения:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.return_move_coef"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Продолжительность безотказной работы (на начало моделирования),
+                            час:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_operating_time"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Зафиксировано отказов (на начало моделирования), шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_failure_count"
+                               min="0">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Средняя продолжительность ремонта, мин:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.average_repair_duration"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col" hidden>
+                        <label class="form-label">Тип груза:</label>
+                        <select class="form-select" v-model="selectedObject.payload_type">
+                            <option v-for="type in payloadTypes" :value="type.value">{{ type.label }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <div v-if="selectedObject && selectedObject.type === 'unload'">
+                <h4>Редактирование площадки разгрузки {{ selectedObject.id }}</h4>
+                <div class="mb-3" hidden>
+                    <label class="form-label">ID:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.id">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Широта:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lat"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Долгота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lon"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Исходная высота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_height"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col" hidden>
+                        <label class="form-label">Тип площадки:</label>
+                        <select class="form-select" v-model="selectedObject.unload_type">
+                            <option v-for="type in unloadTypes" :value="type.value">{{ type.label }}</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Вместимость, т:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.capacity">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Угол наклона (град):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.angle" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Одновременно разгружающихся АС:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.trucks_at_once">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Продолжительность безотказной работы (на начало моделирования),
+                            час:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_operating_time"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Зафиксировано отказов (на начало моделирования), шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_failure_count"
+                               min="0">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Средняя продолжительность ремонта, мин:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.average_repair_duration"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="col" hidden>
+                    <label class="form-label">Тип груза:</label>
+                    <select class="form-select" v-model="selectedObject.payload_type">
+                        <option v-for="type in payloadTypes" :value="type.value">{{ type.label }}</option>
+                    </select>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <!-- Форма для FuelStation (заправка) -->
+            <div v-if="selectedObject && selectedObject.type === 'fuel_station'">
+                <h4>Заправка {{ selectedObject.id }}</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Широта:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lat"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Долгота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lon"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Исходная высота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_height"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Количество пистолетов, шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.num_pumps" min="1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость подачи топлива, л/сек:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.flow_rate" step="0.1"
+                               min="0.1">
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <!-- Форма для ShiftChangeArea (площадка пересменки) -->
+            <div v-if="selectedObject && selectedObject.type === 'shift_change_area'">
+                <h4>Площадка пересменки {{ selectedObject.id }}</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Широта:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lat"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Долгота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_lon"
+                               step="0.000001">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Исходная высота:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_height"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <div v-if="selectedObject && selectedObject.type === 'trail'">
+                <h4>
+                    Маршрут {{ selectedObject.id }}
+                    ({{ getObjectNameById(selectedObject.shovel_id) }} - {{ getObjectNameById(selectedObject.unload_id)
+                    }})
+                </h4>
+
+                <h5>Сегменты маршрута:</h5>
+                <table class="table table-sm route-table">
+                    <thead>
+                    <tr>
+                        <th>Начало</th>
+                        <th>Конец</th>
+                        <th>Скорость порожним (км/ч)</th>
+                        <th>Скорость гружёным (км/ч)</th>
+                        <th>Уклон (%)</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(seg, index) in selectedObject.segments" :key="index">
+                        <td>({{ seg.start[0] }}, {{ seg.start[1] }})</td>
+                        <td>({{ seg.end[0] }}, {{ seg.end[1] }})</td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm"
+                                   v-model="seg.speed_empty" min="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm"
+                                   v-model="seg.speed_loaded" min="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm"
+                                   v-model="seg.slope" step="0.1">
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" @click="removeSegment(index)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить маршрут
+                    </button>
+                    <button class="btn btn-info" @click="showOnMap(selectedObject)">Показать на карте</button>
+                </div>
+            </div>
+
+            <!-- Формы для шаблонов -->
+            <!-- Шаблон самосвала -->
+            <div v-if="selectedObject && selectedObject.type === 'truck_template'">
+                <h4>Шаблон самосвала {{ selectedObject.id }}</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Грузоподъемность кузова (т):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.body_capacity" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость порожним (км/ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.speed_empty" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость гружёным (км/ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.speed_loaded" step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Продолжительность безотказной работы (на начало моделирования),
+                            час:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_operating_time"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Зафиксировано отказов (на начало моделирования), шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_failure_count"
+                               min="0">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Среднее время ремонта (ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.average_repair_duration"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Объем бака (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_capacity" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Критический уровень топлива (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_threshold_critical"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Порог плановой заправки (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_threshold_planned"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Стартовый уровень топлива (л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_level" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Холостой расход топлива (л/ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_idle_lph" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Удельный расход топлива (г/кВт*ч):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_specific_consumption"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Плотность топлива (кг/л):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.fuel_density" step="0.01">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Мощность двигателя (кВт):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.engine_power_kw"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+
+            <!-- Шаблон экскаватора -->
+            <div v-if="selectedObject && selectedObject.type === 'shovel_template'">
+                <h4>Шаблон экскаватора {{ selectedObject.id }}</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Объем ковша (м³):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_volume" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость подъема ковша (м/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_lift_speed"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Количество градусов в одном обороте:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.arm_turn_angle"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость поворота стрелы (град/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.arm_turn_speed"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость копания (м³/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_dig_speed"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Скорость наполнения ковша (м³/с):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_fill_speed"
+                               step="0.01">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Коэффициент наполнения ковша:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.bucket_fill_coef" min="0"
+                               max="1" step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Коэффициент инерции стрелы:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.arm_inertia_coef"
+                               step="0.01">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Коэффициент возвратного движения:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.return_move_coef"
+                               step="0.01">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Продолжительность безотказной работы (на начало моделирования),
+                            час:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_operating_time"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Зафиксировано отказов (на начало моделирования), шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_failure_count"
+                               min="0">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Средняя продолжительность ремонта, мин:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.average_repair_duration"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col" hidden>
+                        <label class="form-label">Тип груза:</label>
+                        <select class="form-select" v-model="selectedObject.payload_type">
+                            <option v-for="type in payloadTypes" :value="type.value">{{ type.label }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+
+            <!-- Шаблон площадки разгрузки -->
+            <div v-if="selectedObject && selectedObject.type === 'unload_template'">
+                <h4>Шаблон площадки разгрузки {{ selectedObject.id }}</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col" hidden>
+                        <label class="form-label">Тип площадки:</label>
+                        <select class="form-select" v-model="selectedObject.unload_type">
+                            <option v-for="type in unloadTypes" :value="type.value">{{ type.label }}</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Вместимость, т:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.capacity">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Угол наклона (град):</label>
+                        <input type="number" class="form-control" v-model="selectedObject.angle" step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Одновременно разгружающихся АС:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.trucks_at_once">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Продолжительность безотказной работы (на начало моделирования),
+                            час:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_operating_time"
+                               step="0.1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Зафиксировано отказов (на начало моделирования), шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.initial_failure_count"
+                               min="0">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Средняя продолжительность ремонта, мин:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.average_repair_duration"
+                               step="0.1">
+                    </div>
+                </div>
+
+                <div class="col" hidden>
+                    <label class="form-label">Тип груза:</label>
+                    <select class="form-select" v-model="selectedObject.payload_type">
+                        <option v-for="type in payloadTypes" :value="type.value">{{ type.label }}</option>
+                    </select>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+
+            <!-- Форма для FuelStationTemplate (шаблон заправки) -->
+            <div v-if="selectedObject && selectedObject.type === 'fuel_station_template'">
+                <h4>Шаблон заправки {{ selectedObject.id }}</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Название:</label>
+                    <input type="text" class="form-control" v-model="selectedObject.name">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">Количество пистолетов, шт:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.num_pumps" min="1">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Скорость подачи топлива, л/сек:</label>
+                        <input type="number" class="form-control" v-model="selectedObject.flow_rate" step="0.1"
+                               min="0.1">
+                    </div>
+                </div>
+
+                <div class="btn-container form-buttons-container">
+                    <button class="btn btn-primary" @click="saveObject(selectedObject)">Сохранить</button>
+                    <button
+                            class="btn btn-danger"
+                            @click="deleteObject(selectedObject)"
+                            v-if="selectedObject?.id">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="routeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Создание маршрута</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Начальная точка (Экскаватор):</label>
+                    <select class="form-select" v-model="newRoute.source_id">
+                        <option v-for="e in selectedQuarry.shovel_list" :value="e.id">
+                            {{ e.name || `Экскаватор ${e.id}` }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Конечная точка (Площадка разгрузки):</label>
+                    <select class="form-select" v-model="newRoute.dest_id">
+                        <option v-for="u in selectedQuarry.unload_list" :value="u.id">
+                            {{ u.name || `Площадка разгрузки ${u.id}` }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" @click="confirmAddRoute">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalTitle">Подтверждение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="confirmModalOk">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalTitle">Сообщение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="messageModalBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/bootstrap.bundle.min.js"></script>
+<script src="/static/vue.global.js"></script>
+<script src="/static/vis-timeline-graph2d.min.js"></script>
+<script src="/static/js/tz_utils.js" type="module"></script>
+
+<script>
+
+    const payloadTypes = [
+        {value: 'gravel', label: 'Гравий'},
+        {value: 'sand', label: 'Песок'},
+        {value: 'clay', label: 'Глина'},
+        {value: 'wet_ore', label: 'Мокрая руда'}
+    ];
+
+    const unloadTypes = [
+        {value: 'hydraulic', label: 'Гидравлическая'},
+        {value: 'mechanical', label: 'Механическая'},
+        {value: 'gravity', label: 'Гравитационная'}
+    ];
+
+    const trailTypes = [
+        {value: 'common', label: 'Обычный'},
+        {value: 'uncommon', label: 'Необычный'},
+        {value: 'special', label: 'Специальный'}
+    ];
+
+    async function loadDefaults() {
+        try {
+            const response = await fetch('/api/defaults');
+            const data = await response.json();
+
+            return {
+                truck: data.truck,
+                truck_template: data.truck_template,
+                shovel: data.shovel,
+                shovel_template: data.shovel_template,
+                unload: data.unload,
+                unload_template: data.unload_template
+            };
+        } catch (e) {
+            console.error("Ошибка загрузки значений по умолчанию:", e);
+            return {};
+        }
+    }
+
+    async function loadQuarryData() {
+        try {
+            const response = await fetch('/api/quarry-data');
+            const data = await response.json();
+
+            const ensureEnum = (value, validValues, defaultValue) => {
+                return validValues.includes(value) ? value : defaultValue;
+            };
+
+            const transformObject = (obj, type) => {
+                const baseTransformed = {
+                    ...obj,
+                    initial_lat: obj.initial_lat,
+                    initial_lon: obj.initial_lon,
+                    initial_height: obj.initial_height,
+                    initial_operating_time: obj.initial_operating_time || 0,
+                    initial_failure_count: obj.initial_failure_count || 0,
+                    average_repair_duration: obj.average_repair_duration || 0,
+                    type: type,
+                    name: obj.name,
+                    created_at: obj.created_at || new Date().toISOString(),
+                    updated_at: obj.updated_at || new Date().toISOString(),
+                    is_calc_enabled: obj.is_calc_enabled !== undefined ? obj.is_calc_enabled : true
+                };
+
+                switch (type) {
+                    case 'truck':
+                        return {
+                            ...baseTransformed,
+                            body_capacity: obj.body_capacity,
+                            speed_empty: obj.speed_empty,
+                            speed_loaded: obj.speed_loaded,
+                            fuel_capacity: obj.fuel_capacity || 200,
+                            fuel_threshold_critical: obj.fuel_threshold_critical || 50,
+                            fuel_threshold_planned: obj.fuel_threshold_planned || 80,
+                            fuel_level: obj.fuel_level || 200,
+                            fuel_idle_lph: obj.fuel_idle_lph || 15,
+                            fuel_specific_consumption: obj.fuel_specific_consumption || 205,
+                            fuel_density: obj.fuel_density || 0.82,
+                            engine_power_kw: obj.engine_power_kw || 1716,
+                            quarry_id: obj.quarry_id
+                        };
+
+                    case 'shovel':
+                        return {
+                            ...baseTransformed,
+                            bucket_volume: obj.bucket_volume,
+                            bucket_lift_speed: obj.bucket_lift_speed,
+                            arm_turn_angle: obj.arm_turn_angle,
+                            arm_turn_speed: obj.arm_turn_speed,
+                            bucket_dig_speed: obj.bucket_dig_speed,
+                            bucket_fill_speed: obj.bucket_fill_speed,
+                            bucket_fill_coef: obj.bucket_fill_coef,
+                            arm_inertia_coef: obj.arm_inertia_coef,
+                            return_move_coef: obj.return_move_coef,
+                            payload_type: ensureEnum(obj.payload_type,
+                                payloadTypes.map(t => t.value),
+                                'gravel'),
+                            quarry_id: obj.quarry_id
+                        };
+
+                    case 'unload':
+                        return {
+                            ...baseTransformed,
+                            unload_type: ensureEnum(obj.unload_type,
+                                unloadTypes.map(t => t.value),
+                                'hydraulic'),
+                            capacity: obj.capacity,
+                            trucks_at_once: obj.trucks_at_once,
+                            angle: obj.angle,
+                            payload_type: ensureEnum(obj.payload_type,
+                                payloadTypes.map(t => t.value),
+                                'sand'),
+                            quarry_id: obj.quarry_id
+                        };
+
+                    case 'fuel_station':
+                        return {
+                            ...baseTransformed,
+                            num_pumps: obj.num_pumps || 2,
+                            flow_rate: obj.flow_rate || 2.0,
+                            quarry_id: obj.quarry_id
+                        };
+
+                    case 'shift_change_area':
+                        return {
+                            ...baseTransformed,
+                            quarry_id: obj.quarry_id
+                        };
+
+                    case 'trail':
+                        return {
+                            ...obj,
+                            type: 'trail',
+                            route_type: ensureEnum(obj.route_type,
+                                trailTypes.map(t => t.value),
+                                'common'),
+                            segments: (obj.segments || []).map(seg => ({
+                                start: seg.start || [0, 0],
+                                end: seg.end || [0, 0],
+                                speed_empty: seg.speed_empty,
+                                speed_loaded: seg.speed_loaded,
+                                slope: seg.slope || 0
+                            })),
+                            created_at: obj.created_at || new Date().toISOString(),
+                            updated_at: obj.updated_at || new Date().toISOString(),
+                            quarry_id: obj.quarry_id
+                        };
+
+                    case 'truck_template':
+                        return {
+                            ...obj,
+                            type: 'truck_template',
+                            body_capacity: obj.body_capacity,
+                            speed_empty: obj.speed_empty,
+                            speed_loaded: obj.speed_loaded,
+                            fuel_capacity: obj.fuel_capacity || 200,
+                            fuel_threshold_critical: obj.fuel_threshold_critical || 50,
+                            fuel_threshold_planned: obj.fuel_threshold_planned || 80,
+                            fuel_level: obj.fuel_level || 200,
+                            fuel_idle_lph: obj.fuel_idle_lph || 15,
+                            fuel_specific_consumption: obj.fuel_specific_consumption || 205,
+                            fuel_density: obj.fuel_density || 0.82,
+                            engine_power_kw: obj.engine_power_kw || 1716
+                        };
+
+                    case 'shovel_template':
+                        return {
+                            ...obj,
+                            type: 'shovel_template',
+                            bucket_volume: obj.bucket_volume,
+                            bucket_lift_speed: obj.bucket_lift_speed,
+                            arm_turn_angle: obj.arm_turn_angle,
+                            arm_turn_speed: obj.arm_turn_speed,
+                            bucket_dig_speed: obj.bucket_dig_speed,
+                            bucket_fill_speed: obj.bucket_fill_speed,
+                            bucket_fill_coef: obj.bucket_fill_coef,
+                            arm_inertia_coef: obj.arm_inertia_coef,
+                            return_move_coef: obj.return_move_coef,
+                            payload_type: ensureEnum(obj.payload_type,
+                                payloadTypes.map(t => t.value),
+                                'gravel')
+                        };
+
+                    case 'unloading_template':
+                        return {
+                            ...obj,
+                            type: 'unload_template',
+                            unload_type: ensureEnum(obj.unload_type,
+                                unloadTypes.map(t => t.value),
+                                'hydraulic'),
+                            capacity: obj.capacity,
+                            trucks_at_once: obj.trucks_at_once,
+                            angle: obj.angle,
+                            payload_type: ensureEnum(obj.payload_type,
+                                payloadTypes.map(t => t.value),
+                                'sand')
+                        };
+
+                    case 'fuel_station_template':
+                        return {
+                            ...baseTransformed,
+                            num_pumps: obj.num_pumps || 2,
+                            flow_rate: obj.flow_rate || 2.0
+                        };
+
+                    default:
+                        return baseTransformed;
+                }
+            };
+
+            const quarries = data.quarry_list.map(quarry => {
+                return {
+                    ...quarry,
+                    truck_list: (quarry.truck_list || []).map(t => transformObject(t, 'truck')),
+                    shovel_list: (quarry.shovel_list || []).map(e => transformObject(e, 'shovel')),
+                    unload_list: (quarry.unload_list || []).map(u => transformObject(u, 'unload')),
+                    fuel_station_list: (quarry.fuel_station_list || []).map(fs => transformObject(fs, 'fuel_station')),
+                    shift_change_area_list: (quarry.shift_change_area_list || []).map(sca => transformObject(sca, 'shift_change_area')),
+                    trail_list: (quarry.trail_list || []).map(r => transformObject(r, 'trail')),
+                    weather: quarry.weather || [],
+                    failure_schedule: quarry.failure_schedule || []
+                };
+            });
+
+            return {
+                time: data.time,
+                quarries: quarries,
+                truck_template_list: (data.templates?.truck_template_list || []).map(t => transformObject(t, 'truck_template')),
+                shovel_template_list: (data.templates?.shovel_template_list || []).map(e => transformObject(e, 'shovel_template')),
+                unload_template_list: (data.templates?.unload_template_list || []).map(u => transformObject(u, 'unload_template')),
+                fuel_station_template_list: (data.templates?.fuel_station_template_list || []).map(fst => transformObject(fst, 'fuel_station_template')),
+            };
+        } catch (e) {
+            console.error("Ошибка загрузки данных:", e);
+            return {
+                quarries: [{
+                    id: null,
+                    name: 'Новый карьер',
+                    truck_list: [],
+                    shovel_list: [],
+                    unload_list: [],
+                    trail_list: [],
+                    weather: [],
+                    failure_schedule: []
+                }],
+                truck_template_list: [],
+                shovel_template_list: [],
+                unload_template_list: []
+            };
+        }
+    }
+
+    window.addEventListener('message', (event) => {
+
+        if (event.data.type === 'markerAdded') {
+            const {markerType, coordinates} = event.data;
+            console.log('Маркер добавлен:', markerType, coordinates);
+        } else if (event.data.type === 'markerWindowClosed') {
+            console.log('Окно добавления маркера закрыто без добавления');
+        }
+    });
+
+    (async function () {
+        const quarryData = await loadQuarryData();
+        const defaultsData = await loadDefaults();
+
+        const {createApp, ref, reactive, computed, watch, nextTick} = Vue;
+
+        createApp({
+            setup() {
+                const defaults = reactive(defaultsData);
+                const appData = reactive({
+                    time: quarryData.time,
+                    quarries: quarryData.quarries,
+                    truck_template_list: quarryData.truck_template_list,
+                    shovel_template_list: quarryData.shovel_template_list,
+                    unload_template_list: quarryData.unload_template_list,
+                    fuel_station_template_list: quarryData.fuel_station_template_list,
+                });
+
+                const currentCategory = ref(null);
+                const selectedObject = ref(null);
+                const startTime = ref("");
+                const endTime = ref("");
+                const selectedTemplate = ref({
+                    truck_list: '',
+                    shovel_list: '',
+                    unload_list: ''
+                });
+                const selectedQuarry = ref(appData.quarries[0]);
+
+                startTime.value = TimeUtils.utcToLocal(appData.time.start_time);
+                endTime.value = TimeUtils.utcToLocal(appData.time.end_time);
+
+                const openRouteEditor = (trail) => {
+                    const width = 800;
+                    const height = 600;
+                    const left = (window.innerWidth - width) / 2;
+                    const top = (window.innerHeight - height) / 2;
+
+                    const features = `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+
+                    let url = `/route-editor?type=Route&id=${encodeURIComponent(trail.id)}`;
+
+                    if (trail.segments && trail.segments.length > 0) {
+                        const start = trail.segments[0].start;
+                        const end = trail.segments[trail.segments.length - 1].end;
+
+                        url += `&start_lat=${start[0]}&start_lng=${start[1]}`;
+                        url += `&end_lat=${end[0]}&end_lng=${end[1]}`;
+                    }
+
+                    window.routeEditorWindow = window.open(
+                        url,
+                        'routeEditorWindow',
+                        features
+                    );
+                };
+
+                const handleRouteEditorMessage = (event) => {
+
+                    if (event.data.type === 'routeUpdated') {
+                        const segments = event.data.segments;
+
+                        if (selectedObject.value && selectedObject.value.type === 'trail') {
+                            selectedObject.value.segments = segments;
+                        }
+                    } else if (event.data.type === 'routeEditorClosed') {
+                        console.log('Редактор маршрута закрыт');
+                    }
+                };
+
+                window.addEventListener('message', handleRouteEditorMessage);
+
+                const handleMapMessage = (event) => {
+                    if (!event.data || !event.data.type) return;
+
+                    if (event.data.type === 'markerAdded' && selectedObject.value) {
+                        const {lng, lat, height} = event.data.coordinates;
+                        console.log('selectedObject.value.type:', selectedObject.value.type);
+
+                        if (selectedObject.value.type === 'quarry') {
+                            selectedObject.value.center_lat = lat;
+                            selectedObject.value.center_lon = lng;
+                            if (height !== undefined) {
+                                selectedObject.value.center_height = height;
+                            }
+                            return;
+                        }
+
+                        if (selectedObject.value.type !== 'trail') {
+                            selectedObject.value.initial_lat = lat;
+                            selectedObject.value.initial_lon = lng;
+                            if (height !== undefined) {
+                                selectedObject.value.initial_height = height;
+                            }
+                            return;
+                        }
+
+                        if (selectedObject.value.type === 'trail' && selectedObject.value.segments) {
+                            if (activeRouteSegmentIndex.value !== null) {
+                                const segment = selectedObject.value.segments[activeRouteSegmentIndex.value];
+
+                                if (activeRoutePointType.value === 'start') {
+                                    segment.start = [lng, lat];
+                                } else if (activeRoutePointType.value === 'end') {
+                                    segment.end = [lng, lat];
+                                }
+                            } else if (selectedObject.value.segments.length > 0) {
+                                const segment = selectedObject.value.segments[0];
+                                segment.end = [lng, lat];
+                            }
+                        }
+                    }
+
+                    activeRouteSegmentIndex.value = null;
+                    activeRoutePointType.value = null;
+                };
+
+                window.addEventListener('message', handleMapMessage);
+
+                const activeRouteSegmentIndex = ref(null);
+                const activeRoutePointType = ref(null);
+
+                const nodeStates = reactive({
+                    truck_list: {expanded: false},
+                    shovel_list: {expanded: false},
+                    unload_list: {expanded: false},
+                    trail_list: {expanded: false},
+                    templates: {expanded: false},
+                    truck_template_list: {expanded: false},
+                    shovel_template_list: {expanded: false},
+                    unload_template_list: {expanded: false},
+                    weather: {expanded: false},
+                    failure_schedule: {expanded: false},
+                    fuel_station_list: {expanded: false},
+                    shift_change_area_list: {expanded: false},
+                    fuel_station_template_list: {expanded: false},
+                });
+
+                const newRoute = reactive({
+                    source_id: "",
+                    dest_id: ""
+                });
+
+                const toggleNode = (nodeKey) => {
+                    if (!nodeStates[nodeKey]) {
+                        nodeStates[nodeKey] = {expanded: true};
+                    } else {
+                        nodeStates[nodeKey].expanded = !nodeStates[nodeKey].expanded;
+                    }
+                };
+
+                const selectCategory = (category, quarry, hasChanged = false) => {
+                    currentCategory.value = category;
+                    selectedQuarry.value = quarry;
+
+                    if (['truck_list', 'shovel_list', 'unload_list', 'fuel_station_list', 'shift_change_area_list', 'trail_list', 'routes'].includes(category)) {
+                        selectedObject.value = null;
+                    }
+
+                    if (hasChanged && ['truck_list', 'shovel_list', 'unload_list'].includes(category)) {
+                        selectedTemplate.value[category] = '';
+                    }
+                };
+
+                const selectObject = (obj) => {
+                    const previousObject = selectedObject.value;
+                    const hasChanged = !previousObject ||
+                        previousObject.id !== obj.id ||
+                        previousObject.type !== obj.type;
+
+                    selectedObject.value = obj;
+
+                    let category = null;
+                    if (obj.type === 'truck') category = 'truck_list';
+                    else if (obj.type === 'shovel') category = 'shovel_list';
+                    else if (obj.type === 'unload') category = 'unload_list';
+                    else if (obj.type === 'trail') category = 'trail_list';
+                    else if (obj.type === 'truck_template') category = 'truck_template_list';
+                    else if (obj.type === 'shovel_template') category = 'shovel_template_list';
+                    else if (obj.type === 'unload_template') category = 'unload_template_list';
+
+                    currentCategory.value = category;
+
+                    if (hasChanged && ['truck_list', 'shovel_list', 'unload_list'].includes(category)) {
+                        selectedTemplate.value[category] = '';
+                    }
+                };
+
+                const getCategoryName = (category) => {
+                    const names = {
+                        'truck_list': 'самосвал',
+                        'shovel_list': 'экскаватор',
+                        'unload_list': 'площадку разгрузки',
+                        'fuel_station_list': 'заправку',
+                        'shift_change_area_list': 'площадку пересменки',
+                        'trail_list': 'маршрут',
+                        'routes': 'маршрут',
+                        'truck_template_list': 'шаблон самосвала',
+                        'shovel_template_list': 'шаблон экскаватора',
+                        'unload_template_list': 'шаблон площадки',
+                        'fuel_station_template_list': 'шаблон заправки',
+                        'weather': 'погоду',
+                        'failure_schedule': 'расписание поломок'
+                    };
+                    return names[category] || 'объект';
+                };
+                const templatesForCategory = (category) => {
+                    const map = {
+                        'truck_list': 'truck_template_list',
+                        'shovel_list': 'shovel_template_list',
+                        'unload_list': 'unload_template_list'
+                    };
+                    return appData[map[category]] || [];
+                };
+
+                const applyTemplate = (category) => {
+                    const templateId = selectedTemplate.value[category];
+                    const objectTypeMap = {
+                        'truck_list': 'truck',
+                        'shovel_list': 'shovel',
+                        'unload_list': 'unload'
+                    };
+
+                    const expectedType = objectTypeMap[category];
+
+                    if (!selectedObject.value || selectedObject.value.type !== expectedType) {
+                        return;
+                    }
+
+                    if (!templateId) {
+                        resetToDefaults(category);
+                        return;
+                    }
+
+                    let template;
+                    switch (category) {
+                        case 'truck_list':
+                            template = appData.truck_template_list.find(t => t.id === templateId);
+                            break;
+                        case 'shovel_list':
+                            template = appData.shovel_template_list.find(e => e.id === templateId);
+                            break;
+                        case 'unload_list':
+                            template = appData.unload_template_list.find(u => u.id === templateId);
+                            break;
+                    }
+
+                    if (template) {
+                        Object.keys(template).forEach(key => {
+                            if (!['id', 'initial_lat', 'initial_lon', 'initial_height', 'created_at', 'updated_at', 'type', 'name'].includes(key)) {
+                                selectedObject.value[key] = template[key];
+                            }
+                        });
+
+                        selectedObject.value.template_id = template.id;
+                    }
+                };
+
+                const resetToDefaults = (category) => {
+                    const objectTypeMap = {
+                        'truck_list': 'truck',
+                        'shovel_list': 'shovel',
+                        'unload_list': 'unload'
+                    };
+
+                    const objectType = objectTypeMap[category];
+
+                    const defaultValues = defaults[objectType];
+
+                    if (!defaultValues || !selectedObject.value) return;
+
+                    const preservedFields = [
+                        'id', 'name', 'initial_lat', 'initial_lon', 'initial_height',
+                        'created_at', 'updated_at', 'type'
+                    ];
+
+                    Object.keys(defaultValues).forEach(key => {
+                        if (!preservedFields.includes(key)) {
+                            selectedObject.value[key] = defaultValues[key];
+                        }
+                    });
+
+                    if (selectedObject.value.template_id) {
+                        delete selectedObject.value.template_id;
+                    }
+                };
+
+                const addObject = () => {
+                    if (currentCategory.value === 'routes' || currentCategory.value === 'trail_list') {
+                        const quarry = selectedQuarry.value || appData.quarries[0];
+
+                        if (quarry.shovel_list.length === 0) {
+                            showMessage('Ошибка', 'Нет доступных экскаваторов для создания маршрута');
+                            return;
+                        }
+                        if (quarry.unload_list.length === 0) {
+                            showMessage('Ошибка', 'Нет доступных площадок разгрузки для создания маршрута');
+                            return;
+                        }
+
+                        if (quarry.shovel_list.length > 0) {
+                            newRoute.source_id = quarry.shovel_list[0].id;
+                        }
+                        if (quarry.unload_list.length > 0) {
+                            newRoute.dest_id = quarry.unload_list[0].id;
+                        }
+
+                        const modal = new bootstrap.Modal(document.getElementById('routeModal'));
+                        modal.show();
+                    } else {
+                        let targetQuarry = selectedQuarry.value;
+                        if (!targetQuarry && selectedObject.value?.type === 'quarry') {
+                            targetQuarry = selectedObject.value;
+                        } else if (!targetQuarry && currentCategory.value && !currentCategory.value.includes('_template_list')) {
+                            targetQuarry = appData.quarries.find(q => {
+                                const listName = getCollectionName();
+                                return q[listName] && q[listName].some(obj => obj === selectedObject.value);
+                            });
+                        }
+
+                        if (!targetQuarry) {
+                            targetQuarry = appData.quarries[0];
+                        }
+
+                        const isTemplate = currentCategory.value.includes('_template_list');
+                        const targetCollection = isTemplate
+                            ? appData[currentCategory.value]
+                            : targetQuarry[getCollectionName()];
+
+                        const counter = targetCollection.length + 1;
+                        const newId = `${getCategoryName(currentCategory.value).capitalize()} ${counter}`;
+
+                        const typeMap = {
+                            'truck_list': 'truck',
+                            'shovel_list': 'shovel',
+                            'unload_list': 'unload',
+                            'trail_list': 'trail',
+                            'shift_change_area_list': 'shift_change_area',
+                            'fuel_station_list': 'fuel_station',
+                            'truck_template_list': 'truck_template',
+                            'shovel_template_list': 'shovel_template',
+                            'unload_template_list': 'unload_template',
+                            'fuel_station_template_list': 'fuel_station_template',
+                        };
+                        const objectType = typeMap[currentCategory.value];
+                        const baseObj = {
+                            ...(defaults[objectType] || {}),
+                            type: objectType,
+                            name: newId,
+                            is_calc_enabled: true,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        };
+
+                        if (!isTemplate) {
+                            baseObj.quarry_id = targetQuarry.id;
+                        }
+
+                        if (selectedTemplate.value[currentCategory.value] && !isTemplate) {
+                            const templateId = selectedTemplate.value[currentCategory.value];
+                            let template;
+                            switch (currentCategory.value) {
+                                case 'truck_list':
+                                    template = appData.truck_template_list.find(t => t.id === templateId);
+                                    break;
+                                case 'shovel_list':
+                                    template = appData.shovel_template_list.find(e => e.id === templateId);
+                                    break;
+                                case 'unload_list':
+                                    template = appData.unload_template_list.find(u => u.id === templateId);
+                                    break;
+                            }
+                            if (template) {
+                                Object.keys(template).forEach(key => {
+                                    if (!['id', 'initial_lat', 'initial_lon', 'initial_height', 'type'].includes(key)) {
+                                        baseObj[key] = template[key];
+                                    }
+                                });
+                                baseObj.template_id = template.id;
+                            }
+                        }
+
+                        targetCollection.push(baseObj);
+                        selectedObject.value = baseObj;
+                    }
+                };
+
+                watch(() => ({...selectedTemplate.value}), (newVal, oldVal) => {
+                    const changedCategories = ['truck_list', 'shovel_list', 'unload_list'].filter(
+                        category => newVal[category] !== oldVal[category]
+                    );
+
+                    changedCategories.forEach(category => {
+                        applyTemplate(category);
+                    });
+                }, {deep: true});
+
+                const getCollectionName = () => {
+                    const collections = {
+                        'truck_list': 'truck_list',
+                        'shovel_list': 'shovel_list',
+                        'unload_list': 'unload_list',
+                        'trail_list': 'trail_list',
+                        'shift_change_area_list': 'shift_change_area_list',
+                        'fuel_station_list': 'fuel_station_list'
+                    };
+                    return collections[currentCategory.value] || null;
+                };
+
+                const confirmAddRoute = () => {
+                    const source = selectedQuarry.value.shovel_list.find(e => e.id === newRoute.source_id);
+                    const dest = selectedQuarry.value.unload_list.find(u => u.id === newRoute.dest_id);
+                    if (!source || !dest) {
+                        showMessage('Ошибка', 'Ошибка выбора точек маршрута');
+                        return;
+                    }
+
+                    const segments = [{
+                        start: [source.initial_lat, source.initial_lon],
+                        end: [dest.initial_lat, dest.initial_lon],
+                        speed_empty: defaults.default_trail_speed_empty || 30,
+                        speed_loaded: defaults.default_trail_speed_loaded || 25,
+                        slope: 0
+                    }];
+
+                    selectedObject.value = {
+                        type: 'trail',
+                        shovel_id: source.id,
+                        unload_id: dest.id,
+                        segments: segments
+                    };
+
+                    currentCategory.value = 'trail_list';
+
+                    const modalEl = document.getElementById('routeModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                };
+
+                const saveObject = async (obj) => {
+                    if (!obj || !selectedQuarry.value) return;
+
+                    try {
+                        const dataToSend = {
+                            action: obj.id ? 'update' : 'create',
+                            quarry_id: selectedQuarry.value.id,
+                            type: obj.type,
+                            data: { ...obj }
+                        };
+
+                        delete dataToSend.data.source_id;
+                        delete dataToSend.data.dest_id;
+
+                        if (obj.type === 'trail') {
+                            dataToSend.data.segments = obj.segments.map(seg => ({
+                                start: seg.start,
+                                end: seg.end,
+                                speed_empty: parseFloat(seg.speed_empty) || 0,
+                                speed_loaded: parseFloat(seg.speed_loaded) || 0,
+                                slope: parseFloat(seg.slope) || 0
+                            }));
+                        }
+
+                        const response = await fetch('/api/object', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(dataToSend)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            if (obj.type === 'trail' && !obj.id && result.id) {
+                                obj.id = result.id;
+
+                                selectedQuarry.value.trail_list.push(obj);
+                            }
+
+                            if (!obj.id && result.id) {
+                                obj.id = result.id;
+                            }
+                            showMessage('Успех', 'Объект успешно сохранён');
+                            await reloadQuarryData();
+                        } else {
+                            showMessage('Ошибка', result.error || 'Ошибка сохранения');
+                        }
+                    } catch (error) {
+                        showMessage('Ошибка', 'Не удалось сохранить объект');
+                    }
+                };
+
+                const deleteObject = async (obj) => {
+
+                    if (!obj || !obj.id) {
+                        showMessage('Ошибка', 'Нечего удалять - объект не выбран или не имеет ID');
+                        return;
+                    }
+
+                    const confirmed = await showConfirm(
+                        'Подтверждение удаления',
+                        `Вы уверены, что хотите удалить ${obj.id}?`
+                    );
+
+                    if (!confirmed) return;
+
+                    try {
+                        const response = await fetch('/api/object', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                type: obj.type,
+                                id: obj.id
+                            })
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            switch (obj.type) {
+                                case 'truck':
+                                    selectedQuarry.value.truck_list = selectedQuarry.value.truck_list.filter(t => t.id !== obj.id);
+                                    break;
+                                case 'shovel':
+                                    selectedQuarry.value.shovel_list = selectedQuarry.value.shovel_list.filter(e => e.id !== obj.id);
+                                    break;
+                                case 'unload':
+                                    selectedQuarry.value.unload_list = selectedQuarry.value.unload_list.filter(u => u.id !== obj.id);
+                                    break;
+                                case 'trail':
+                                    selectedQuarry.value.trail_list = selectedQuarry.value.trail_list.filter(r => r.id !== obj.id);
+                                    break;
+                                case 'truck_template':
+                                    appData.truck_template_list = appData.truck_template_list.filter(t => t.id !== obj.id);
+                                    break;
+                                case 'shovel_template':
+                                    appData.shovel_template_list = appData.shovel_template_list.filter(e => e.id !== obj.id);
+                                    break;
+                                case 'unload_template':
+                                    appData.unload_template_list = appData.unload_template_list.filter(u => u.id !== obj.id);
+                                    break;
+                                case 'fuel_station_template':
+                                    appData.fuel_station_template_list = appData.fuel_station_template_list.filter(t => t.id !== obj.id);
+                                    break;
+                                case 'fuel_station':
+                                    selectedQuarry.value.fuel_station_list = selectedQuarry.value.fuel_station_list.filter(fs => fs.id !== obj.id);
+                                    break;
+                                case 'shift_change_area':
+                                    selectedQuarry.value.shift_change_area_list = selectedQuarry.value.shift_change_area_list.filter(sca => sca.id !== obj.id);
+                                    break;
+                            }
+
+                            selectedObject.value = null;
+                            showMessage('Успех', 'Объект успешно удален');
+                            await reloadQuarryData();
+                        } else {
+                            showMessage('Ошибка', result.error || 'Ошибка удаления');
+                        }
+                    } catch (error) {
+                        showMessage('Ошибка', 'Произошла ошибка при удалении объекта');
+                    }
+                };
+
+                const removeSegment = (index) => {
+                    if (selectedObject.value && selectedObject.value.segments) {
+                        selectedObject.value.segments.splice(index, 1);
+                    }
+                };
+
+                const showOnMap = (obj) => {
+                    const typeMap = {
+                        'truck': 'Truck',
+                        'shovel': 'Excavator',
+                        'unload': 'UnloadingSite',
+                        'trail': 'Road',
+                        'fuel_station': 'FuelStation',
+                        'shift_change_area': 'Parking',
+                        'quarry': 'Quarry',
+                    };
+
+                    const typeParam = typeMap[obj.type];
+                    if (!typeParam) {
+                        showMessage('Ошибка', 'Невозможно показать объект на карте');
+                        return;
+                    }
+
+                    let mapUrl = `/map?type=${typeParam}&id=${obj.id}`;
+
+                    if (obj.type === 'quarry') {
+                        if (obj.center_lat && obj.center_lon) {
+                            mapUrl += `&lat=${obj.center_lat}&lng=${obj.center_lon}`;
+                        }
+                        mapUrl += `&isQuarry=true`;
+                    } else if (obj.type !== 'trail') {
+                        if (obj.initial_lat && obj.initial_lon) {
+                            mapUrl += `&lat=${obj.initial_lat}&lng=${obj.initial_lon}`;
+                            if (obj.initial_height) {
+                                mapUrl += `&height=${obj.initial_height}`;
+                            }
+                        }
+                    } else if (obj.segments?.length > 0) {
+                        const storageKey = `routeSegments_${obj.id}`;
+                        sessionStorage.setItem(storageKey, JSON.stringify(obj.segments));
+
+                        const firstSegment = obj.segments[0];
+                        const lastSegment = obj.segments[obj.segments.length - 1];
+
+                        if (firstSegment.start) {
+                            mapUrl += `&start_lat=${firstSegment.start[0]}&start_lng=${firstSegment.start[1]}`;
+                        }
+                        if (lastSegment.end) {
+                            mapUrl += `&end_lat=${lastSegment.end[0]}&end_lng=${lastSegment.end[1]}`;
+                        }
+                    }
+
+                    window.open(mapUrl, '_blank', 'width=1200,height=800,menubar=no,toolbar=no,location=no');
+                };
+
+                const editRouteOnMap = (trail) => {
+                    showMessage('Информация', `Редактирование маршрута ${trail.id} на карте`);
+                };
+
+                const reloadQuarryData = async () => {
+                    const newData = await loadQuarryData();
+
+                    const selectedId = selectedObject.value?.id;
+                    const selectedType = selectedObject.value?.type;
+
+                    appData.quarries = newData.quarries;
+                    appData.truck_template_list = newData.truck_template_list;
+                    appData.shovel_template_list = newData.shovel_template_list;
+                    appData.unload_template_list = newData.unload_template_list;
+
+                    if (selectedId && selectedType && selectedType !== 'quarry') {
+                        let found;
+                        if (selectedType.includes('template')) {
+                            const collectionMap = {
+                                'truck_template': 'truck_template_list',
+                                'shovel_template': 'shovel_template_list',
+                                'unload_template': 'unload_template_list',
+                                'fuel_station_template': 'fuel_station_template_list',
+                            };
+                            const collection = collectionMap[selectedType];
+                            found = appData[collection].find(item => item.id === selectedId);
+                        } else {
+                            found = selectedQuarry.value[getCollectionByType(selectedType)]
+                                .find(item => item.id === selectedId);
+                        }
+
+                        if (found) selectedObject.value = found;
+                    }
+                };
+
+                const getCollectionByType = (type) => {
+                    const map = {
+                        'truck': 'truck_list',
+                        'shovel': 'shovel_list',
+                        'unload': 'unload_list',
+                        'trail': 'trail_list',
+                        'fuel_station': 'fuel_station_list',
+                        'shift_change_area': 'shift_change_area_list',
+                    };
+                    return map[type] || null;
+                };
+
+                const saveProject = () => {
+                    fetch('/save-project', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(selectedQuarry)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showMessage('Успех', 'Проект успешно сохранен');
+                            } else {
+                                showMessage('Ошибка', 'Ошибка сохранения: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            showMessage('Ошибка', 'Произошла ошибка при сохранении проекта');
+                        });
+                };
+
+                const loadProject = () => {
+                    fetch('/load-project')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.quarry) {
+                                Object.keys(selectedQuarry).forEach(key => {
+                                    if (Array.isArray(selectedQuarry[key])) {
+                                        selectedQuarry[key] = [];
+                                    }
+                                });
+
+                                Object.assign(selectedQuarry, data.quarry);
+                                selectedObject.value = null;
+                                currentCategory.value = null;
+                                showMessage('Успех', 'Проект успешно загружен');
+                            } else {
+                                showMessage('Ошибка', 'Ошибка загрузки: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            showMessage('Ошибка', 'Произошла ошибка при загрузке проекта');
+                        });
+                };
+
+                const showMessage = (arg1, arg2) => {
+
+                    const modalElement = document.getElementById('messageModal');
+                    const titleEl = document.getElementById('messageModalTitle');
+                    const bodyEl = document.getElementById('messageModalBody');
+
+                    if (!modalElement || !titleEl || !bodyEl) {
+                        console.error("Элементы модального окна не найдены!");
+                        return;
+                    }
+
+                    if (typeof arg2 !== 'undefined') {
+                        titleEl.textContent = arg1 || 'Сообщение';
+                        bodyEl.textContent = arg2 || '';
+                        bodyEl.style.display = arg2 ? 'block' : 'none';
+                    } else if (typeof arg1 === 'object' && arg1 !== null) {
+                        const response = arg1;
+
+                        titleEl.textContent = response.error || 'Ошибка';
+
+                        if (response.errors_dict && Object.keys(response.errors_dict).length > 0) {
+                            let errorsHtml = '<ul>';
+
+                            for (const [field, errors] of Object.entries(response.errors_dict)) {
+                                const fieldName = field.replace(/_/g, ' ');
+                                const errorMessages = Array.isArray(errors) ? errors : [String(errors)];
+                                errorsHtml += `<li><strong>${fieldName}:</strong> ${errorMessages.join(', ')}</li>`;
+                            }
+
+                            bodyEl.innerHTML = errorsHtml + '</ul>';
+                            bodyEl.style.display = 'block';
+                        } else {
+                            bodyEl.textContent = response.error || 'Неизвестная ошибка';
+                            bodyEl.style.display = response.error ? 'block' : 'none';
+                        }
+                    } else {
+                        console.error("Неправильные аргументы для showMessage!");
+                        return;
+                    }
+
+                    new bootstrap.Modal(modalElement).show();
+                };
+
+                const showConfirm = (title, message) => {
+                    return new Promise((resolve) => {
+                        const titleEl = document.getElementById('confirmModalTitle');
+                        const bodyEl = document.getElementById('confirmModalBody');
+
+                        titleEl.textContent = title || 'Подтверждение';
+                        bodyEl.textContent = message;
+
+                        bodyEl.style.display = message ? 'block' : 'none';
+
+                        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+                        const okButton = document.getElementById('confirmModalOk');
+                        const handler = () => {
+                            resolve(true);
+                            modal.hide();
+                            okButton.removeEventListener('click', handler);
+                        };
+
+                        okButton.addEventListener('click', handler);
+                        modal.show();
+                    });
+                };
+
+                const goToScenarios = () => {
+                    window.location.href = '/';
+                }
+
+                const newProject = async () => {
+                    const confirmed = await showConfirm(
+                        'Подтверждение',
+                        'Создать новый проект? Текущие данные будут потеряны.'
+                    );
+
+                    if (confirmed) {
+                        Object.keys(selectedQuarry).forEach(key => {
+                            if (Array.isArray(selectedQuarry[key])) {
+                                selectedQuarry[key] = [];
+                            }
+                        });
+                        selectedObject.value = null;
+                        currentCategory.value = null;
+                        showMessage('Успех', 'Новый проект создан');
+                    }
+                };
+
+                String.prototype.capitalize = function () {
+                    return this.charAt(0).toUpperCase() + this.slice(1);
+                };
+
+                const toHHMM = (absMinutes) => {
+                    if (absMinutes == null) return '00:00';
+                    const m = ((absMinutes % 1440) + 1440) % 1440;
+                    const h = Math.floor(m / 60);
+                    const mm = m % 60;
+                    return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+                };
+
+                const fromHHMM = (s) => {
+                    if (!s) return 0;
+                    const parts = s.split(':');
+                    if (parts.length !== 2) return 0;
+                    const [h, m] = parts.map(Number);
+                    if (isNaN(h) || isNaN(m)) return 0;
+                    return h * 60 + m;
+                };
+
+                const reorderShiftIds = () => {
+                    if (!selectedObject.value || !selectedObject.value.shift_config) return;
+
+                    const sc = selectedObject.value.shift_config;
+                    sc.forEach((shift, index) => {
+                        shift.id = index + 1;
+                    });
+                };
+
+                let reorderTimeout = null;
+                const reorderShiftIdsDebounced = () => {
+                    if (reorderTimeout) clearTimeout(reorderTimeout);
+                    reorderTimeout = setTimeout(reorderShiftIds, 100);
+                };
+
+                const selectQuarry = (quarry) => {
+                    const quarryCopy = JSON.parse(JSON.stringify(quarry));
+
+                    selectedQuarry.value = quarryCopy;
+
+                    const qid = quarryCopy.id;
+
+                    [
+                        'truck_list',
+                        'shovel_list',
+                        'unload_list',
+                        'trail_list',
+                        'fuel_station_list',
+                        'shift_change_area_list',
+                        'weather',
+                        'failure_schedule'
+                    ].forEach(key => {
+                        const stateKey = `${key}_${qid}`;
+                        if (!nodeStates[stateKey]) {
+                            nodeStates[stateKey] = {expanded: false};
+                        }
+                    });
+
+                    selectedObject.value = {
+                        type: 'quarry',
+                        id: quarryCopy.id,
+                        name: quarryCopy.name,
+                        center_lat: quarryCopy.center_lat,
+                        center_lon: quarryCopy.center_lon,
+                        center_height: quarryCopy.center_height,
+                        lunch_break_duration: quarryCopy.lunch_break_duration,
+                        lunch_break_offset: quarryCopy.lunch_break_offset,
+                        work_break_duration: quarryCopy.work_break_duration,
+                        work_break_rate: quarryCopy.work_break_rate,
+                        timezone: quarryCopy.timezone,
+                        shift_config: quarryCopy.shift_config?.length
+                            ? JSON.parse(JSON.stringify(quarryCopy.shift_config))
+                            : [{begin_offset: 0, end_offset: 480}]
+                    };
+
+                    const sc = selectedObject.value?.shift_config;
+                    sc.forEach((s) => {
+                        if (s.begin_offset_time == null) s.begin_offset_time = toHHMM(s.begin_offset ?? 0);
+                        if (s.end_offset_time == null) s.end_offset_time = toHHMM(s.end_offset ?? 0);
+                    });
+
+                    reorderShiftIds();
+
+                    if (selectedObject.value.lunch_break_offset_time == null) {
+                        selectedObject.value.lunch_break_offset_time = toHHMM(selectedObject.value.lunch_break_offset ?? 360);
+                    }
+
+                    currentCategory.value = null;
+                };
+
+                if (appData.quarries.length > 0) {
+                    const firstQuarry = appData.quarries[0];
+                    selectQuarry(firstQuarry);
+
+                    const quarryNodeKey = `quarry_${firstQuarry.id}`;
+                    if (!nodeStates[quarryNodeKey]) {
+                        nodeStates[quarryNodeKey] = {expanded: true};
+                    } else {
+                        nodeStates[quarryNodeKey].expanded = true;
+                    }
+                }
+
+                const getObjectNameById = (id) => {
+                    if (!id) return '—';
+                    const allObjects = [
+                        ...selectedQuarry.value.shovel_list,
+                        ...selectedQuarry.value.unload_list
+                    ];
+                    const obj = allObjects.find(o => o.id === id);
+                    return obj?.name || 'Неизвестно';
+                };
+
+                // Вся логика «Настройки смен» ↓
+                const updateShiftTime = (shiftIndex, timeType, timeValue) => {
+                    const shiftConfig = selectedObject.value.shift_config;
+                    const currentShift = shiftConfig[shiftIndex];
+                    const minutesInDay = fromHHMM(timeValue);
+
+                    if (timeType === 'begin') {
+                        updateShiftBeginTime(shiftConfig, shiftIndex, currentShift, minutesInDay);
+                    } else if (timeType === 'end') {
+                        updateShiftEndTime(shiftConfig, shiftIndex, currentShift, minutesInDay);
+                    }
+                    
+                    autoAdjustLunchOffset();
+
+                    if (timeline.value) {
+                        updateTimeline();
+                    }
+
+                    function updateShiftBeginTime(shiftConfig, shiftIndex, currentShift, minutesInDay) {
+                        // Первая смена
+                        if (shiftIndex === 0) {
+                            const currentDay = Math.floor((currentShift.begin_offset ?? 0) / 1440) * 1440;
+                            const newBeginAbsolute = currentDay + minutesInDay;
+
+                            currentShift.begin_offset = newBeginAbsolute;
+                            currentShift.begin_offset_time = toHHMM(newBeginAbsolute);
+
+                            adjustCurrentShiftEndTime(currentShift, newBeginAbsolute);
+                            syncNeighborShiftsAfterBeginChange(shiftConfig, shiftIndex, newBeginAbsolute, currentShift.end_offset);
+                        } else {
+                            const prevShift = shiftConfig[shiftIndex - 1];
+                            const baseDay = Math.floor(prevShift.begin_offset / 1440) * 1440;
+
+                            let newBeginAbsolute = baseDay + minutesInDay;
+
+                            currentShift.begin_offset = newBeginAbsolute;
+                            currentShift.begin_offset_time = toHHMM(newBeginAbsolute);
+
+                            adjustCurrentShiftEndTime(currentShift, newBeginAbsolute);
+
+                            prevShift.end_offset = newBeginAbsolute;
+                            prevShift.end_offset_time = toHHMM(newBeginAbsolute);
+                        }
+                    }
+
+                    function updateShiftEndTime(shiftConfig, shiftIndex, currentShift, minutesInDay) {
+                        const currentBeginTime = currentShift.begin_offset ?? 0;
+                        const currentBeginDay = Math.floor(currentBeginTime / 1440) * 1440;
+                        const currentBeginMinutesInDay = currentBeginTime % 1440;
+
+                        let newEndAbsolute;
+
+                        if (minutesInDay > currentBeginMinutesInDay) {
+                            newEndAbsolute = currentBeginDay + minutesInDay;
+                        } else {
+                            newEndAbsolute = currentBeginDay + 1440 + minutesInDay;
+                        }
+
+                        const MIN_SHIFT_DURATION = 60;
+                        if (newEndAbsolute - currentBeginTime < MIN_SHIFT_DURATION) {
+                            newEndAbsolute = currentBeginTime + MIN_SHIFT_DURATION;
+                        }
+
+                        const MAX_SHIFT_DURATION = 1440;
+                        if (newEndAbsolute - currentBeginTime > MAX_SHIFT_DURATION) {
+                            newEndAbsolute = currentBeginTime + MAX_SHIFT_DURATION;
+                        }
+
+                        currentShift.end_offset = newEndAbsolute;
+                        currentShift.end_offset_time = toHHMM(newEndAbsolute);
+
+                        syncNextShiftAfterEndChange(shiftConfig, shiftIndex, newEndAbsolute);
+                    }
+
+                    function adjustCurrentShiftEndTime(currentShift, newBeginAbsolute) {
+                        const currentEndTimeInDay = fromHHMM(
+                            currentShift.end_offset_time ?? toHHMM(currentShift.end_offset ?? newBeginAbsolute),
+                        );
+
+                        const sameDayEnd = Math.floor(newBeginAbsolute / 1440) * 1440 + currentEndTimeInDay;
+                        const newEndAbsolute = sameDayEnd < newBeginAbsolute ? sameDayEnd + 1440 : sameDayEnd;
+
+                        currentShift.end_offset = newEndAbsolute;
+                        currentShift.end_offset_time = toHHMM(newEndAbsolute);
+                    }
+
+                    function syncNeighborShiftsAfterBeginChange(shiftConfig, shiftIndex, newBeginAbsolute, newEndAbsolute) {
+                        if (shiftIndex > 0) {
+                            const previousShift = shiftConfig[shiftIndex - 1];
+                            previousShift.end_offset = newBeginAbsolute;
+                            previousShift.end_offset_time = toHHMM(newBeginAbsolute);
+                        }
+
+                        if (shiftIndex < shiftConfig.length - 1) {
+                            const nextShift = shiftConfig[shiftIndex + 1];
+                            nextShift.begin_offset = newEndAbsolute;
+                            nextShift.begin_offset_time = toHHMM(newEndAbsolute);
+                        }
+                    }
+
+                    function syncNextShiftAfterEndChange(shiftConfig, shiftIndex, newEndAbsolute) {
+                        if (shiftIndex < shiftConfig.length - 1) {
+                            const nextShift = shiftConfig[shiftIndex + 1];
+                            nextShift.begin_offset = newEndAbsolute;
+                            nextShift.begin_offset_time = toHHMM(newEndAbsolute);
+                        }
+                    }
+                };
+
+                const updateLunchBreakOffset = (timeValue) => {
+                    const minutesFromStart = fromHHMM(timeValue);
+
+                    if (selectedObject.value?.shift_config && selectedObject.value.lunch_break_duration > 0) {
+                        const validationResult = validateLunchSettingsForAllShifts(minutesFromStart, selectedObject.value.lunch_break_duration);
+                        if (!validationResult.isValid) {
+                            alert(`Изменение заблокировано!\n\nСдвиг обеда ${Math.floor(minutesFromStart/60)}ч ${minutesFromStart%60}м не помещается в смены:\n${validationResult.problemShifts.join('\n')}`);
+                            const oldTimeValue = toHHMM(selectedObject.value.lunch_break_offset);
+                            selectedObject.value.lunch_break_offset_time = oldTimeValue;
+                            return;
+                        }
+                    }
+
+                    selectedObject.value.lunch_break_offset = minutesFromStart;
+                    selectedObject.value.lunch_break_offset_time = timeValue;
+                    
+                    if (timeline.value) {
+                        updateTimeline();
+                    }
+                };
+
+                const validateLunchSettingsForAllShifts = (offsetMinutes, durationMinutes) => {
+                    if (!selectedObject.value?.shift_config) {
+                        return { isValid: true, problemShifts: [] };
+                    }
+
+                    const problemShifts = [];
+
+                    for (const shift of selectedObject.value.shift_config) {
+                        const shiftDurationMinutes = shift.end_offset - shift.begin_offset;
+
+                        // Проверяем что сдвиг + длительность обеда <= длительности смены
+                        if (offsetMinutes + durationMinutes > shiftDurationMinutes) {
+                            problemShifts.push(`Смена ${shift.id} (${Math.floor(shiftDurationMinutes/60)}ч ${shiftDurationMinutes%60}м)`);
+                        }
+
+                        if (offsetMinutes < 0) {
+                            problemShifts.push(`Смена ${shift.id} (отрицательный сдвиг)`);
+                        }
+                    }
+
+                    return {
+                        isValid: problemShifts.length === 0,
+                        problemShifts: problemShifts
+                    };
+                };
+
+                const validateAndUpdateLunchDuration = (event) => {
+                    const newDuration = parseInt(event.target.value) || 0;
+
+                    if (newDuration <= 0) {
+                        return;
+                    }
+
+                    if (selectedObject.value?.shift_config && selectedObject.value.lunch_break_offset !== null && selectedObject.value.lunch_break_offset !== undefined) {
+                        const validationResult = validateLunchSettingsForAllShifts(selectedObject.value.lunch_break_offset, newDuration);
+                        if (!validationResult.isValid) {
+                            alert(`Изменение заблокировано!\n\nДлительность обеда ${newDuration} мин. не помещается в смены:\n${validationResult.problemShifts.join('\n')}\n\nПопробуйте меньшую длительность или уменьшите сдвиг обеда.`);
+                            // Принудительно возвращаем предыдущее значение
+                            event.target.value = selectedObject.value.lunch_break_duration;
+                            selectedObject.value.lunch_break_duration = selectedObject.value.lunch_break_duration;
+                            return;
+                        }
+                    }
+                    
+                    if (timeline.value) {
+                        updateTimeline();
+                    }
+                };
+
+                const addShift = () => {
+                    const DEFAULT_DURATION = 12 * 60;
+
+                    if (!selectedObject.value || selectedObject.value.type !== 'quarry') return;
+                    const sc = selectedObject.value.shift_config ?? (selectedObject.value.shift_config = []);
+
+                    if (sc.length === 0) {
+                        const begin = 480;
+                        const end = begin + DEFAULT_DURATION;
+                        sc.push({
+                            id: 1,
+                            begin_offset: begin,
+                            begin_offset_time: toHHMM(begin),
+                            end_offset: end,
+                            end_offset_time: toHHMM(end),
+                        });
+                        autoAdjustLunchOffset();
+                        
+                        if (timeline.value) {
+                            updateTimeline();
+                        }
+                        return;
+                    }
+
+                    const last = sc[sc.length - 1];
+                    const begin = last.end_offset;
+                    const end = begin + DEFAULT_DURATION;
+                    
+                    const maxId = Math.max(...sc.map(s => s.id || 0), 0);
+                    const newId = maxId + 1;
+                    
+                    sc.push({
+                        id: newId,
+                        begin_offset: begin,
+                        begin_offset_time: toHHMM(begin),
+                        end_offset: end,
+                        end_offset_time: toHHMM(end),
+                    });
+                    
+                    autoAdjustLunchOffset();
+
+                    if (timeline.value) {
+                        updateTimeline();
+                    }
+                };
+
+                const removeShift = (index) => {
+                    if (!selectedObject.value || selectedObject.value.type !== 'quarry') return;
+                    const sc = selectedObject.value.shift_config;
+                    if (!sc || sc.length <= 1) return;
+
+                    const shouldSync = index > 0 && index < sc.length - 1;
+                    const nextShiftBegin = shouldSync ? sc[index + 1].begin_offset : null;
+
+                    sc.splice(index, 1);
+
+                    if (shouldSync && nextShiftBegin !== null) {
+                        sc[index - 1].end_offset = nextShiftBegin;
+                        sc[index - 1].end_offset_time = toHHMM(nextShiftBegin);
+                    }
+                    
+                    reorderShiftIds();
+                    
+                    autoAdjustLunchOffset();
+
+                    if (timeline.value) {
+                        updateTimeline();
+                    }
+                };
+
+                const formatDuration = (minutes) => {
+                    const hours = Math.floor(minutes / 60);
+                    const mins = minutes % 60;
+
+                    if (hours === 0) {
+                        return `${mins} мин.`;
+                    } else if (mins === 0) {
+                        return `${hours} ч.`;
+                    } else {
+                        return `${hours} ч. ${mins} мин.`;
+                    }
+                };
+
+                const getShiftValidationStatus = (shiftConfig) => {
+                    if (!shiftConfig || shiftConfig.length === 0) {
+                        return {isValid: false, message: 'Нет смен'};
+                    }
+
+                    const firstShift = shiftConfig[0];
+                    const lastShift = shiftConfig[shiftConfig.length - 1];
+
+                    for (let i = 0; i < shiftConfig.length - 1; i++) {
+                        if (shiftConfig[i].end_offset !== shiftConfig[i + 1].begin_offset) {
+                            return {
+                                isValid: false,
+                                message: `Разрыв между сменой ${i + 1} и ${i + 2}`,
+                            };
+                        }
+                    }
+
+                    const totalDuration = lastShift.end_offset - firstShift.begin_offset;
+                    const expectedDuration = 1440;
+
+                    if (totalDuration < expectedDuration) {
+                        const missingMinutes = expectedDuration - totalDuration;
+                        return {
+                            isValid: false,
+                            message: `Не хватает ${formatDuration(missingMinutes)} Суммарная продолжительность смен должна составлять ровно 24 часа.`,
+                        };
+                    } else if (totalDuration > expectedDuration) {
+                        const excessMinutes = totalDuration - expectedDuration;
+                        return {
+                            isValid: false,
+                            message: `Превышение на ${formatDuration(excessMinutes)} Суммарная продолжительность смен должна составлять ровно 24 часа.`,
+                        };
+                    }
+
+                    return null;
+                };
+
+                const validationStatus = computed(() => {
+                    return getShiftValidationStatus(selectedObject.value?.shift_config);
+                });
+
+                // timeline
+                const timeline = ref(null);
+                const timelineItems = ref(null);
+
+                watch(() => selectedObject.value, (newVal) => {
+                    if (newVal?.type === 'quarry') {
+                        nextTick(() => {
+                            if (!timeline.value) {
+                                initializeTimeline();
+                            }
+                            if (timeline.value) {
+                                updateTimeline();
+                            }
+                        });
+                    } else {
+                        if (timeline.value) {
+                            timeline.value.destroy();
+                            timeline.value = null;
+                        }
+                    }
+                }, { immediate: true });
+
+                const initializeTimeline = () => {
+                    const container = document.getElementById('visualization');
+
+                    const options = {
+                        orientation: 'top',
+                        showCurrentTime: false,
+                        zoomable: false,
+                        moveable: true,
+                        editable: {
+                            add: false,
+                            updateTime: true,
+                            updateGroup: false,
+                            remove: false,
+                            overrideItems: false
+                        },
+                        stack: false,
+                        stackSubgroups: false,
+                        selectable: true,
+                        multiselect: false,
+                        height: '160px',
+                        format: {
+                            minorLabels: {
+                                hour: 'HH:mm',
+                                day: 'HH:mm'
+                            },
+                            majorLabels: {
+                                hour: 'HH:mm',
+                                day: 'HH:mm'
+                            }
+                        },
+                        timeAxis: {scale: 'hour', step: 2},
+                        start: new Date(2024, 0, 0, 22, 0, 0),
+                        end: new Date(2024, 0, 2, 12, 0, 0),
+                        xss: {
+                            disabled: false,
+                            filterOptions: {
+                                whiteList: {
+                                    span: ['class', 'style'],
+                                    div: ['class', 'style'],
+                                    i: ['class'],
+                                    strong: [],
+                                    em: [],
+                                    br: []
+                                }
+                            }
+                        },
+                        template: (item, element, data) => {
+                            if (item.itemType === 'lunch') {
+                                return `<div class="lunch-template">
+                                    <span class="lunch-label">Обед</span>
+                                </div>`;
+                            }
+
+                            if (!selectedObject.value || !selectedObject.value.shift_config || !Array.isArray(selectedObject.value.shift_config)) {
+                                return 'Смена';
+                            }
+
+                            const shift = selectedObject.value.shift_config.find(s => s.id === item.id);
+                            if (!shift) return 'Смена';
+
+                            const startTimeStr = formatDetailedTime(
+                                item.start.getHours(),
+                                item.start.getMinutes()
+                            );
+                            const endTimeStr = formatDetailedTime(
+                                item.end.getHours(),
+                                item.end.getMinutes()
+                            );
+
+                            return `
+                                <div>
+                                    Смена ${shift.id}
+                                </div>
+                                <div>
+                                    <span>
+                                        ${startTimeStr}–${endTimeStr}
+                                    </span>
+                                </div>
+                            `;
+                        },
+
+                        onMoving: (item, callback) => {
+                            if (item.itemType === 'lunch') {
+                                const validationResult = preValidateLunchMovement(item);
+                                if (!validationResult.isValid) {
+                                    callback(item);
+                                    return;
+                                }
+
+                                const correctedLunch = validateLunchMovement(item);
+                                updateLunchSettingsFromTimeline(correctedLunch);
+                                syncAllLunchPositions();
+                                callback(correctedLunch);
+                            } else {
+                                const originalItem = timelineItems.value.get(item.id);
+                                let correctedItem;
+                                const startChanged = (originalItem.start.getTime() !== item.start.getTime());
+                                const endChanged = (originalItem.end.getTime() !== item.end.getTime());
+                                const isResizing = startChanged || endChanged;
+                                const isDurationChanged = (originalItem.end - originalItem.start) !== (item.end - item.start);
+
+                                if (isResizing || isDurationChanged) {
+                                    correctedItem = validateShiftResize(item, originalItem);
+                                } else {
+                                    correctedItem = validateNoOverlap(item);
+                                }
+                                
+                                updateShiftFromTimeline(correctedItem);
+                                syncLunchWithShift(correctedItem);
+                                callback(correctedItem);
+                            }
+                        },
+
+                        onMove: (item, callback) => {
+                            if (item.itemType === 'lunch') {
+                                const validationResult = preValidateLunchMovement(item);
+                                if (!validationResult.isValid) {
+                                    const originalItem = timelineItems.value.get(item.id);
+                                    callback(originalItem);
+                                    return;
+                                }
+
+                                const correctedLunch = validateLunchMovement(item);
+                                updateLunchSettingsFromTimeline(correctedLunch);
+                                syncAllLunchPositions();
+                                callback(correctedLunch);
+                            } else {
+                                const originalItem = timelineItems.value.get(item.id);
+                                let correctedItem;
+
+                                const startChanged = (originalItem.start.getTime() !== item.start.getTime());
+                                const endChanged = (originalItem.end.getTime() !== item.end.getTime());
+                                const isResizing = startChanged || endChanged;
+                                const isDurationChanged = (originalItem.end - originalItem.start) !== (item.end - item.start);
+
+                                if (isResizing || isDurationChanged) {
+                                    correctedItem = validateShiftResize(item, originalItem);
+                                } else {
+                                    correctedItem = validateNoOverlap(item);
+                                }
+                                
+                                if (correctedItem.start.getTime() === originalItem.start.getTime() &&
+                                    correctedItem.end.getTime() === originalItem.end.getTime()) {
+                                }
+                                
+                                updateShiftFromTimeline(correctedItem);
+                                syncLunchWithShift(correctedItem);
+                                reorderShiftIdsDebounced();
+                                callback(correctedItem);
+                            }
+                        }
+                    };
+
+                    timeline.value = new vis.Timeline(container, [], options);
+                };
+
+                const formatDetailedTime = (hour, minute = 0) => {
+                    const displayHour = hour >= 24 ? hour - 24 : hour;
+                    return `${displayHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                };
+
+                const updateTimeline = () => {
+                    if (!timeline.value) return;
+                    
+                    if (!selectedObject.value || !selectedObject.value.shift_config || !Array.isArray(selectedObject.value.shift_config)) {
+                        return;
+                    }
+
+                    let needsReorder = false;
+                    selectedObject.value.shift_config.forEach((shift, index) => {
+                        if (!shift.id) {
+                            shift.id = index + 1;
+                            needsReorder = true;
+                        }
+                    });
+                    
+                    if (needsReorder) {
+                        reorderShiftIds();
+                    }
+
+                    const groups = new vis.DataSet([
+                        { id: 'shifts', content: 'Смена', order: 1 },
+                        { id: 'lunches', content: 'Обед', order: 2 }
+                    ]);
+
+                    timelineItems.value = new vis.DataSet();
+
+                    selectedObject.value.shift_config.forEach((shift, index) => {
+                        const baseDate = new Date(2024, 0, 1);
+
+                        const startTime = new Date(baseDate);
+                        startTime.setMinutes(shift.begin_offset);
+
+                        const endTime = new Date(baseDate);
+                        endTime.setMinutes(shift.end_offset);
+
+                        timelineItems.value.add({
+                            id: shift.id,
+                            start: startTime,
+                            end: endTime,
+                            type: 'range',
+                            group: 'shifts',
+                            content: `Смена ${shift.id}`,
+                            itemType: 'shift',
+                        });
+
+                        if (selectedObject.value.lunch_break_offset !== null &&
+                            selectedObject.value.lunch_break_offset !== undefined &&
+                            selectedObject.value.lunch_break_duration > 0) {
+                            const lunchStartTime = new Date(startTime);
+                            lunchStartTime.setMinutes(startTime.getMinutes() + selectedObject.value.lunch_break_offset);
+
+                            const lunchEndTime = new Date(lunchStartTime);
+                            lunchEndTime.setMinutes(lunchStartTime.getMinutes() + selectedObject.value.lunch_break_duration);
+
+                            if (lunchEndTime <= endTime) {
+                                timelineItems.value.add({
+                                    id: `lunch_${shift.id}`,
+                                    start: lunchStartTime,
+                                    end: lunchEndTime,
+                                    type: 'range',
+                                    group: 'lunches',
+                                    content: `Обед ${shift.id}`,
+                                    className: 'lunch-item-grouped',
+                                    itemType: 'lunch',
+                                    parentShiftId: shift.id,
+                                    editable: {
+                                        updateTime: true,
+                                        updateGroup: false,
+                                        remove: false
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    timeline.value.setGroups(groups);
+                    timeline.value.setItems(timelineItems.value);
+                };
+
+                const updateShiftFromTimeline = (timelineItem) => {
+                    if (!selectedObject.value || !selectedObject.value.shift_config || !Array.isArray(selectedObject.value.shift_config)) {
+                        return;
+                    }
+                    
+                    const shift = selectedObject.value.shift_config.find(s => s.id === timelineItem.id);
+                    if (!shift) return;
+
+                    const baseDate = new Date(2024, 0, 1);
+                    const startMinutes = Math.floor((timelineItem.start - baseDate) / (1000 * 60));
+                    const endMinutes = Math.floor((timelineItem.end - baseDate) / (1000 * 60));
+
+                    shift.begin_offset = startMinutes;
+                    shift.begin_offset_time = toHHMM(startMinutes);
+                    shift.end_offset = endMinutes;
+                    shift.end_offset_time = toHHMM(endMinutes);
+
+                    autoAdjustLunchOffset();
+                };
+
+                const autoAdjustLunchOffset = () => {
+                    if (!selectedObject.value?.shift_config ||
+                        !selectedObject.value.lunch_break_duration ||
+                        selectedObject.value.lunch_break_duration <= 0) {
+                        return;
+                    }
+
+                    const currentOffset = selectedObject.value.lunch_break_offset || 0;
+                    const currentDuration = selectedObject.value.lunch_break_duration;
+
+                    const validation = validateLunchSettingsForAllShifts(currentOffset, currentDuration);
+                    if (validation.isValid) {
+                        return;
+                    }
+
+                    let maxPossibleOffset = 0;
+                    for (const shift of selectedObject.value.shift_config) {
+                        const shiftDuration = shift.end_offset - shift.begin_offset;
+                        const maxOffsetForThisShift = Math.max(0, shiftDuration - currentDuration);
+
+                        if (maxPossibleOffset === 0 || maxOffsetForThisShift < maxPossibleOffset) {
+                            maxPossibleOffset = maxOffsetForThisShift;
+                        }
+                    }
+
+                    if (maxPossibleOffset < 0) {
+                        maxPossibleOffset = 0;
+                    }
+
+                    if (maxPossibleOffset !== currentOffset) {
+                        selectedObject.value.lunch_break_offset = maxPossibleOffset;
+                        selectedObject.value.lunch_break_offset_time = toHHMM(maxPossibleOffset);
+
+                        if (timeline.value) {
+                            updateTimeline();
+                        }
+                    }
+                };
+
+                const updateLunchSettingsFromTimeline = (lunchItem) => {
+                    const parentShiftId = lunchItem.parentShiftId;
+                    const shiftItem = timelineItems.value.get(parentShiftId);
+                    
+                    if (!shiftItem) return;
+                    
+                    const baseDate = new Date(2024, 0, 1);
+                    const lunchStartMinutes = Math.floor((lunchItem.start - baseDate) / (1000 * 60));
+                    const lunchDurationMinutes = Math.floor((lunchItem.end - lunchItem.start) / (1000 * 60));
+                    const shiftStartMinutes = Math.floor((shiftItem.start - baseDate) / (1000 * 60));
+                    
+                    const offsetMinutes = lunchStartMinutes - shiftStartMinutes;
+                    
+                    selectedObject.value.lunch_break_offset = Math.round(offsetMinutes);
+                    selectedObject.value.lunch_break_offset_time = toHHMM(offsetMinutes);
+                    selectedObject.value.lunch_break_duration = Math.round(lunchDurationMinutes);
+                };
+
+                const preValidateLunchMovement = (lunchItem) => {
+                    const parentShiftId = lunchItem.parentShiftId;
+                    const parentShift = timelineItems.value.get(parentShiftId);
+
+                    if (!parentShift) {
+                        return { isValid: false, problemShifts: ['Родительская смена не найдена'] };
+                    }
+
+                    const corrected = { ...lunchItem };
+                    const lunchDuration = corrected.end - corrected.start;
+
+                    if (corrected.start < parentShift.start) {
+                        corrected.start = new Date(parentShift.start);
+                        corrected.end = new Date(corrected.start.getTime() + lunchDuration);
+                    }
+
+                    if (corrected.end > parentShift.end) {
+                        corrected.end = new Date(parentShift.end);
+                        corrected.start = new Date(corrected.end.getTime() - lunchDuration);
+                    }
+
+                    return validateLunchForAllShifts(corrected, parentShift);
+                };
+
+                const validateLunchMovement = (lunchItem) => {
+                    const parentShiftId = lunchItem.parentShiftId;
+                    const parentShift = timelineItems.value.get(parentShiftId);
+                    
+                    if (!parentShift) return lunchItem;
+                    
+                    const corrected = { ...lunchItem };
+                    const lunchDuration = corrected.end - corrected.start;
+
+                    if (corrected.start < parentShift.start) {
+                        corrected.start = new Date(parentShift.start);
+                        corrected.end = new Date(corrected.start.getTime() + lunchDuration);
+                    }
+                    
+                    if (corrected.end > parentShift.end) {
+                        corrected.end = new Date(parentShift.end);
+                        corrected.start = new Date(corrected.end.getTime() - lunchDuration);
+                    }
+                    
+                    const isValidForAllShifts = validateLunchForAllShifts(corrected, parentShift);
+                    if (!isValidForAllShifts.isValid) {
+                        return lunchItem;
+                    }
+                    
+                    return corrected;
+                };
+
+                const validateLunchForAllShifts = (lunchItem, parentShift) => {
+                    if (!selectedObject.value?.shift_config) {
+                        return { isValid: true, problemShifts: [] };
+                    }
+
+                    const lunchOffsetMs = lunchItem.start - parentShift.start;
+                    const lunchDurationMs = lunchItem.end - lunchItem.start;
+
+                    const problemShifts = [];
+
+                    for (const shift of selectedObject.value.shift_config) {
+                        const shiftItem = timelineItems.value.get(shift.id);
+                        if (!shiftItem) continue;
+
+                        const shiftDurationMs = shiftItem.end - shiftItem.start;
+
+                        if (lunchOffsetMs + lunchDurationMs > shiftDurationMs) {
+                            problemShifts.push(`Смена ${shift.id}`);
+                        }
+
+                        if (lunchOffsetMs < 0) {
+                            problemShifts.push(`Смена ${shift.id} (сдвиг отрицательный)`);
+                        }
+                    }
+
+                    return {
+                        isValid: problemShifts.length === 0,
+                        problemShifts: problemShifts
+                    };
+                };
+
+                const validateNoOverlap = (movingItem) => {
+                    if (!timelineItems.value) return movingItem;
+
+                    const allShifts = timelineItems.value.get({
+                        filter: function(item) {
+                            return item.id !== movingItem.id && item.itemType !== 'lunch';
+                        }
+                    });
+                    
+                    allShifts.sort((a, b) => a.start - b.start);
+                    
+                    let correctedItem = { ...movingItem };
+                    const originalDuration = movingItem.end - movingItem.start;
+                    
+                    const currentShiftIndex = findShiftPosition(correctedItem, allShifts);
+                    
+                    if (currentShiftIndex > 0) {
+                        const prevShift = allShifts[currentShiftIndex - 1];
+                        if (correctedItem.start < prevShift.end) {
+                            correctedItem.start = new Date(prevShift.end.getTime());
+                            correctedItem.end = new Date(correctedItem.start.getTime() + originalDuration);
+                        }
+                    }
+                    
+                    if (currentShiftIndex < allShifts.length) {
+                        const nextShift = allShifts[currentShiftIndex];
+                        if (correctedItem.end > nextShift.start) {
+                            correctedItem.end = new Date(nextShift.start.getTime());
+                            correctedItem.start = new Date(correctedItem.end.getTime() - originalDuration);
+                            
+                            if (currentShiftIndex > 0) {
+                                const prevShift = allShifts[currentShiftIndex - 1];
+                                if (correctedItem.start < prevShift.end) {
+                                    return movingItem;
+                                }
+                            }
+                        }
+                    }
+                    
+                    return correctedItem;
+                };
+
+                const findShiftPosition = (targetShift, sortedShifts) => {
+                    for (let i = 0; i < sortedShifts.length; i++) {
+                        if (targetShift.start <= sortedShifts[i].start) {
+                            return i;
+                        }
+                    }
+                    return sortedShifts.length;
+                };
+
+                const validateShiftResize = (item, originalItem) => {
+                    if (!timelineItems.value) return item;
+
+                    const allShifts = timelineItems.value.get({
+                        filter: function(shift) {
+                            return shift.id !== item.id && shift.itemType !== 'lunch';
+                        }
+                    }).sort((a, b) => a.start - b.start);
+
+                    let corrected = { ...item };
+
+                    const startChanged = (originalItem.start.getTime() !== item.start.getTime());
+                    const endChanged = (originalItem.end.getTime() !== item.end.getTime());
+                    const isLeftResize = startChanged && !endChanged;
+                    const isRightResize = endChanged && !startChanged;
+                    const isBothResize = startChanged && endChanged;
+
+                    const newPosition = findShiftPosition(corrected, allShifts);
+
+                    if (newPosition > 0) {
+                        const prevShift = allShifts[newPosition - 1];
+                        if (corrected.start < prevShift.end) {
+                            if (isLeftResize) {
+                                return originalItem;
+                            } else {
+                                corrected.start = new Date(prevShift.end.getTime());
+                                if (!isBothResize) {
+                                    const duration = item.end - item.start;
+                                    corrected.end = new Date(corrected.start.getTime() + duration);
+                                }
+                            }
+                        }
+                    }
+
+                    if (newPosition < allShifts.length) {
+                        const nextShift = allShifts[newPosition];
+                        if (corrected.end > nextShift.start) {
+                            if (isRightResize) {
+                                return originalItem;
+                            } else {
+                                corrected.end = new Date(nextShift.start.getTime());
+                                if (!isBothResize) {
+                                    const duration = item.end - item.start;
+                                    corrected.start = new Date(corrected.end.getTime() - duration);
+                                }
+                            }
+                        }
+                    }
+
+                    // 1 час в ms
+                    const minDuration = 60 * 60 * 1000;
+                    if (corrected.end - corrected.start < minDuration) {
+                        return originalItem;
+                    }
+
+                    return corrected;
+                };
+
+                const syncAllLunchPositions = () => {
+                    if (!timelineItems.value) return;
+                    
+                    if (!selectedObject.value || !selectedObject.value.shift_config || !Array.isArray(selectedObject.value.shift_config)) {
+                        return;
+                    }
+                    
+                    const updatedLunches = [];
+                    
+                    selectedObject.value.shift_config.forEach(shift => {
+                        const shiftItem = timelineItems.value.get(shift.id);
+                        const lunchId = `lunch_${shift.id}`;
+
+                        if (shiftItem && selectedObject.value.lunch_break_offset !== null &&
+                            selectedObject.value.lunch_break_offset !== undefined &&
+                            selectedObject.value.lunch_break_duration > 0) {
+                            const newLunchStart = new Date(shiftItem.start);
+                            newLunchStart.setMinutes(shiftItem.start.getMinutes() + selectedObject.value.lunch_break_offset);
+                            
+                            const newLunchEnd = new Date(newLunchStart);
+                            newLunchEnd.setMinutes(newLunchStart.getMinutes() + selectedObject.value.lunch_break_duration);
+                            
+                            if (newLunchEnd <= shiftItem.end) {
+                                updatedLunches.push({
+                                    id: lunchId,
+                                    start: newLunchStart,
+                                    end: newLunchEnd
+                                });
+                            }
+                        }
+                    });
+                    
+                    if (updatedLunches.length > 0) {
+                        timelineItems.value.update(updatedLunches);
+                    }
+                };
+
+                const syncLunchWithShift = (shiftItem) => {
+                    const lunchId = `lunch_${shiftItem.id}`;
+                    const lunchItem = timelineItems.value.get(lunchId);
+                    
+                    if (!lunchItem) return;
+
+                    if (selectedObject.value.lunch_break_offset !== null &&
+                        selectedObject.value.lunch_break_offset !== undefined &&
+                        selectedObject.value.lunch_break_duration > 0) {
+                        const newLunchStart = new Date(shiftItem.start);
+                        newLunchStart.setMinutes(shiftItem.start.getMinutes() + selectedObject.value.lunch_break_offset);
+                        
+                        const newLunchEnd = new Date(newLunchStart);
+                        newLunchEnd.setMinutes(newLunchStart.getMinutes() + selectedObject.value.lunch_break_duration);
+                        
+                        if (newLunchEnd <= shiftItem.end) {
+                            timelineItems.value.update({
+                                id: lunchId,
+                                start: newLunchStart,
+                                end: newLunchEnd
+                            });
+                        }
+                    }
+                };
+
+                return {
+                    appData,
+                    selectedQuarry,
+                    currentCategory,
+                    selectedObject,
+                    startTime,
+                    endTime,
+                    newRoute,
+                    nodeStates,
+                    payloadTypes,
+                    unloadTypes,
+                    trailTypes,
+                    selectedTemplate,
+                    toggleNode,
+                    selectCategory,
+                    selectObject,
+                    getCategoryName,
+                    addObject,
+                    confirmAddRoute,
+                    saveObject,
+                    deleteObject,
+                    removeSegment,
+                    showOnMap,
+                    editRouteOnMap,
+                    reloadQuarryData,
+                    saveProject,
+                    loadProject,
+                    newProject,
+                    openRouteEditor,
+                    templatesForCategory,
+                    applyTemplate,
+                    selectQuarry,
+                    addShift,
+                    removeShift,
+                    goToScenarios,
+                    getObjectNameById,
+                    updateShiftTime,
+                    validationStatus,
+                    updateLunchBreakOffset,
+                    validateAndUpdateLunchDuration,
+                    validateLunchSettingsForAllShifts,
+                    timeline,
+                    timelineItems,
+                    updateTimeline,
+                    validateNoOverlap,
+                    validateShiftResize,
+                    validateLunchForAllShifts,
+                    preValidateLunchMovement,
+                    findShiftPosition,
+                    reorderShiftIds,
+                };
+            }
+        }).mount('body');
+    })();
+</script>
+</body>
+</html>

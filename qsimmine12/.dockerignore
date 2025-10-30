@@ -1,0 +1,11 @@
+*
+
+!requirements*.txt
+!.env
+!**/*.py
+!**/*.html
+!**/*.css
+!**/*.js
+!**/*.sh
+!**/*.ini
+!**/*.mako

@@ -1,0 +1,41 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^(dev|staging|main)$/'
+    - when: never
+
+noop:
+  stage: .pre
+  script: echo "noop"
+  rules:
+    - when: never
+
+include:
+  - project: "k8s/gitlab-template"
+    ref: "main"
+    file: "/microservices-build.gitlab-ci.yaml"
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^(dev|staging|main)$/'
+
+default:
+  tags:
+    - infra-cluster
+
+stages:
+  - test
+  - scanner
+  - lint    
+  - build    
+  - lock_check
+  - deploy
+
+pytest:
+  stage: test
+  image: python:3.12
+  script:
+    - pip install --upgrade pip
+    - pip config set global.index-url https://${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD}@nexus.dmi-msk.ru/repository/pypi-staging-group/simple
+    - pip install -r app/requirements.txt
+    - pytest
+  only:
+    - merge_requests
+  allow_failure: true

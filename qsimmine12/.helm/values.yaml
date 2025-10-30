@@ -1,0 +1,95 @@
+image:
+  repository: registry.dmi-msk.ru
+  name: qsimmine12
+  tag: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets:
+  - name: registry.dmi-msk.ru
+
+nameOverride: ""
+fullnameOverride: "backend"
+
+replicaCount: 1
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+service:
+  type: ClusterIP
+  port: 8000
+  annotations: {}
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: regru-dns
+  hosts:
+    - host: {}
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: 
+   - secretName: {}
+     hosts:
+       - {}
+
+# resources:
+#   requests:
+#     cpu: 100m
+#     memory: 128Mi
+#   limits:
+#     cpu: "2"
+#     memory: 1Gi
+
+probes:
+  enabled: false
+  path: /health
+  scheme: HTTP
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 6
+  successThreshold: 1
+
+env:
+  APP_MODE: "prod"
+  APP_MODULE: "app:app"
+  GUNICORN_CONF: "./app/gunicorn.conf.py"
+  UVICORN_HOST: "0.0.0.0"
+  UVICORN_PORT: "8000"
+  ALEMIBC_INI: "app/migrations/alembic.ini"
+  REDIS_URL: {}
+
+  SECRET_KEY: {}
+  DB_HOST: {}
+  DB_USER: {}
+  DB_PWD: {}
+  DB_NAME: {}
+  TZ: {}
+  STORED_RESULTS_NUMBER: {}
+  MQTT_RELAY_DB_NAME: {}
+  MQTT_RELAY_REDIS_URL_TASK_MGR: {}
+
+podAnnotations: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+lifecycle:
+  preStopSleepSeconds: 5
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClass: local-path

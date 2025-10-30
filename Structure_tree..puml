@@ -1,0 +1,104 @@
+@startuml
+title Структурная схема проекта (v1.1_с_учетом_комментариев)
+
+' --- Стили ---
+skinparam defaultFontName "Arial"
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam dpi 200
+skinparam linetype ortho
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #444444
+  FontColor #000000
+  FontSize 14
+  FontStyle bold
+}
+
+skinparam rectangle {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+  FontColor #0D47A1
+  RoundCorner 10
+}
+
+skinparam database {
+  BackgroundColor #FFF3E0
+  BorderColor #EF6C00
+  FontColor #4E342E
+  RoundCorner 10
+}
+
+' --- Основная структура ---
+rectangle "Фронтенд\n(index.html, CSS, JS)" as frontend
+rectangle "Развертывание\n(Chart.yaml, values.yaml)" as deploy
+rectangle "Хранилище\n(upload/, Redis, БД)" as storage
+
+package "Приложение (app)" {
+
+  package "API и Веб-слой" {
+    rectangle "routes.py\nAPI эндпоинты" as routes
+    rectangle "forms.py\nВалидация и обработка данных" as forms
+  }
+
+  package "Сервисный слой (Services)" {
+    rectangle "object_service.py\nУниверсальная работа с БД" as obj_service
+    rectangle "quarry_data_service.py\nАгрегатор данных по карьеру" as quarry_service
+    rectangle "simulation_id_service.py\nОбработка и сохранение симуляций" as sim_service
+    rectangle "date_time_service.py\nЛогика времени и смен" as time_service
+  }
+
+  package "Модели (Models)" {
+    database "models.py\nORM-модели таблиц" as models
+  }
+
+  package "Ядро Симуляции (Sim Engine)" {
+    rectangle "simulation_manager.py\nДиспетчер, точка входа" as manager
+    rectangle "simulate.py\nИсполнитель симуляции" as simulate
+    rectangle "planner/\nПланировщик (алгоритмы)" as planner
+    rectangle "core/calculations/\nМатематика (truck, unload...)" as calc
+    rectangle "core/states.py\nСправочник состояний" as states
+    rectangle "core/props.py\nСправочник сущностей" as props
+    rectangle "simulations/\nПоведение объектов" as sims
+    rectangle "simulations/telemetry_emitter.py\nГенератор телеметрии в памяти" as telemetry
+  }
+
+  package "Конфигурация и Утилиты" {
+    rectangle "shift.py\nЛогика смен" as shift
+    rectangle "utils.py\nУтилиты (время, файлы)" as utils
+    rectangle "dxf_converter.py\nDXF → GeoJSON" as dxf
+  }
+}
+
+' --- Взаимосвязи ---
+frontend --> routes : 1
+routes --> forms : 2
+forms --> obj_service : 3
+obj_service --> models : 4
+
+' Запуск симуляции
+routes --> manager : 5
+manager --> simulate : 6
+simulate --> planner : 7
+simulate --> calc : 8
+simulate --> states : 9
+simulate --> telemetry : 10
+
+' Обработка и сохранение результатов симуляции
+manager --> sim_service : 11
+sim_service --> storage : 12
+
+' Прочие API-маршруты
+routes --> quarry_service : 13
+quarry_service --> models : 14
+routes --> time_service : 15
+time_service --> shift : 16
+routes --> forms : 17
+forms --> dxf : 18
+dxf --> storage : 19
+
+deploy --> app
+storage --> app
+
+@enduml

@@ -1,0 +1,2993 @@
+{
+  "start_time": "2025-10-06T08:00:00.000Z",
+  "end_time": "2025-10-06T09:30:02.000Z",
+  "quarry": {
+    "timezone": "Europe/Moscow",
+    "center_height": 0,
+    "id": 1,
+    "shift_config": [
+      {
+        "begin_offset": 0,
+        "end_offset": 480,
+        "begin_offset_time": "00:00",
+        "end_offset_time": "08:00",
+        "reactId": "shift-1-0"
+      },
+      {
+        "begin_offset": 480,
+        "end_offset": 1440,
+        "begin_offset_time": "08:00",
+        "end_offset_time": "00:00",
+        "reactId": "shift-1-1"
+      }
+    ],
+    "shift_change_duration": 30,
+    "lunch_break_duration": 60,
+    "shift_change_offset": 690,
+    "created_at": "2025-08-11T09:56:29.014507Z",
+    "center_lat": 58.174935,
+    "name": "Карьер 1",
+    "work_break_rate": 1,
+    "updated_at": "2025-09-22T12:53:00.189561Z",
+    "center_lon": 59.816051,
+    "work_break_duration": 10,
+    "lunch_break_offset": 240,
+    "shovel_list": [
+      {
+        "bucket_fill_speed": 0.07,
+        "bucket_fill_coef": 0.9,
+        "updated_at": "2025-10-16T06:37:06.394541Z",
+        "initial_failure_count": 40,
+        "bucket_lift_speed": 0.6,
+        "created_at": "2025-07-23T17:56:24.717000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "arm_inertia_coef": 1.2,
+        "template_id": null,
+        "average_repair_duration": 480,
+        "arm_turn_speed": 24,
+        "arm_turn_angle": 90,
+        "bucket_volume": 22,
+        "initial_operating_time": 4000,
+        "is_calc_enabled": true,
+        "initial_lon": 59.81606125831605,
+        "initial_lat": 58.17334497342791,
+        "bucket_dig_speed": 0.5,
+        "id": 1,
+        "return_move_coef": 0.3,
+        "payload_type": "gravel",
+        "name": "Э1"
+      },
+      {
+        "bucket_fill_speed": 0.07,
+        "bucket_fill_coef": 0.9,
+        "updated_at": "2025-10-16T06:37:15.516269Z",
+        "initial_failure_count": 40,
+        "bucket_lift_speed": 0.6,
+        "created_at": "2025-07-24T08:48:52.382000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "arm_inertia_coef": 1.2,
+        "template_id": null,
+        "average_repair_duration": 480,
+        "arm_turn_speed": 24,
+        "arm_turn_angle": 90,
+        "bucket_volume": 22,
+        "initial_operating_time": 4000,
+        "is_calc_enabled": true,
+        "initial_lon": 59.82150077819824,
+        "initial_lat": 58.17012533381828,
+        "bucket_dig_speed": 0.5,
+        "id": 3,
+        "return_move_coef": 0.3,
+        "payload_type": "gravel",
+        "name": "Э3"
+      }
+    ],
+    "truck_list": [
+      {
+        "fuel_level": 200,
+        "fuel_capacity": 2900,
+        "updated_at": "2025-09-24T11:44:02.889549Z",
+        "engine_power_kw": 1715,
+        "fuel_specific_consumption": 208,
+        "initial_failure_count": 20000,
+        "created_at": "2025-07-24T08:48:01.179000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "fuel_density": 0.82,
+        "template_id": null,
+        "average_repair_duration": 4,
+        "initial_operating_time": 1000,
+        "is_calc_enabled": true,
+        "body_capacity": 220,
+        "initial_lon": 59.83188629150391,
+        "initial_lat": 58.170678013186865,
+        "speed_loaded": 18,
+        "fuel_idle_lph": 15,
+        "id": 2,
+        "speed_empty": 35,
+        "fuel_threshold_planned": 80,
+        "fuel_threshold_critical": 50,
+        "name": "АС3"
+      },
+      {
+        "fuel_level": 200,
+        "fuel_capacity": 2900,
+        "updated_at": "2025-09-24T11:42:54.745781Z",
+        "engine_power_kw": 1715,
+        "fuel_specific_consumption": 208,
+        "initial_failure_count": 50,
+        "created_at": "2025-07-24T08:48:46.860000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "fuel_density": 0.82,
+        "template_id": 3,
+        "average_repair_duration": 4,
+        "initial_operating_time": 2200,
+        "is_calc_enabled": true,
+        "body_capacity": 220,
+        "initial_lon": 59.83115673065186,
+        "initial_lat": 58.1700677410665,
+        "speed_loaded": 18,
+        "fuel_idle_lph": 15,
+        "id": 6,
+        "speed_empty": 35,
+        "fuel_threshold_planned": 80,
+        "fuel_threshold_critical": 50,
+        "name": "АС6"
+      },
+      {
+        "fuel_level": 200,
+        "fuel_capacity": 1900,
+        "updated_at": "2025-09-24T11:43:26.515711Z",
+        "engine_power_kw": 1194,
+        "fuel_specific_consumption": 208,
+        "initial_failure_count": 50,
+        "created_at": "2025-07-24T08:48:55.289000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "fuel_density": 0.82,
+        "template_id": 2,
+        "average_repair_duration": 4,
+        "initial_operating_time": 1200,
+        "is_calc_enabled": true,
+        "body_capacity": 130,
+        "initial_lon": 59.82892513275147,
+        "initial_lat": 58.168866336054855,
+        "speed_loaded": 18,
+        "fuel_idle_lph": 6,
+        "id": 7,
+        "speed_empty": 35,
+        "fuel_threshold_planned": 80,
+        "fuel_threshold_critical": 50,
+        "name": "АС7"
+      },
+      {
+        "fuel_level": 200,
+        "fuel_capacity": 2900,
+        "updated_at": "2025-09-24T11:43:35.573581Z",
+        "engine_power_kw": 1715,
+        "fuel_specific_consumption": 208,
+        "initial_failure_count": 50,
+        "created_at": "2025-07-24T08:49:03.913000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "fuel_density": 0.82,
+        "template_id": 3,
+        "average_repair_duration": 4,
+        "initial_operating_time": 2200,
+        "is_calc_enabled": true,
+        "body_capacity": 220,
+        "initial_lon": 59.83098506927491,
+        "initial_lat": 58.168345276378055,
+        "speed_loaded": 18,
+        "fuel_idle_lph": 15,
+        "id": 8,
+        "speed_empty": 35,
+        "fuel_threshold_planned": 80,
+        "fuel_threshold_critical": 50,
+        "name": "АС8"
+      },
+      {
+        "fuel_level": 200,
+        "fuel_capacity": 1900,
+        "updated_at": "2025-09-24T11:43:32.688490Z",
+        "engine_power_kw": 1194,
+        "fuel_specific_consumption": 208,
+        "initial_failure_count": 50,
+        "created_at": "2025-07-24T08:49:13.654000Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "fuel_density": 0.82,
+        "template_id": 2,
+        "average_repair_duration": 4,
+        "initial_operating_time": 1200,
+        "is_calc_enabled": true,
+        "body_capacity": 130,
+        "initial_lon": 59.830083847045906,
+        "initial_lat": 58.168413240461845,
+        "speed_loaded": 18,
+        "fuel_idle_lph": 6,
+        "id": 9,
+        "speed_empty": 35,
+        "fuel_threshold_planned": 80,
+        "fuel_threshold_critical": 50,
+        "name": "АС9"
+      }
+    ],
+    "unload_list": [
+      {
+        "initial_lat": 58.178408231598,
+        "capacity": 10,
+        "template_id": null,
+        "unload_type": "hydraulic",
+        "average_repair_duration": 24,
+        "id": 1,
+        "initial_operating_time": 240000,
+        "created_at": "2025-07-23T17:56:33.674000Z",
+        "quarry_id": 1,
+        "trucks_at_once": 100,
+        "initial_height": 0,
+        "updated_at": "2025-09-24T11:54:58.592205Z",
+        "payload_type": "gravel",
+        "initial_lon": 59.80823993682861,
+        "name": "Площадка разгрузки 1",
+        "angle": 3,
+        "initial_failure_count": 50
+      },
+      {
+        "initial_lat": 58.17793158267287,
+        "capacity": 100000000,
+        "template_id": null,
+        "unload_type": "hydraulic",
+        "average_repair_duration": 24,
+        "id": 2,
+        "initial_operating_time": 240000,
+        "created_at": "2025-08-07T15:17:14.220734Z",
+        "quarry_id": 1,
+        "trucks_at_once": 100,
+        "initial_height": 0,
+        "updated_at": "2025-09-24T11:45:46.933565Z",
+        "payload_type": "gravel",
+        "initial_lon": 59.82204794883729,
+        "name": "Площадку разгрузки 2",
+        "angle": 25,
+        "initial_failure_count": 50
+      }
+    ],
+    "trail_list": [],
+    "fuel_station_list": [
+      {
+        "initial_lat": 58.16861373601135,
+        "flow_rate": 3,
+        "template_id": null,
+        "num_pumps": 2,
+        "id": 1,
+        "created_at": "2025-08-12T13:36:19.934175Z",
+        "quarry_id": 1,
+        "initial_height": 0,
+        "updated_at": "2025-09-24T11:48:03.019423Z",
+        "initial_lon": 59.82202649116516,
+        "name": "Заправка 1"
+      }
+    ],
+    "idle_area_list": [
+      {
+        "initial_lat": 58.170119897560454,
+        "is_shift_change_area": true,
+        "is_lunch_area": false,
+        "id": 2,
+        "created_at": "2025-09-08T11:59:27.809214Z",
+        "is_repair_area": false,
+        "quarry_id": 1,
+        "initial_height": 0,
+        "updated_at": "2025-10-24T04:22:20.524470Z",
+        "initial_lon": 59.82915043830872,
+        "name": "Площадку пересменки",
+        "is_blast_waiting_area": false
+      },
+      {
+        "initial_lat": 58.1697339372997,
+        "is_shift_change_area": false,
+        "is_lunch_area": true,
+        "id": 4,
+        "created_at": "2025-10-24T04:22:11.126024Z",
+        "is_repair_area": false,
+        "quarry_id": 1,
+        "initial_height": 0,
+        "updated_at": "2025-10-24T04:25:45.894253Z",
+        "initial_lon": 59.835200445557504,
+        "name": "Площадка обеда",
+        "is_blast_waiting_area": true
+      },
+      {
+        "initial_lat": 58.16595525894436,
+        "is_shift_change_area": false,
+        "is_lunch_area": false,
+        "id": 5,
+        "created_at": "2025-10-24T04:23:10.229007Z",
+        "is_repair_area": false,
+        "quarry_id": 1,
+        "initial_height": 0,
+        "updated_at": "2025-10-24T04:25:25.039404Z",
+        "initial_lon": 59.82670371243154,
+        "name": "Площадка ожидания взрыва",
+        "is_blast_waiting_area": true
+      },
+      {
+        "initial_lat": 58.16449096400339,
+        "is_shift_change_area": false,
+        "is_lunch_area": true,
+        "id": 6,
+        "created_at": "2025-10-24T04:24:06.892079Z",
+        "is_repair_area": true,
+        "quarry_id": 1,
+        "initial_height": 0,
+        "updated_at": "2025-10-24T05:34:43.643592Z",
+        "initial_lon": 59.81315424815657,
+        "name": "Площадка ремонта и обеда",
+        "is_blast_waiting_area": false
+      }
+    ],
+    "scenario_list": [
+      {
+        "is_calc_reliability_enabled": false,
+        "r_target": 0.05,
+        "boot_b": 5000,
+        "consecutive": 2,
+        "delta_target": 0.01,
+        "id": 1,
+        "max_runs_num": 105,
+        "is_auto_truck_distribution": false,
+        "created_at": "2025-08-18T10:20:43.127902Z",
+        "end_time": "2025-08-18T20:00:00Z",
+        "step_runs_num": 15,
+        "alpha": 0.05,
+        "process_num": null,
+        "quarry_id": 1,
+        "updated_at": "2025-09-12T08:28:01.956894Z",
+        "start_time": "2025-08-18T07:00:00Z",
+        "name": "ТЕСТ сценарий ( не трогать)",
+        "init_runs_num": 15
+      },
+      {
+        "is_calc_reliability_enabled": false,
+        "r_target": 0.05,
+        "boot_b": 5000,
+        "consecutive": 2,
+        "delta_target": 0.01,
+        "id": 14,
+        "max_runs_num": 105,
+        "is_auto_truck_distribution": false,
+        "created_at": "2025-08-29T07:25:20.815778Z",
+        "end_time": "2025-08-29T17:00:00Z",
+        "step_runs_num": 15,
+        "alpha": 0.05,
+        "process_num": null,
+        "quarry_id": 1,
+        "updated_at": "2025-09-11T08:39:12.712633Z",
+        "start_time": "2025-08-29T03:00:00Z",
+        "name": "Тестовый Сценарий 2",
+        "init_runs_num": 15
+      },
+      {
+        "is_calc_reliability_enabled": false,
+        "r_target": 0.05,
+        "boot_b": 5000,
+        "consecutive": 2,
+        "delta_target": 0.01,
+        "id": 15,
+        "max_runs_num": 105,
+        "is_auto_truck_distribution": true,
+        "created_at": "2025-09-08T12:22:53.473085Z",
+        "end_time": "2025-09-08T15:00:00Z",
+        "step_runs_num": 15,
+        "alpha": 0.05,
+        "process_num": null,
+        "quarry_id": 1,
+        "updated_at": "2025-09-08T12:22:53.473092Z",
+        "start_time": "2025-09-08T07:00:00Z",
+        "name": "Сценарий без АС по маршрутам",
+        "init_runs_num": 15
+      },
+      {
+        "is_calc_reliability2025-10-24T05:41:06.239013761Z _enabled": false,
+        "r_target": 0.05,
+        "boot_b": 5000,
+        "consecutive": 2,
+        "delta_target": 0.01,
+        "id": 16,
+        "max_runs_num": 105,
+        "is_auto_truck_distribution": false,
+        "created_at": "2025-09-08T14:03:15.499815Z",
+        "end_time": "2025-09-08T15:00:00Z",
+        "step_runs_num": 15,
+        "alpha": 0.05,
+        "process_num": null,
+        "quarry_id": 1,
+        "updated_at": "2025-09-24T08:10:59.923304Z",
+        "start_time": "2025-09-08T07:00:00Z",
+        "name": "Сценарий Карьера 2",
+        "init_runs_num": 15
+      },
+      {
+        "is_calc_reliability_enabled": false,
+        "r_target": 0.05,
+        "boot_b": 5000,
+        "consecutive": 2,
+        "delta_target": 0.01,
+        "id": 18,
+        "max_runs_num": 105,
+        "is_auto_truck_distribution": true,
+        "created_at": "2025-10-06T09:01:45.328501Z",
+        "end_time": "2025-10-06T11:00:00Z",
+        "step_runs_num": 15,
+        "alpha": 0.05,
+        "process_num": null,
+        "quarry_id": 1,
+        "updated_at": "2025-10-06T09:01:45.328505Z",
+        "start_time": "2025-10-06T08:00:00Z",
+        "name": "Планировщик + симуляция",
+        "init_runs_num": 15
+      }
+    ],
+    "map_overlay_list": [],
+    "planned_idle_list": [
+      {
+        "vehicle_type": "shovel",
+        "vehicle_id": 1,
+        "id": 4,
+        "created_at": "2025-10-10T09:08:25.969747Z",
+        "end_time": "2025-10-06T08:40:00Z",
+        "quarry_id": 1,
+        "updated_at": "2025-10-10T09:08:25.969753Z",
+        "start_time": "2025-10-06T08:20:00Z"
+      },
+      {
+        "vehicle_type": "truck",
+        "vehicle_id": 6,
+        "id": 5,
+        "created_at": "2025-10-10T09:08:25.969754Z",
+        "end_time": "2025-10-06T09:00:00Z",
+        "quarry_id": 1,
+        "updated_at": "2025-10-10T09:08:25.969755Z",
+        "start_time": "2025-10-06T08:30:00Z"
+      }
+    ],
+    "road_net_id": 1,
+    "schedules": {
+      "blasting": [
+        {
+          "id": 27,
+          "end_time": "2025-10-06T09:29:00.000Z",
+          "quarry_id": 1,
+          "start_time": "2025-10-06T09:00:00.000Z",
+          "geojson_data": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        59.819376,
+                        58.16965
+                      ],
+                      [
+                        59.81972,
+                        58.169797
+                      ],
+                      [
+                        59.820364,
+                        58.169786
+                      ],
+                      [
+                        59.820535,
+                        58.169378
+                      ],
+                      [
+                        59.820299,
+                        58.169129
+                      ],
+                      [
+                        59.819591,
+                        58.169084
+                      ],
+                      [
+                        59.819376,
+                        58.16965
+                      ]
+                    ]
+                  ]
+                },
+                "properties": {
+                  "id": 25,
+                  "group": 25,
+                  "content": "",
+                  "timeline_index": 0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": 28,
+          "end_time": "2025-10-06T09:00:00.000Z",
+          "quarry_id": 1,
+          "start_time": "2025-10-06T08:00:00.000Z",
+          "geojson_data": {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "geometry": {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [
+                        59.81884,
+                        58.174165
+                      ],
+                      [
+                        59.819827,
+                        58.173962
+                      ],
+                      [
+                        59.819698,
+                        58.173396
+                      ],
+                      [
+                        59.818411,
+                        58.173667
+                      ],
+                      [
+                        59.818561,
+                        58.173916
+                      ],
+                      [
+                        59.81884,
+                        58.174165
+                      ]
+                    ]
+                  ]
+                },
+                "properties": {
+                  "id": 26,
+                  "group": 26,
+                  "content": "",
+                  "timeline_index": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "planned_idle": [
+        {
+          "vehicle_type": "shovel",
+          "vehicle_id": 1,
+          "id": 4,
+          "created_at": "2025-10-10T09:08:25.969747Z",
+          "end_time": "2025-10-06T08:40:00Z",
+          "quarry_id": 1,
+          "updated_at": "2025-10-10T09:08:25.969753Z",
+          "start_time": "2025-10-06T08:20:00Z"
+        },
+        {
+          "vehicle_type": "truck",
+          "vehicle_id": 6,
+          "id": 5,
+          "created_at": "2025-10-10T09:08:25.969754Z",
+          "end_time": "2025-10-06T09:00:00Z",
+          "quarry_id": 1,
+          "updated_at": "2025-10-10T09:08:25.969755Z",
+          "start_time": "2025-10-06T08:30:00Z"
+        }
+      ]
+    },
+    "road_net": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82150077819824,
+                58.17012533381828,
+                0.0
+              ],
+              [
+                59.821039,
+                58.170329,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 35.0,
+            "direction": "=",
+            "point_0_bonds": [
+              {
+                "id": 3,
+                "type": "shovel"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.821039,
+                58.170329,
+                0.0
+              ],
+              [
+                59.820428,
+                58.170493,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 40.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.820428,
+                58.170493,
+                0.0
+              ],
+              [
+                59.819076,
+                58.170838,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 88.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.819076,
+                58.170838,
+                0.0
+              ],
+              [
+                59.818304,
+                58.170957,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 47.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.818304,
+                58.170957,
+                0.0
+              ],
+              [
+                59.817445,
+                58.171263,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 61.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.817445,
+                58.171263,
+                0.0
+              ],
+              [
+                59.816566,
+                58.171183,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 52.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.816566,
+                58.171183,
+                0.0
+              ],
+              [
+                59.81589,
+                58.171308,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 42.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81589,
+                58.171308,
+                0.0
+              ],
+              [
+                59.815042,
+                58.171308,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 50.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.815042,
+                58.171308,
+                0.0
+              ],
+              [
+                59.814141,
+                58.171331,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 53.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.814141,
+                58.171331,
+                0.0
+              ],
+              [
+                59.812682,
+                58.171466,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 87.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.812682,
+                58.171466,
+                0.0
+              ],
+              [
+                59.81133,
+                58.171619,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 81.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81133,
+                58.171619,
+                0.0
+              ],
+              [
+                59.810418,
+                58.171744,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 55.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.810418,
+                58.171744,
+                0.0
+              ],
+              [
+                59.809506,
+                58.172208,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 74.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.809506,
+                58.172208,
+                0.0
+              ],
+              [
+                59.809077,
+                58.17253,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 44.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.809077,
+                58.17253,
+                0.0
+              ],
+              [
+                59.808841,
+                58.172932,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 47.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808841,
+                58.172932,
+                0.0
+              ],
+              [
+                59.808776,
+                58.173317,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 43.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808776,
+                58.173317,
+                0.0
+              ],
+              [
+                59.80916261672974,
+                58.173859665907656,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 64.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.80916261672974,
+                58.173859665907656,
+                0.0
+              ],
+              [
+                59.80955958366395,
+                58.17410860743842,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 36.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.80955958366395,
+                58.17410860743842,
+                0.0
+              ],
+              [
+                59.809613,
+                58.174725,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 69.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.809613,
+                58.174725,
+                0.0
+              ],
+              [
+                59.809356,
+                58.174997,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 34.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.809356,
+                58.174997,
+                0.0
+              ],
+              [
+                59.809066,
+                58.175399,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 48.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.809066,
+                58.175399,
+                0.0
+              ],
+              [
+                59.808937,
+                58.175732,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 38.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808937,
+                58.175732,
+                0.0
+              ],
+              [
+                59.808648,
+                58.175919,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 27.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808648,
+                58.175919,
+                0.0
+              ],
+              [
+                59.808197,
+                58.176106,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 34.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808197,
+                58.176106,
+                0.0
+              ],
+              [
+                59.807832,
+                58.176502,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 49.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.807832,
+                58.176502,
+                0.0
+              ],
+              [
+                59.80803608894349,
+                58.17692039417019,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 48.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.80803608894349,
+                58.17692039417019,
+                0.0
+              ],
+              [
+                59.808251,
+                58.17756,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 72.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808251,
+                58.17756,
+                0.0
+              ],
+              [
+                59.80823993682861,
+                58.178408231598,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 94.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 1,
+                "type": "unload"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.816566,
+                58.171183,
+                0.0
+              ],
+              [
+                59.818062672697074,
+                58.17053582894481,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 113.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.818062672697074,
+                58.17053582894481,
+                0.0
+              ],
+              [
+                59.819340261972684,
+                58.16985682518172,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 106.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.819340261972684,
+                58.16985682518172,
+                0.0
+              ],
+              [
+                59.820197666396666,
+                58.169138198746296,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 94.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.820197666396666,
+                58.169138198746296,
+                0.0
+              ],
+              [
+                59.82095973095844,
+                58.16856102369386,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 78.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82095973095844,
+                58.16856102369386,
+                0.0
+              ],
+              [
+                59.82232708174756,
+                58.16791283999363,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 108.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.814141,
+                58.171331,
+                0.0
+              ],
+              [
+                59.81397986412049,
+                58.171590382551415,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 30.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81397986412049,
+                58.171590382551415,
+                0.0
+              ],
+              [
+                59.81299281120301,
+                58.17187347679825,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 66.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81299281120301,
+                58.17187347679825,
+                0.0
+              ],
+              [
+                59.81202721595765,
+                58.17215656879159,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 65.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81202721595765,
+                58.17215656879159,
+                0.0
+              ],
+              [
+                59.81106162071229,
+                58.17256421730318,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 73.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81106162071229,
+                58.17256421730318,
+                0.0
+              ],
+              [
+                59.810653924942024,
+                58.17307377137169,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 61.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.810653924942024,
+                58.17307377137169,
+                0.0
+              ],
+              [
+                59.81091141700745,
+                58.1737644885636,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 78.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81091141700745,
+                58.1737644885636,
+                0.0
+              ],
+              [
+                59.81170535087586,
+                58.17404756550414,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 56.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81170535087586,
+                58.17404756550414,
+                0.0
+              ],
+              [
+                59.812585115432746,
+                58.17404756550414,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 52.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.812585115432746,
+                58.17404756550414,
+                0.0
+              ],
+              [
+                59.81277823448181,
+                58.173617287663994,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 49.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81277823448181,
+                58.173617287663994,
+                0.0
+              ],
+              [
+                59.812370538711555,
+                58.17325494439211,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 47.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.812585115432746,
+                58.17404756550414,
+                0.0
+              ],
+              [
+                59.81393694877625,
+                58.17409230048892,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 79.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81393694877625,
+                58.17409230048892,
+                0.0
+              ],
+              [
+                59.815331697463996,
+                58.17383187011417,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 87.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.815331697463996,
+                58.17383187011417,
+                0.0
+              ],
+              [
+                59.81606125831605,
+                58.17334497342791,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 69.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 1,
+                "type": "shovel"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81106162071229,
+                58.17256421730318,
+                0.0
+              ],
+              [
+                59.81153368949891,
+                58.172699541963624,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 32.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81153368949891,
+                58.172699541963624,
+                0.0
+              ],
+              [
+                59.81269240379334,
+                58.17255233665582,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 70.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81269240379334,
+                58.17255233665582,
+                0.0
+              ],
+              [
+                59.814366102218635,
+                58.17232586576172,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 101.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.814366102218635,
+                58.17232586576172,
+                0.0
+              ],
+              [
+                59.81576085090638,
+                58.172156011644695,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 84.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81576085090638,
+                58.172156011644695,
+                0.0
+              ],
+              [
+                59.81721997261048,
+                58.17206542245058,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 86.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81721997261048,
+                58.17206542245058,
+                0.0
+              ],
+              [
+                59.81816411018372,
+                58.17220130615523,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 57.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81816411018372,
+                58.17220130615523,
+                0.0
+              ],
+              [
+                59.819129705429084,
+                58.17259763066156,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 72.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.819129705429084,
+                58.17259763066156,
+                0.0
+              ],
+              [
+                59.81996655464173,
+                58.17259763066156,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 49.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81996655464173,
+                58.17259763066156,
+                0.0
+              ],
+              [
+                59.82099652290345,
+                58.172427777842536,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 63.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82099652290345,
+                58.172427777842536,
+                0.0
+              ],
+              [
+                59.82099652290345,
+                58.17206542245058,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 40.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808937,
+                58.175732,
+                0.0
+              ],
+              [
+                59.80977416038514,
+                58.17633517362684,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 83.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.80977416038514,
+                58.17633517362684,
+                0.0
+              ],
+              [
+                59.810889959335334,
+                58.17691260644936,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 92.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.810889959335334,
+                58.17691260644936,
+                0.0
+              ],
+              [
+                59.812391996383674,
+                58.17724094642129,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 95.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.812391996383674,
+                58.17724094642129,
+                0.0
+              ],
+              [
+                59.81391549110413,
+                58.17732020044301,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 90.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81391549110413,
+                58.17732020044301,
+                0.0
+              ],
+              [
+                59.8152244091034,
+                58.17750135182931,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 79.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.8152244091034,
+                58.17750135182931,
+                0.0
+              ],
+              [
+                59.81655478477479,
+                58.1776825022927,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 81.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81655478477479,
+                58.1776825022927,
+                0.0
+              ],
+              [
+                59.818099737167366,
+                58.17792026087527,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 94.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.818099737167366,
+                58.17792026087527,
+                0.0
+              ],
+              [
+                59.819644689559944,
+                58.17788629546079,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 91.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.819644689559944,
+                58.17788629546079,
+                0.0
+              ],
+              [
+                59.821339845657356,
+                58.17787497364879,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 99.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.821339845657356,
+                58.17787497364879,
+                0.0
+              ],
+              [
+                59.82204794883729,
+                58.17793158267287,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 42.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 2,
+                "type": "unload"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82232708174756,
+                58.16791283999363,
+                0.0
+              ],
+              [
+                59.8232924938202,
+                58.168115442961955,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 61.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.8232924938202,
+                58.168115442961955,
+                0.0
+              ],
+              [
+                59.824129343032844,
+                58.16873830818297,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 85.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.824129343032844,
+                58.16873830818297,
+                0.0
+              ],
+              [
+                59.82543826103211,
+                58.169644274488036,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 127.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82543826103211,
+                58.169644274488036,
+                0.0
+              ],
+              [
+                59.82606053352357,
+                58.170221815962734,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 74.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82606053352357,
+                58.170221815962734,
+                0.0
+              ],
+              [
+                59.82614636421204,
+                58.17084464429755,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 69.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82614636421204,
+                58.17084464429755,
+                0.0
+              ],
+              [
+                59.826318025588996,
+                58.171376870777415,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 60.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.826318025588996,
+                58.171376870777415,
+                0.0
+              ],
+              [
+                59.82715487480164,
+                58.171535404785054,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 52.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82715487480164,
+                58.171535404785054,
+                0.0
+              ],
+              [
+                59.82820630073548,
+                58.171535404785054,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 62.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82820630073548,
+                58.171535404785054,
+                0.0
+              ],
+              [
+                59.82940793037415,
+                58.17136554689269,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 73.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82940793037415,
+                58.17136554689269,
+                0.0
+              ],
+              [
+                59.82964396476746,
+                58.170912588547004,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 52.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82964396476746,
+                58.170912588547004,
+                0.0
+              ],
+              [
+                59.82964396476746,
+                58.17059551427247,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 35.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82964396476746,
+                58.17059551427247,
+                0.0
+              ],
+              [
+                59.82915043830872,
+                58.170119897560454,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 60.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 2,
+                "type": "idle_area"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82095973095844,
+                58.16856102369386,
+                0.0
+              ],
+              [
+                59.821103811264045,
+                58.16890817862296,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 40.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.821103811264045,
+                58.16890817862296,
+                0.0
+              ],
+              [
+                59.82166171073914,
+                58.16890817862296,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 33.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82166171073914,
+                58.16890817862296,
+                0.0
+              ],
+              [
+                59.82202649116516,
+                58.16861373601135,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 39.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 1,
+                "type": "fuel_station"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.808937,
+                58.175732,
+                0.0
+              ],
+              [
+                59.811297770850935,
+                58.17520130592252,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 150.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.811297770850935,
+                58.17520130592252,
+                0.0
+              ],
+              [
+                59.81365797449706,
+                58.17492983924822,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 142.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81365797449706,
+                58.17492983924822,
+                0.0
+              ],
+              [
+                59.81505264028792,
+                58.17464705925877,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 88.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81505264028792,
+                58.17464705925877,
+                0.0
+              ],
+              [
+                59.81576070138174,
+                58.174352965684236,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 53.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81576070138174,
+                58.174352965684236,
+                0.0
+              ],
+              [
+                59.8167047828402,
+                58.17427378622937,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 56.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.8167047828402,
+                58.17427378622937,
+                0.0
+              ],
+              [
+                59.81852857656673,
+                58.17394575518108,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 113.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81852857656673,
+                58.17394575518108,
+                0.0
+              ],
+              [
+                59.819815960373674,
+                58.173662967365935,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 82.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.819815960373674,
+                58.173662967365935,
+                0.0
+              ],
+              [
+                59.82127499535491,
+                58.17362903267701,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 86.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82127499535491,
+                58.17362903267701,
+                0.0
+              ],
+              [
+                59.82176849248092,
+                58.1735046052072,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 32.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82176849248092,
+                58.1735046052072,
+                0.0
+              ],
+              [
+                59.82168266689379,
+                58.17293902031192,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 63.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82168266689379,
+                58.17293902031192,
+                0.0
+              ],
+              [
+                59.82269111754259,
+                58.173097384989326,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 62.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82269111754259,
+                58.173097384989326,
+                0.0
+              ],
+              [
+                59.823570829810656,
+                58.172588353159476,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 77.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.823570829810656,
+                58.172588353159476,
+                0.0
+              ],
+              [
+                59.82502986479189,
+                58.17205668991362,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 104.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82502986479189,
+                58.17205668991362,
+                0.0
+              ],
+              [
+                59.826318025588996,
+                58.171376870777415,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 107.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82232708174756,
+                58.16791283999363,
+                0.0
+              ],
+              [
+                59.82006320792063,
+                58.1670479434349,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 164.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82006320792063,
+                58.1670479434349,
+                0.0
+              ],
+              [
+                59.81778882986167,
+                58.16623335046889,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 161.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81778882986167,
+                58.16623335046889,
+                0.0
+              ],
+              [
+                59.81564319018337,
+                58.165577137013244,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 145.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.81564319018337,
+                58.165577137013244,
+                0.0
+              ],
+              [
+                59.81315424815657,
+                58.16449096400339,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 189.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 6,
+                "type": "idle_area"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82232708174756,
+                58.16791283999363,
+                0.0
+              ],
+              [
+                59.82361399129484,
+                58.16719977818432,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 109.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82361399129484,
+                58.16719977818432,
+                0.0
+              ],
+              [
+                59.825459241418145,
+                58.16660015162237,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 127.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.825459241418145,
+                58.16660015162237,
+                0.0
+              ],
+              [
+                59.82670371243154,
+                58.16595525894436,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 102.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 5,
+                "type": "idle_area"
+              }
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.82964396476746,
+                58.170912588547004,
+                0.0
+              ],
+              [
+                59.830565863852414,
+                58.17075207538573,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 57.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.830565863852414,
+                58.17075207538573,
+                0.0
+              ],
+              [
+                59.8318747040562,
+                58.16997150546004,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 116.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.8318747040562,
+                58.16997150546004,
+                0.0
+              ],
+              [
+                59.8338486925602,
+                58.169858377962534,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 116.0,
+            "direction": "="
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                59.8338486925602,
+                58.169858377962534,
+                0.0
+              ],
+              [
+                59.835200445557504,
+                58.1697339372997,
+                0.0
+              ]
+            ]
+          },
+          "properties": {
+            "length": 80.0,
+            "direction": "=",
+            "point_1_bonds": [
+              {
+                "id": 4,
+                "type": "idle_area"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "scenario": {
+    "id": 18,
+    "name": "Планировщик + симуляция",
+    "start_time": "2025-10-06T08:00:00+00:00",
+    "end_time": "2025-10-06T09:30:00+00:00",
+    "quarry_id": 1,
+    "is_auto_truck_distribution": true,
+    "is_calc_reliability_enabled": false,
+    "trails": []
+  }
+}

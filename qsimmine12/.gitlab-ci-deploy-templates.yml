@@ -1,0 +1,53 @@
+.deploy_template_nir_bortarh:
+  stage: deploy
+  tags:
+    - nir-bortarh
+  variables:
+    GIT_STRATEGY: "none"
+  script:
+    - |
+      set -Eeuo pipefail
+      export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
+
+      echo "===> Очистка старых /tmp/${CI_PROJECT_NAME}-*"
+      find /tmp -maxdepth 1 -type d -name "${CI_PROJECT_NAME}-*" -exec rm -rf {} +
+
+      mkdir -p /srv/${CI_PROJECT_NAME}
+      sudo chown -R gitlab-runner:gitlab-runner /srv/${CI_PROJECT_NAME}
+
+      TMP_CLONE="/tmp/${CI_PROJECT_NAME}-${CI_JOB_ID}"
+      echo "Клонируем в: $TMP_CLONE"
+      git clone https://${GIT_BOT}:${GIT_BOT_TOKEN}@gitlab-6bd8e4a9.ru.tuna.am/retek.pgr/${CI_PROJECT_NAME}.git "$TMP_CLONE"
+
+      rsync -a --delete "$TMP_CLONE"/ /srv/${CI_PROJECT_NAME}/
+      cd /srv/${CI_PROJECT_NAME}
+
+      echo "===> up + build + pull + recreate"
+      APP_MODE=prod docker compose up -d --build --force-recreate --remove-orphans
+
+.deploy_template_goose003:
+  stage: deploy
+  tags:
+    - goose003
+  variables:
+    GIT_STRATEGY: "none"
+  script:
+    - |
+      set -Eeuo pipefail
+      export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
+
+      echo "===> Очистка старых /tmp/${CI_PROJECT_NAME}-*"
+      find /tmp -maxdepth 1 -type d -name "${CI_PROJECT_NAME}-*" -exec rm -rf {} +
+
+      mkdir -p /srv/${CI_PROJECT_NAME}
+      sudo chown -R gitlab-runner:gitlab-runner /srv/${CI_PROJECT_NAME}
+
+      TMP_CLONE="/tmp/${CI_PROJECT_NAME}-${CI_JOB_ID}"
+      echo "Клонируем в: $TMP_CLONE"
+      git clone https://${GIT_BOT}:${GIT_BOT_TOKEN}@gitlab-6bd8e4a9.ru.tuna.am/retek.pgr/${CI_PROJECT_NAME}.git "$TMP_CLONE"
+
+      rsync -a --delete "$TMP_CLONE"/ /srv/${CI_PROJECT_NAME}/
+      cd /srv/${CI_PROJECT_NAME}
+
+      echo "===> up + build + pull + recreate"
+      APP_MODE=prod docker compose up -d --build --force-recreate --remove-orphans

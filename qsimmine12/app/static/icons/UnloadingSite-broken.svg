@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="100"
+   height="100"
+   viewBox="0 0 100 100"
+   fill="none"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="UnloadingSite-broken.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="7.57"
+     inkscape:cx="50.1321"
+     inkscape:cy="50"
+     inkscape:window-width="1707"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3" />
+  <path
+     d="M0 16C0 7.16345 7.16344 0 16 0H84C92.8366 0 100 7.16344 100 16V84C100 92.8366 92.8366 100 84 100H16C7.16345 100 0 92.8366 0 84V16Z"
+     fill="url(#paint0_linear_111_675)"
+     id="path1"
+     style="fill:#ff0000" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M19.27 15.7344C18.9204 15.3839 18.4745 15.1451 17.989 15.0483C17.5034 14.9515 17.0001 15.001 16.5427 15.1905C16.0853 15.3801 15.6945 15.7012 15.4199 16.1131C15.1453 16.5251 14.9991 17.0092 15 17.5043V82.5002C15 83.1632 15.2634 83.799 15.7322 84.2678C16.2011 84.7366 16.837 85 17.5 85H60C60.3697 84.9998 60.7348 84.9175 61.0689 84.7593C61.403 84.601 61.6979 84.3705 61.9322 84.0846C62.1666 83.7986 62.3346 83.4642 62.4241 83.1055C62.5136 82.7468 62.5225 82.3727 62.45 82.0102L59.95 69.511C59.8453 68.987 59.5754 68.5105 59.18 68.1511L32.35 43.7576L29.975 27.1537C29.8992 26.6182 29.6519 26.1218 29.27 25.7388L19.27 15.7344ZM55 40.0029C55 37.3509 56.0536 34.8075 57.9289 32.9323C59.8043 31.057 62.3478 30.0035 65 30.0035C67.6522 30.0035 70.1957 31.057 72.0711 32.9323C73.9464 34.8075 75 37.3509 75 40.0029C75 42.6549 73.9464 45.1982 72.0711 47.0735C70.1957 48.9487 67.6522 50.0022 65 50.0022C62.3478 50.0022 59.8043 48.9487 57.9289 47.0735C56.0536 45.1982 55 42.6549 55 40.0029ZM75 70.001C75 68.675 75.5268 67.4033 76.4645 66.4657C77.4021 65.528 78.6739 65.0013 80 65.0013C81.3261 65.0013 82.5978 65.528 83.5355 66.4657C84.4732 67.4033 85 68.675 85 70.001C85 71.327 84.4732 72.5986 83.5355 73.5363C82.5978 74.4739 81.3261 75.0006 80 75.0006C78.6739 75.0006 77.4021 74.4739 76.4645 73.5363C75.5268 72.5986 75 71.327 75 70.001ZM40 20.0042C40 18.6782 40.5268 17.4065 41.4645 16.4688C42.4022 15.5312 43.6739 15.0045 45 15.0045C46.3261 15.0045 47.5979 15.5312 48.5355 16.4688C49.4732 17.4065 50 18.6782 50 20.0042C50 21.3302 49.4732 22.6018 48.5355 23.5395C47.5979 24.4771 46.3261 25.0038 45 25.0038C43.6739 25.0038 42.4022 24.4771 41.4645 23.5395C40.5268 22.6018 40 21.3302 40 20.0042Z"
+     fill="#7C3C2D"
+     id="path2"
+     style="fill:#ffffff;fill-opacity:1" />
+  <defs
+     id="defs3">
+    <linearGradient
+       id="paint0_linear_111_675"
+       x1="0"
+       y1="50"
+       x2="100"
+       y2="50"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         stop-color="#EACDA3"
+         id="stop2" />
+      <stop
+         offset="1"
+         stop-color="#D6AE7B"
+         id="stop3" />
+    </linearGradient>
+  </defs>
+</svg>

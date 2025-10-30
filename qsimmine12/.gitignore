@@ -1,0 +1,17 @@
+.DS_Store
+.venv*
+.vscode
+.idea
+
+__pycache__
+
+
+# sim engine
+telemetry.csv
+
+.history/
+
+pgadmin_data/
+
+upload/*
+!upload/**/.gitkeep

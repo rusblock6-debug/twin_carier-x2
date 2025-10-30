@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Цифровой двойник карьера</title>
+    <link rel="stylesheet" href="/static/onest.font.css"/>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="/static/leaflet.css"/>
+    <style>
+        body {
+            background: #f4f8fb;
+            margin: 0;
+            padding: 15px;
+        }
+
+        * {
+            font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        h1,
+        h2,
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            height: 30px;
+            width: auto;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 100px);
+        }
+
+        .left-side {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quarry__title {
+            margin: 0;
+            font-size: 36px;
+            color: #ED8D48;
+        }
+
+        .calculation {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: max-content 100px;
+            gap: 5px;
+        }
+
+        .calculation__text {
+            font-weight: 700;
+        }
+
+        .calculation__number {
+            text-align: right;
+        }
+
+        .routes {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 180px;
+        }
+
+        .routes__title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .routes-table-container {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .routes-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .routes-table th,
+        .routes-table td {
+            padding: 6px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .routes-table th {
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        th {
+            color: #858585;
+        }
+
+        .schedule {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .chart {
+            display: flex;
+            height: 100%;
+            position: relative;
+        }
+
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1 1 50%;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .schedule__title {
+            font-weight: bold;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .schedule__amount {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ED8D48;
+            margin: 0;
+        }
+
+        .chart-wrapper {
+            flex-grow: 1;
+            min-height: 0;
+            position: relative;
+        }
+
+        .chart-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .y-axis {
+            position: absolute;
+            height: calc(100% - 25px);
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            text-align: right;
+            font-size: 10px;
+            color: #666;
+            width: 40px;
+            bottom: 25px;
+        }
+
+        .bars {
+            display: flex;
+            height: calc(100% - 25px);
+            margin-left: 30px;
+            align-items: flex-end;
+            justify-content: space-between;
+            border-left: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            position: absolute;
+            bottom: 25px;
+            left: 30px;
+            right: 10px;
+            padding: 0 5px;
+        }
+
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+            width: 24px;
+            flex-shrink: 0;
+        }
+
+        .bar {
+            width: 18px;
+            background: #ED8D48;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .time-label {
+            position: absolute;
+            bottom: -20px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        #trips-chart .bar {
+            background: #ED8D48;
+        }
+
+        .right-side {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map {
+            flex-grow: 1;
+            border-radius: 10px;
+            background: #e9ecef;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #map {
+            flex-grow: 1;
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .player-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+
+        .player-btn {
+            background: #ED8D48;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .player-btn.playing {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .player-btn:hover {
+            background: #e7a273;
+        }
+
+        .player-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .time-range {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+        }
+
+        #frame-info {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            min-width: 120px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #frame-slider {
+            flex-grow: 1;
+            max-width: 500px;
+            margin: 0 5px;
+        }
+
+        #start-time, #end-time {
+            font-size: 12px;
+            color: #666;
+            min-width: 50px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        #speed-input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .marker-label {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 0 0 2px white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            transform: translateY(-10px);
+        }
+
+        .segment-label {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-shadow: 0 0 2px white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+
+        .leaflet-control {
+            background: white;
+            border-radius: 4px;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaflet-tooltip {
+            box-shadow: none;
+            background: white;
+            z-index: inherit;
+        }
+
+        .leaflet-tooltip.excavator-tooltip {
+            z-index: 1001;
+        }
+
+        .leaflet-tooltip.truck-tooltip {
+            z-index: 999;
+        }
+
+        .leaflet-tooltip.unloading-tooltip {
+            z-index: 1001;
+        }
+
+        .loader {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        /* Стили для панели событий */
+        .events-panel {
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            height: calc(100vh - 100px);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+            border-left: 1px solid #ddd;
+        }
+
+        .events-panel.collapsed {
+            width: 40px;
+            padding: 10px 5px;
+        }
+
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .events-title {
+            font-weight: bold;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        .toggle-events {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            color: #ED8D48;
+        }
+
+        .events-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .events-list.collapsed {
+            display: none;
+        }
+
+        .event-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border-left: 3px solid #ED8D48;
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .event-time {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .highlighted {
+            font-weight: bold;
+            background-color: #fff8e6;
+            transition: background-color 0.3s;
+        }
+
+        .event-content {
+            color: #333;
+        }
+
+        .event-object {
+            font-style: italic;
+            color: #888;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            left: -5px;
+            width: 10px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 10;
+        }
+
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 3px;
+            height: 50px;
+            width: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .events-panel.collapsed .resize-handle {
+            display: none;
+        }
+
+        .filter-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 3px 8px;
+            margin-right: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            background: #f5f5f5;
+            color: #ED8D48;
+            border-color: #ED8D48;
+        }
+        .filter-btn.active {
+            background: #ED8D48;
+            color: white;
+            border-color: #ED8D48;
+        }
+        .filter-dropdown {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            min-width: 150px;
+            display: none;
+        }
+        .filter-dropdown-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .filter-dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        .filter-dropdown-item.selected {
+            background: #ED8D48;
+            color: white;
+        }
+        .filter-dropdown-item.all {
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+<div class="header">
+    <h1 class="quarry__title">Цифровой двойник</h1>
+    <img src="/static/images/logo.svg" alt="Логотип" class="logo">
+</div>
+
+<div class="main-content">
+    <div class="left-side">
+        <div class="quarry">
+            <div class="calculation">
+                <p class="calculation__text">Симуляция на дату</p>
+                <p start-date class="calculation__number"></p>
+
+                <p class="calculation__text">Количество самосвалов</p>
+                <p trucks-count class="calculation__number">0</p>
+
+                <p class="calculation__text">Количество экскаваторов</p>
+                <p excavators-count class="calculation__number">0</p>
+            </div>
+        </div>
+
+        <div class="routes">
+            <p class="routes__title">Маршруты за смену</p>
+            <div class="routes-table-container">
+                <table class="routes-table">
+                    <thead>
+                    <tr>
+                        <th>Самосвал</th>
+                        <th>Экскаватор</th>
+                        <th>Площадка</th>
+                    </tr>
+                    </thead>
+                    <tbody id="routes-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="schedule">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <p class="schedule__title">Вывезенная масса:</p>
+                    <p class="schedule__amount"></p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="chart-container" id="volume-chart">
+                        <div class="chart">
+                            <div class="y-axis"></div>
+                            <div class="bars"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <p class="schedule__title">Количество рейсов по часам:</p>
+                    <p class="schedule__amount" total-trips>0</p>
+                </div>
+                <div class="chart-wrapper">
+                    <div class="chart-container" id="trips-chart">
+                        <div class="chart">
+                            <div class="y-axis"></div>
+                            <div class="bars"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-side">
+        <div class="map">
+            <div id="map"></div>
+            <div class="player-container">
+                <button id="reset-btn" class="player-btn" title="В начало">⏮</button>
+                <button id="play-pause-btn" class="player-btn" title="Старт">▶</button>
+                <span id="frame-info">00:00:00</span>
+
+                <div class="time-range">
+                    <span id="start-time">00:00:00</span>
+                    <input type="range" id="frame-slider" min="0" value="0">
+                    <span id="end-time">00:00:00</span>
+                </div>
+
+                <div id="slider-loading"
+                     style="display: none; position: absolute; top: 10px; right: 10px; background: white; padding: 5px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <i class="fa fa-spinner fa-spin"></i> Загрузка данных...
+                </div>
+
+                <div class="speed-control">
+                    <label for="speed-input">Скорость:</label>
+                    <input type="number" id="speed-input" min="0.1" max="100" step="0.1" value="10">
+                    <span>мс/кадр</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="events-panel collapsed" id="events-panel">
+        <div class="resize-handle" id="resize-handle"></div>
+        <div class="events-header">
+            <button class="toggle-events" id="toggle-events">→</button>
+            <span class="events-title" hidden>Лог событий</span>
+        </div>
+        <div class="events-list collapsed" id="events-list"></div>
+    </div>
+</div>
+
+<div class="loader" id="loader">
+    <h3>Загрузка данных симуляции...</h3>
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="/static/leaflet.js"></script>
+<!-- Leaflet Editable -->
+<script src="/static/Leaflet.Editable.min.js"></script>
+<script src="/static/js/tz_utils.js" type="module"></script>
+
+<script>
+    const icons = {
+        excavator: L.icon({
+            iconUrl: '/static/icons/Excavator.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            tooltipAnchor: [0, 16],
+            popupAnchor: [0, -16],
+            shadowSize: 0,
+        }),
+        truck: L.icon({
+            iconUrl: '/static/icons/Truck2.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            tooltipAnchor: [0, 0],
+            popupAnchor: [0, -32],
+            shadowSize: 0,
+        }),
+        unloading_site: L.icon({
+            iconUrl: '/static/icons/UnloadingSite.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            tooltipAnchor: [0, 16],
+            popupAnchor: [0, 0],
+            shadowSize: 0,
+        }),
+    };
+
+    const brokenIcons = {
+        excavator: L.icon({
+            iconUrl: '/static/icons/Excavator-broken.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            tooltipAnchor: [0, 16],
+            popupAnchor: [0, -16],
+            shadowSize: 0,
+        }),
+        truck: L.icon({
+            iconUrl: '/static/icons/Truck2-broken.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            tooltipAnchor: [0, 0],
+            popupAnchor: [0, -32],
+            shadowSize: 0,
+        }),
+        unloading_site: L.icon({
+            iconUrl: '/static/icons/UnloadingSite-broken.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            tooltipAnchor: [0, 16],
+            popupAnchor: [0, 0],
+            shadowSize: 0,
+        }),
+    };
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    function renderChart(containerId, chartData, unit) {
+        const container = document.getElementById(containerId);
+        if (!container || !chartData || chartData.length === 0) return;
+
+        const yAxisContainer = container.querySelector('.y-axis');
+        const barsContainer = container.querySelector('.bars');
+
+        yAxisContainer.innerHTML = '';
+        barsContainer.innerHTML = '';
+
+        const maxValue = Math.max(...chartData.map(d => d.value));
+        const maxY = unit === 'рейсов'
+            ? Math.ceil(maxValue / 5) * 5
+            : Math.ceil(maxValue / 100) * 100;
+
+        const yStep = maxY / 5;
+        for (let i = 0; i <= 5; i++) {
+            const value = Math.round(i * yStep);
+            const span = document.createElement('span');
+            span.textContent = `${formatNumber(value)}${unit === 'рейсов' ? '' : ' ' + unit}`;
+            yAxisContainer.appendChild(span);
+        }
+
+        chartData.forEach(data => {
+            const barContainer = document.createElement('div');
+            barContainer.className = 'bar-container';
+
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.height = `${(data.value / maxY) * 100}%`;
+            bar.title = `${data.time} - ${formatNumber(data.value)} ${unit}`;
+
+            const timeLabel = document.createElement('div');
+            timeLabel.className = 'time-label';
+            timeLabel.textContent = data.time.split(':')[0];
+
+            barContainer.appendChild(bar);
+            barContainer.appendChild(timeLabel);
+            barsContainer.appendChild(barContainer);
+        });
+    }
+
+    let map;
+    let staticSegments = [];
+    let quarryData = null;
+    let isPlaying = false;
+
+    function togglePlayPause() {
+        player.isPlaying = !player.isPlaying;
+
+        if (player.isPlaying) {
+            playFrames();
+            document.getElementById('play-pause-btn').innerHTML = '⏸';
+        } else {
+            cancelAnimationFrame(player.animationFrameId);
+            document.getElementById('play-pause-btn').innerHTML = '▶';
+        }
+    }
+
+    function updatePlayButton() {
+        const button = document.getElementById('play-pause-btn');
+
+        if (isPlaying) {
+            button.innerHTML = '⏸';
+            button.title = 'Пауза';
+            button.classList.add('playing');
+        } else {
+            button.innerHTML = '▶';
+            button.title = 'Старт';
+            button.classList.remove('playing');
+        }
+    }
+
+    async function loadQuarryData() {
+        try {
+            const response = await fetch('/api/quarry-data');
+            if (response.ok) {
+                return await response.json();
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки данных карьера:', error);
+            return {};
+        }
+    }
+
+    function updateRoutesTable(quarryData) {
+        const routesBody = document.getElementById('routes-body');
+        routesBody.innerHTML = '';
+
+        if (!quarryData || !quarryData.trail_list || quarryData.trail_list.length === 0) {
+            return;
+        }
+
+        const excavatorsMap = new Map();
+        const trucksMap = new Map();
+        const sitesMap = new Map();
+
+        quarryData.shovel_list.forEach(exc => excavatorsMap.set(exc.id, exc));
+        quarryData.truck_list.forEach(truck => trucksMap.set(truck.id, truck));
+        quarryData.unload_list.forEach(site => sitesMap.set(site.id, site));
+
+        quarryData.trail_list.forEach(trail => {
+            const excavator = excavatorsMap.get(trail.shovel_id);
+            if (!excavator) return;
+
+            const site = sitesMap.get(trail.unload_id);
+
+            trail.trucks.forEach(truckId => {
+                const truck = trucksMap.get(truckId);
+                if (!truck) return;
+
+                const row = document.createElement('tr');
+
+                const truckCell = document.createElement('td');
+                truckCell.textContent = truck.name;
+
+                const excavatorCell = document.createElement('td');
+                excavatorCell.textContent = excavator.name;
+
+                const siteCell = document.createElement('td');
+                siteCell.textContent = site ? site.name : '-';
+
+                row.appendChild(truckCell);
+                row.appendChild(excavatorCell);
+                row.appendChild(siteCell);
+
+                routesBody.appendChild(row);
+            });
+        });
+    }
+
+    const player = {
+        batches: new Map(),
+        currentFrame: 0,
+        totalFrames: 0,
+        frameCache: new Map(),
+        isLoading: false,
+        meta: null,
+        timestamps: [],
+        lastBatchIndex: -1,
+        isPlaying: false,
+        simId: null,
+        animationFrameId: null,
+        speed: 10,
+        markers: new Map(),
+        lastRequestedBatch: -1,
+        isSeeking: false,
+        targetFrame: null,
+        queueMarkers: new Map(),
+    };
+
+    function renderQuarryData(data) {
+        const quarryData = data['quarry_list'][0]; // TODO: пока берем всегда данные первого карьера в списке
+        updateRoutesTable(quarryData);
+
+        document.querySelector('[start-date]').textContent = new Date(TimeUtils.utcToLocal(data.time.start_time))
+            .toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            })
+            .replace(/\//g, '.');
+
+        document.querySelector('[trucks-count]').textContent = quarryData.truck_list.length;
+
+        document.querySelector('[excavators-count]').textContent = quarryData.shovel_list.length;
+
+        quarryData.unload_list.forEach(site => {
+            const marker = L.marker([site.initial_lat, site.initial_lon], {
+                icon: icons.unloading_site,
+                zIndexOffset: 1500,
+                title: site.name
+            }).addTo(map);
+
+            let popupContent = `<b>${site.name}</b><br>`;
+            popupContent += `Тип: Площадка разгрузки<br>`;
+
+            marker.bindPopup(popupContent, {
+                offset: [0, -10]
+            });
+
+            marker.bindTooltip(site.name, {
+                permanent: true,
+                direction: 'top',
+                className: 'marker-label unloading-tooltip',
+                offset: [0, -32],
+                pane: 'tooltipPane'
+            });
+
+            const markerId = site.id + '_unload';
+            marker.meta = {};
+            marker.meta.name = site.name;
+            marker.meta.capacity = site.capacity;
+            player.markers.set(markerId, marker);
+        });
+
+        quarryData.trail_list.forEach(trail => {
+            trail.segments.forEach(segment => {
+                const start = [segment.start[0], segment.start[1]];
+                const end = [segment.end[0], segment.end[1]];
+
+                const polyline = L.polyline([start, end], {
+                    color: 'blue',
+                    weight: 3.5,
+                    dashArray: '0, 12',
+                    opacity: 1,
+                    interactive: false
+                }).addTo(map);
+
+                staticSegments.push(polyline);
+            });
+        });
+    }
+
+    function showLoader(show) {
+        document.getElementById('loader').style.display = show ? 'block' : 'none';
+    }
+
+    async function loadSimulationMeta(simId) {
+        const response = await fetch(`/api/simulation/${simId}/meta`);
+        if (!response.ok) throw new Error('Ошибка загрузки метаданных');
+        return await response.json();
+    }
+
+    function loadBatchesAroundPosition(secondsFromStart) {
+        if (!player.meta) return;
+
+        const centerBatchIndex = Math.floor(secondsFromStart / player.meta.batch_size_seconds);
+
+        const batchesToLoad = [];
+        for (let i = centerBatchIndex - 2; i <= centerBatchIndex + 2; i++) {
+            if (i >= 0 && i < player.meta.total_batches && !player.batches.has(i)) {
+                batchesToLoad.push(i);
+            }
+        }
+
+        if (batchesToLoad.length > 0) {
+            loadBatches(batchesToLoad);
+        }
+    }
+
+    async function seekToPosition(secondsFromStart) {
+        pauseFrames();
+        player.isSeeking = true;
+        document.getElementById('slider-loading').style.display = 'block';
+
+        const targetTimestamp = player.meta.start_timestamp + secondsFromStart;
+        player.targetFrame = targetTimestamp;
+
+        loadBatchesAroundPosition(secondsFromStart);
+
+        const targetBatchIndex = Math.floor(secondsFromStart / player.meta.batch_size_seconds);
+        await waitForBatch(targetBatchIndex);
+
+        if (player.targetFrame !== targetTimestamp) return;
+
+        const frameIndex = findNearestFrameIndex(targetTimestamp);
+        if (frameIndex !== -1) {
+            player.currentFrame = frameIndex;
+            showFrame(player.currentFrame);
+            updateFrameInfo();
+            updateEventsHighlight();
+        }
+
+        document.getElementById('slider-loading').style.display = 'none';
+        player.isSeeking = false;
+        player.targetFrame = null;
+    }
+
+    function waitForBatch(batchIndex) {
+        return new Promise((resolve) => {
+            const check = () => {
+                if (player.batches.has(batchIndex)) {
+                    resolve();
+                } else {
+                    setTimeout(check, 100);
+                }
+            };
+            check();
+        });
+    }
+
+    function findNearestFrameIndex(targetTimestamp) {
+        let left = 0;
+        let right = player.timestamps.length - 1;
+        let result = -1;
+
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2);
+
+            if (player.timestamps[mid] >= targetTimestamp) {
+                result = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        return result !== -1 ? result : player.timestamps.length - 1;
+    }
+
+    async function loadBatches(batchIndices) {
+        if (!batchIndices || batchIndices.length === 0 || player.isLoading) return;
+        player.isLoading = true;
+
+        try {
+            const toLoad = batchIndices.filter(i => !player.batches.has(i));
+            if (toLoad.length === 0) return;
+
+            const batchPromises = toLoad.map(index =>
+                fetch(`/api/simulation/${player.simId}/batch/${index}`)
+                    .then(response => response.json())
+            );
+
+            const batches = await Promise.all(batchPromises);
+
+            batches.forEach((batch, i) => {
+                const index = toLoad[i];
+                player.batches.set(index, batch);
+
+                batch.frames.forEach(frame => {
+                    if (!player.frameCache.has(frame.timestamp)) {
+                        player.frameCache.set(frame.timestamp, []);
+                        player.timestamps.push(frame.timestamp);
+                    }
+                    player.frameCache.get(frame.timestamp).push(frame);
+                });
+            });
+
+            player.timestamps.sort((a, b) => a - b);
+            player.totalFrames = player.timestamps.length;
+
+        } catch (error) {
+            console.error("Ошибка загрузки батчей:", error);
+        } finally {
+            player.isLoading = false;
+        }
+    }
+
+    async function initMap() {
+        map = L.map('map', {attributionControl: false}).setView([58.172, 59.817], 16);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri'
+        }).addTo(map);
+
+        initMapEventHandlers();
+
+        quarryData = await loadQuarryData();
+        renderQuarryData(quarryData);
+    }
+
+    function showFrame(frameIndex) {
+        if (frameIndex < 0 || frameIndex >= player.totalFrames) return;
+
+        const timestamp = player.timestamps[frameIndex];
+        const frameObjects = player.frameCache.get(timestamp) || [];
+
+        frameObjects.forEach(obj => {
+            try {
+                let marker = player.markers.get(obj.object_id);
+
+                if (marker) {
+                    if (obj.object_type !== 'unloading_site') {
+                        marker.setLatLng([obj.lat, obj.lon]);
+                    }
+                    obj.meta = marker.meta;
+                    marker.setPopupContent(generatePopupContent(obj));
+
+                    if (obj.object_type === 'excavator' || obj.object_type === 'unloading_site') {
+                        updateQueueMarker(obj, marker);
+                    }
+
+                    updateMarkerIcon(obj, marker);
+
+                } else {
+                    if (obj.object_type !== 'unloading_site') {
+                        const icon = icons[obj.object_type] || icons.truck;
+                        const zIndexOffset = obj.object_type === 'excavator' ? 2000 : 1000;
+
+                        marker = L.marker([obj.lat, obj.lon], {
+                            icon: icon,
+                            title: obj.object_name,
+                            zIndexOffset: zIndexOffset,
+                            bubblingMouseEvents: false
+                        }).addTo(map);
+
+                        marker.bindPopup(() => generatePopupContent(obj));
+
+                        marker.bindTooltip(obj.object_name, {
+                            permanent: true,
+                            direction: 'top',
+                            className: `marker-label ${obj.object_type}-tooltip`,
+                            offset: [0, -32],
+                            pane: 'tooltipPane'
+                        });
+
+                        updateMarkerIcon(obj, marker);
+
+                        player.markers.set(obj.object_id, marker);
+                    }
+                }
+            } catch (error) {
+                console.error(`Ошибка обработки объекта ${obj.object_id}:`, error);
+            }
+        });
+
+        updateEventsHighlight();
+    }
+
+    function createQueueIcon(count) {
+        return L.divIcon({
+            html: `
+                    <div style="position:relative">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#4CAF50"/>
+                            <text x="12" y="16" font-size="12" text-anchor="middle" fill="white">${count}</text>
+                        </svg>
+                    </div>
+                `,
+            className: 'queue-marker',
+            iconSize: [32, 24],
+            iconAnchor: [16, 12],
+            popupAnchor: [0, -12]
+        });
+    }
+
+    function updateQueueIcon(marker, count) {
+        if (!marker || !marker._icon) return;
+
+        marker._icon.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#4CAF50"/>
+                    <text x="12" y="16" font-size="12" text-anchor="middle" fill="white">${count}</text>
+                </svg>
+            `;
+    }
+
+    const QUEUE_MARKER_OFFSET = 30;
+
+    function updateQueueMarkerPosition(objectId, objectType) {
+        const queueData = player.queueMarkers.get(objectId);
+        if (!queueData || !map) return;
+
+        const mainMarker = player.markers.get(objectId);
+        if (!mainMarker) return;
+
+        const mainLatLng = mainMarker.getLatLng();
+        const mainPoint = map.latLngToContainerPoint(mainLatLng);
+
+        const queuePoint = L.point(
+            mainPoint.x + QUEUE_MARKER_OFFSET,
+            mainPoint.y
+        );
+
+        const queueLatLng = map.containerPointToLatLng(queuePoint);
+        queueData.marker.setLatLng(queueLatLng);
+    }
+
+    function updateAllQueueMarkersPosition() {
+        if (!player.queueMarkers) return;
+
+        player.queueMarkers.forEach((data, objectId) => {
+            if (data.type) {
+                updateQueueMarkerPosition(objectId, data.type);
+            }
+        });
+    }
+
+    function updateQueueMarker(obj, mainMarker) {
+        const queueCount = obj.trucks_queue?.length || 0;
+        const queueData = player.queueMarkers.get(obj.object_id);
+
+        if (queueCount > 0) {
+            if (queueData && queueData.marker) {
+                if (queueCount !== queueData.count) {
+                    updateQueueIcon(queueData.marker, queueCount);
+                    updateQueueMarkerPosition(obj.object_id, obj.object_type);
+                    queueData.count = queueCount;
+                    const popup = queueData.marker.getPopup();
+                    if (popup) popup.setContent(generateQueuePopupContent(obj));
+                }
+            } else {
+                createQueueMarker(obj, mainMarker);
+            }
+        } else {
+            removeQueueMarker(obj.object_id);
+        }
+    }
+
+    function updateMarkerIcon(obj, marker) {
+        const cur_icon = marker.getIcon() || icons.truck;
+        let next_icon = icons[obj.object_type] || icons.truck;
+        if (obj.state == 'Ремонт') {
+            next_icon = brokenIcons[obj.object_type] || brokenIcons.truck;
+        }
+        if (cur_icon.options.iconUrl != next_icon.options.iconUrl) {
+            marker.setIcon(next_icon);
+        }
+    }
+
+    function initMapEventHandlers() {
+        if (!map) return;
+        map.off('zoomend moveend', updateAllQueueMarkersPosition);
+        map.on('zoomend moveend', updateAllQueueMarkersPosition);
+    }
+
+    function createQueueMarker(obj, mainMarker) {
+        const queueCount = obj.object_type === 'excavator'
+            ? (obj.trucks_queue?.length || 0)
+            : (obj.trucks_queue?.length || 0) + (obj.unloading_trucks?.length || 0);
+
+        const queueMarker = L.marker(mainMarker.getLatLng(), {
+            icon: createQueueIcon(queueCount),
+            title: `Очередь ${obj.object_name}`,
+            zIndexOffset: obj.object_type === 'excavator' ? 1900 : 1300,
+            bubblingMouseEvents: false
+        }).addTo(map);
+
+        queueMarker.bindPopup(generateQueuePopupContent(obj));
+
+        player.queueMarkers.set(obj.object_id, {
+            marker: queueMarker,
+            mainMarkerId: obj.object_id,
+            count: queueCount,
+            type: obj.object_type
+        });
+
+        updateQueueMarkerPosition(obj.object_id, obj.object_type);
+    }
+
+    function removeQueueMarker(excavatorId) {
+        const queueData = player.queueMarkers.get(excavatorId);
+        if (queueData) {
+            map.removeLayer(queueData.marker);
+            player.queueMarkers.delete(excavatorId);
+        }
+    }
+
+    function generateQueuePopupContent(obj) {
+        let content = `<b>Очередь самосвалов:</b><ul>`;
+        obj.trucks_queue.forEach(truck => {
+            content += `<li>${truck}</li>`;
+        });
+        content += `</ul>`;
+        return content;
+    }
+
+    function generatePopupContent(obj) {
+        if (obj.object_type === 'truck') {
+            return `<b>${obj.object_name}</b>
+                    <div>Тип: Самосвал</div>
+                    <div>Скорость: ${obj.speed} км/ч</div>
+                    <div>Вес: ${obj.weight} т</div>
+                    <div>Состояние: ${obj.state}</div>
+                `;
+        } else if (obj.object_type === 'excavator') {
+            return `<b>${obj.object_name}</b>
+                    <div>Тип: Экскаватор</div>
+                    <div>Состояние: ${obj.state}</div>
+                    <div>На погрузке: ${obj.loading_truck}</div>
+                `;
+        } else if (obj.object_type === 'unloading_site') {
+            return `<b>${obj.meta.name}</b>
+                    <div>Тип: Площадка разгрузки</div>
+                    <div style="word-break: break-word;">На разгрузке: ${obj.unloading_trucks.length ? obj.unloading_trucks.join(', ') : '-'}</div>
+                `;
+        }
+    }
+
+    function formatTime(timestamp) {
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+    }
+
+    function updateFrameInfo() {
+        if (!player.meta || player.timestamps.length === 0) return;
+
+        const currentTimestamp = player.timestamps[player.currentFrame];
+
+        document.getElementById('frame-info').textContent =
+            formatTime(currentTimestamp);
+
+        const secondsFromStart = currentTimestamp - player.meta.start_timestamp;
+        const slider = document.getElementById('frame-slider');
+        slider.value = secondsFromStart;
+    }
+
+    function prefetchNextBatches() {
+        if (!player.meta || player.timestamps.length === 0 || player.isLoading) return;
+
+        const currentTime = player.timestamps[player.currentFrame];
+        const secondsFromStart = currentTime - player.meta.start_timestamp;
+        const currentBatch = Math.floor(secondsFromStart / player.meta.batch_size_seconds);
+
+        const batchesToLoad = [];
+        for (let i = 1; i <= 3; i++) {
+            const nextBatch = currentBatch + i;
+            if (nextBatch < player.meta.total_batches && !player.batches.has(nextBatch)) {
+                batchesToLoad.push(nextBatch);
+            }
+        }
+
+        if (batchesToLoad.length > 0) {
+            loadBatches(batchesToLoad);
+        }
+    }
+
+    function getNextBatchToLoad() {
+        if (!player.meta || player.timestamps.length === 0) return -1;
+
+        let lastLoadedBatch = -1;
+        for (let i = 0; i < player.meta.total_batches; i++) {
+            if (player.batches.has(i)) {
+                lastLoadedBatch = i;
+            }
+        }
+
+        const batchesToLoad = [];
+        for (let i = 1; i <= 3; i++) {
+            const nextBatch = lastLoadedBatch + i;
+            if (nextBatch < player.meta.total_batches) {
+                batchesToLoad.push(nextBatch);
+            }
+        }
+
+        return batchesToLoad.length > 0 ? batchesToLoad : -1;
+    }
+
+    function initControls() {
+        if (!player.meta) return;
+
+        const slider = document.getElementById('frame-slider');
+        slider.min = 0;
+        slider.max = player.meta.end_timestamp - player.meta.start_timestamp;
+
+        document.getElementById('start-time').textContent =
+            formatTime(player.meta.start_timestamp);
+
+        document.getElementById('end-time').textContent =
+            formatTime(player.meta.end_timestamp);
+
+        slider.addEventListener('input', function () {
+            const secondsFromStart = parseInt(this.value);
+            seekToPosition(secondsFromStart);
+        });
+
+        slider.addEventListener('change', function () {
+            const secondsFromStart = parseInt(this.value);
+            seekToPosition(secondsFromStart);
+        });
+    }
+
+    async function initPlayer(simId) {
+        player.simId = simId;
+        player.meta = await loadSimulationMeta(simId);
+
+        initControls();
+
+        const initialBatches = [];
+        for (let i = 0; i < Math.min(5, player.meta.total_batches); i++) {
+            initialBatches.push(i);
+        }
+
+        await loadBatches(initialBatches);
+
+        if (player.totalFrames === 0) {
+            console.error("Нет данных для воспроизведения");
+            return;
+        }
+
+        player.currentFrame = 0;
+        showFrame(player.currentFrame);
+        updateFrameInfo();
+    }
+
+    function playFrames() {
+        if (!player.isPlaying) return;
+
+        if (player.currentFrame >= player.timestamps.length) {
+            const batchesToLoad = getNextBatchToLoad();
+
+            if (batchesToLoad !== -1) {
+                loadBatches(batchesToLoad);
+
+                pauseFrames();
+                return;
+            } else {
+                pauseFrames();
+            }
+            return;
+        }
+
+        const startTime = performance.now();
+
+        showFrame(player.currentFrame);
+        updateFrameInfo();
+
+        player.currentFrame++;
+
+        if (player.currentFrame % 10 === 0) {
+            prefetchNextBatches();
+        }
+
+        const elapsed = performance.now() - startTime;
+        const targetDelay = Math.max(16, player.speed - elapsed);
+
+        player.animationFrameId = setTimeout(() => {
+            requestAnimationFrame(playFrames);
+        }, targetDelay);
+    }
+
+    function pauseFrames() {
+        player.isPlaying = false;
+        updatePlayButton();
+    }
+
+    function resetPlayer() {
+        player.isPlaying = false;
+        cancelAnimationFrame(player.animationFrameId);
+        player.currentFrame = 0;
+        showFrame(player.currentFrame);
+        updateFrameInfo();
+        document.getElementById('play-pause-btn').innerHTML = '▶';
+        updateEventsHighlight();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const simId = urlParams.get('sim_id') || '{{ sim_id }}';
+
+        if (!simId) {
+            console.error('ID симуляции не указан');
+            return;
+        }
+
+        try {
+            showLoader(true);
+
+            await initMap();
+            await initPlayer(simId);
+
+            const summaryResponse = await fetch(`/api/simulation/${simId}/summary`);
+            if (!summaryResponse.ok) throw new Error('Ошибка загрузки summary');
+            const summary = await summaryResponse.json();
+
+            document.querySelector('[total-trips]').textContent = summary.trips;
+            document.querySelector('.schedule__amount').textContent = formatNumber(summary.weight) + ' т';
+
+            renderChart('volume-chart', summary.chart_volume_data, 'т');
+            renderChart('trips-chart', summary.chart_trip_data, 'рейсов');
+
+            const speedInput = document.getElementById('speed-input');
+            speedInput.value = player.speed;
+
+            setTimeout(() => prefetchNextBatches(), 1000);
+
+            document.getElementById('play-pause-btn').addEventListener('click', togglePlayPause);
+            document.getElementById('reset-btn').addEventListener('click', function () {
+                pauseFrames();
+                resetPlayer();
+            });
+
+            speedInput.addEventListener('change', function () {
+                let newSpeed = parseInt(this.value);
+                if (isNaN(newSpeed)) newSpeed = 100;
+                if (newSpeed < 1) newSpeed = 1;
+                if (newSpeed > 1000) newSpeed = 1000;
+
+                this.value = newSpeed;
+                player.speed = newSpeed;
+
+                if (player.intervalId) {
+                    pauseFrames();
+                    playFrames();
+                }
+            });
+
+            initEventsPanel(simId);
+
+        } catch (error) {
+            console.error('Ошибка инициализации:', error);
+            alert('Ошибка загрузки данных: ' + error.message);
+        } finally {
+            showLoader(false);
+        }
+    });
+
+    function updateEventsHighlight() {
+        if (!filteredEvents.length || !player.timestamps || player.currentFrame >= player.timestamps.length) {
+            return;
+        }
+
+        const currentTime = player.timestamps[player.currentFrame];
+        const eventItems = document.querySelectorAll('#events-list .event-item');
+
+        let lastEventIndexInFiltered = -1;
+        for (let i = 0; i < filteredEvents.length; i++) {
+            if (filteredEvents[i].time <= currentTime) {
+                lastEventIndexInFiltered = i;
+            } else {
+                break;
+            }
+        }
+
+        eventItems.forEach(item => item.classList.remove('highlighted'));
+
+        if (lastEventIndexInFiltered >= 0 && eventItems[lastEventIndexInFiltered]) {
+            const highlightedEvent = eventItems[lastEventIndexInFiltered];
+            highlightedEvent.classList.add('highlighted');
+
+            const eventsList = document.getElementById('events-list');
+            const eventRect = highlightedEvent.getBoundingClientRect();
+            const listRect = eventsList.getBoundingClientRect();
+
+            if (eventRect.top < listRect.top || eventRect.bottom > listRect.bottom) {
+                highlightedEvent.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }
+        }
+    }
+
+    let allEvents = [];
+    let filteredEvents = [];
+    let objectNames = [];
+    let currentFilter = 'all';
+
+    function initEventsPanel(simId) {
+        const eventsPanel = document.getElementById('events-panel');
+        const eventsList = document.getElementById('events-list');
+        const toggleEventsBtn = document.getElementById('toggle-events');
+        const resizeHandle = document.getElementById('resize-handle');
+        const eventsHeader = document.querySelector('.events-header');
+        let eventsLoaded = false;
+        let isResizing = false;
+
+        let eventsTitle = eventsHeader.querySelector('.events-title');
+        if (!eventsTitle) {
+            eventsTitle = document.createElement('span');
+            eventsTitle.className = 'events-title';
+            eventsTitle.textContent = 'События';
+            eventsTitle.hidden = true;
+            eventsHeader.insertBefore(eventsTitle, toggleEventsBtn);
+        }
+
+        const filterBtn = document.createElement('button');
+        filterBtn.className = 'filter-btn';
+        filterBtn.id = 'filter-btn';
+        filterBtn.textContent = 'Фильтр';
+        filterBtn.style.display = 'none';
+
+        const filterDropdown = document.createElement('div');
+        filterDropdown.className = 'filter-dropdown';
+        filterDropdown.id = 'filter-dropdown';
+
+        toggleEventsBtn.parentNode.insertBefore(filterBtn, toggleEventsBtn.nextSibling);
+        eventsHeader.appendChild(filterDropdown);
+
+        eventsHeader.style.position = 'relative';
+
+        toggleEventsBtn.addEventListener('click', function() {
+            eventsPanel.classList.toggle('collapsed');
+            eventsList.classList.toggle('collapsed');
+            if (eventsPanel.classList.contains('collapsed')) {
+                toggleEventsBtn.innerHTML = '→';
+                eventsPanel.style.width = '';
+                eventsTitle.hidden = true;
+                filterBtn.style.display = 'none';
+            } else {
+                toggleEventsBtn.innerHTML = '←';
+                eventsTitle.hidden = false;
+                if (eventsLoaded && objectNames.length > 0) {
+                    filterBtn.style.display = 'inline-block';
+                }
+                if (!eventsLoaded) {
+                    loadEvents(simId);
+                    eventsLoaded = true;
+                }
+            }
+        });
+
+        filterBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.querySelectorAll('.filter-dropdown').forEach(dropdown => {
+                if (dropdown !== filterDropdown) {
+                    dropdown.style.display = 'none';
+                }
+            });
+            if (filterDropdown.style.display === 'block') {
+                filterDropdown.style.display = 'none';
+            } else {
+                const rect = filterBtn.getBoundingClientRect();
+                const headerRect = eventsHeader.getBoundingClientRect();
+                filterDropdown.style.top = `${rect.bottom - headerRect.top}px`;
+                filterDropdown.style.left = `${rect.left - headerRect.left}px`;
+                filterDropdown.style.display = 'block';
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!filterDropdown.contains(e.target) && e.target !== filterBtn) {
+                filterDropdown.style.display = 'none';
+            }
+        });
+
+        resizeHandle.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            const startX = e.clientX;
+            const startWidth = parseInt(getComputedStyle(eventsPanel).width);
+            function onMouseMove(e) {
+                if (!isResizing) return;
+                const newWidth = startWidth - (e.clientX - startX);
+                if (newWidth > 200 && newWidth < 600) {
+                    eventsPanel.style.width = newWidth + 'px';
+                }
+            }
+            function onMouseUp() {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.preventDefault();
+        });
+
+        function applyFilter(filter) {
+            currentFilter = filter;
+
+            if (filter === 'all') {
+                filterBtn.textContent = 'Фильтр';
+                filterBtn.classList.remove('active');
+            } else {
+                filterBtn.textContent = `Фильтр: ${filter}`;
+                filterBtn.classList.add('active');
+            }
+
+            if (filter === 'all') {
+                filteredEvents = [...allEvents];
+            } else {
+                filteredEvents = allEvents.filter(event => event.object_name === filter);
+            }
+
+            displayFilteredEvents();
+            updateEventsHighlight();
+        }
+
+        window.applyEventsFilter = applyFilter;
+    }
+
+    async function loadEvents(simId) {
+        try {
+            const eventsList = document.getElementById('events-list');
+            eventsList.innerHTML = '<div class="event-item">Загрузка событий...</div>';
+            const response = await fetch(`/api/simulation/${simId}/events`);
+            if (!response.ok) throw new Error('Ошибка загрузки событий');
+            const events = await response.json();
+
+            events.sort((a, b) => a.time - b.time);
+
+            const uniqueObjectNames = [...new Set(events.map(event => event.object_name))]
+                .filter(Boolean)
+                .sort((a, b) => a.localeCompare(b));
+
+            const filterBtn = document.getElementById('filter-btn');
+            const filterDropdown = document.getElementById('filter-dropdown');
+
+            allEvents = events;
+            objectNames = uniqueObjectNames;
+            filteredEvents = [...events];
+
+            filterDropdown.innerHTML = '';
+
+            const allItem = document.createElement('div');
+            allItem.className = 'filter-dropdown-item all';
+            allItem.textContent = 'Все объекты';
+            allItem.addEventListener('click', () => {
+                window.applyEventsFilter('all');
+                filterDropdown.style.display = 'none';
+            });
+            filterDropdown.appendChild(allItem);
+
+            uniqueObjectNames.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'filter-dropdown-item';
+                item.textContent = name;
+                item.addEventListener('click', () => {
+                    window.applyEventsFilter(name);
+                    filterDropdown.style.display = 'none';
+                });
+                filterDropdown.appendChild(item);
+            });
+
+            if (filterBtn) {
+                filterBtn.style.display = 'inline-block';
+            }
+
+            displayFilteredEvents();
+
+            if (!document.getElementById('events-panel').classList.contains('collapsed')) {
+                updateEventsHighlight();
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки событий:', error);
+            document.getElementById('events-list').innerHTML = '<div class="event-item">Ошибка загрузки событий</div>';
+        }
+    }
+
+    function displayFilteredEvents() {
+        const eventsList = document.getElementById('events-list');
+        if (!filteredEvents || filteredEvents.length === 0) {
+            eventsList.innerHTML = '<div class="event-item">События отсутствуют</div>';
+            return;
+        }
+        eventsList.innerHTML = '';
+        filteredEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'event-item';
+            eventElement.dataset.eventTime = event.time;
+
+            const eventTime = new Date(event.time * 1000);
+            const timeString = eventTime.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            eventElement.innerHTML = `
+                <div class="event-time">${timeString}</div>
+                <div class="event-content">${escapeHtml(event.event_name)}</div>
+                <div class="event-object">${escapeHtml(event.object_name)}</div>
+            `;
+
+            eventElement.addEventListener('click', function() {
+                document.querySelectorAll('#events-list .event-item').forEach(item => {
+                    item.classList.remove('highlighted');
+                });
+                this.classList.add('highlighted');
+
+                if (!player.meta) {
+                    console.error('Метаданные плеера не загружены');
+                    return;
+                }
+
+                const secondsFromStart = Math.max(0, event.time - player.meta.start_timestamp);
+
+                seekToPosition(secondsFromStart);
+            });
+
+            eventsList.appendChild(eventElement);
+        });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>
+</body>
+</html>
