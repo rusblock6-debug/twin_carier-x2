@@ -38,8 +38,8 @@ from app.geojson_schema import FEATURE_COLLECTION_POINT_LINESTRING, FEATURE_COLL
 from app.road_net import RoadNetCleaner
 from app.shift import ShiftLogic, ShiftConfigException
 from app import SessionLocal
-from roadnet.core import BaseSchemaValidator, RoadNetFactory, RoadNetGraph
-from roadnet.exceptions import RoadNetException
+from app.sim_engine.core.dummy_roadnet import *
+from app.sim_engine.core.dummy_roadnet import *
 
 db = SessionLocal()
 
@@ -802,3 +802,4 @@ TYPE_SCHEMA_MAP: Dict[str, Type[BaseModel]] = {
     MapOverlay.__tablename__: MapOverlaySchema,
     PlannedIdle.__tablename__: PlannedIdleSchema,
 }
+

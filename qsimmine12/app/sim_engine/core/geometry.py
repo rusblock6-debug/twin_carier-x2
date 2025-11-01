@@ -3,7 +3,7 @@ import copy
 from dataclasses import dataclass
 from typing import Tuple
 
-from roadnet.core import Edge, Vertex, RoadNetFactory
+from app.sim_engine.core.dummy_roadnet import *
 
 from app.sim_engine.core.props import Route as SimRoute, SimData
 from app.sim_engine.enums import ObjectType
@@ -447,3 +447,4 @@ def find_route_edges_around_restricted_zones_from_position_to_object(
     return chosen_route
 
 # endregion
+

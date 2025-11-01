@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>API: Документированные функции</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <style>
+        * {box-sizing:border-box;margin:0;padding:0;}
+        body {font-family:Arial,sans-serif;height:100vh;overflow:hidden;background:#f9f9f9;}
+        #app {height:100%;}
+        #toolbar {background:#2c3e50;color:#fff;padding:10px;display:flex;gap:10px;align-items:center;font-size:14px;}
+        #toolbar label {background:#34495e;padding:6px 12px;border-radius:4px;cursor:pointer;}
+        #toolbar input[type=file] {display:none;}
+        #search {flex:1;max-width:350px;padding:6px;border-radius:4px;border:1px solid #555;background:#fff;color:#000;}
+        #content {display:flex;height:calc(100vh - 56px);}
+        .panel {overflow:auto;background:#fff;padding:15px;}
+        #tree {width:320px;font-size:13px;border-right:1px solid #ddd;position:relative;}
+        #details {flex:1;}
+        .resizer {width:5px;background:#ccc;cursor:col-resize;position:absolute;top:0;bottom:0;right:-2px;}
+        details {margin:6px 0;}
+        summary {cursor:pointer;font-weight:600;color:#2c3e50;}
+        .node {cursor:pointer;padding:3px 6px;border-radius:3px;}
+        .node:hover {background:#e3f2fd;}
+        pre {background:#f5f5f5;padding:10px;border-radius:4px;font-family:Consolas;margin:8px 0;white-space:pre-wrap;}
+        code {background:#eee;padding:2px 6px;border-radius:3px;font-family:Consolas;}
+        .call {color:#0066cc;text-decoration:underline;cursor:pointer;}
+        .stats {color:#bdc3c7;font-size:12px;}
+        .filter-btn {background:#27ae60;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;}
+        .filter-btn.active {background:#1e7e34;}
+    </style>
+</head>
+<body>
+
+<div id="app" v-cloak>
+    <div id="toolbar">
+        <label>
+            project_metadata_full.json
+            <input type="file" ref="file" @change="load" accept=".json">
+        </label>
+        <input v-model="query" @input="applyFilter" placeholder="Поиск по имени, docstring, вызовам..." autofocus>
+        <button @click="query=''; applyFilter()" title="Очистить">X</button>
+        <button class="filter-btn" :class="{active: filterMode}" @click="filterMode = !filterMode; applyFilter()">
+            {{ filterMode ? 'Все' : 'Только с docstring' }}
+        </button>
+        <span class="stats">Найдено: {{ filtered.length }} / {{ totalFunctions }} функций</span>
+    </div>
+
+    <div id="content">
+        <div id="tree" class="panel">
+            <div class="resizer" @mousedown="resizeStart"></div>
+            <div v-if="filtered.length === 0 && files.length > 0" style="color:#999;padding:30px;text-align:center;">
+                Ничего не найдено
+            </div>
+            <div v-for="file in filtered" :key="file.file_path">
+                <details open>
+                    <summary>{{ file.module }} ({{ basename(file.file_path) }})</summary>
+                    <div v-for="f in file.functions" :key="f.function_name" class="node" @click="select(f, file)">
+                        {{ f.class_name ? f.class_name + '.' : '' }}{{ f.function_name }}
+                        <small v-if="f.docstring" style="color:#27ae60;">●</small>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <div id="details" class="panel">
+            <div v-if="selected">
+                <h2>{{ selected.class_name ? selected.class_name + '.' : '' }}{{ selected.function_name }}</h2>
+                <p><b>Файл:</b> <code>{{ selected.file_path }}</code> ({{ selected.line_start }}-{{ selected.line_end }})</p>
+                <p><b>Модуль:</b> <code>{{ selected.module }}</code></p>
+                <p v-if="selected.docstring"><b>Docstring:</b><pre>{{ selected.docstring }}</pre></p>
+                <p v-if="selected.arguments && selected.arguments.length"><b>Аргументы:</b>
+                    <ul>
+                        <li v-for="a in selected.arguments">
+                            <code>{{ a.name }}</code>{{ a.type ? `: ${a.type}` : '' }}{{ a.default ? ` = ${a.default}` : '' }}
+                        </li>
+                    </ul>
+                </p>
+                <p v-if="selected.return_type"><b>Возвращает:</b> <code>{{ selected.return_type }}</code></p>
+                <p v-if="selected.calls && selected.calls.length"><b>Вызывает ({{ selected.calls.length }}):</b>
+                    <span v-for="(c, i) in selected.calls" :key="i">
+                        <code class="call" @click="searchCall(c)">{{ c }}</code>{{ i < selected.calls.length-1 ? ', ' : '' }}
+                    </span>
+                </p>
+            </div>
+            <div v-else style="color:#999;padding:40px;text-align:center;">
+                Загрузите JSON и выберите функцию
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        files: [],
+        filtered: [],
+        query: '',
+        selected: null,
+        filterMode: true
+    },
+    computed: {
+        totalFunctions() {
+            return this.files.reduce((sum, f) => sum + (f.functions ? f.functions.length : 0), 0);
+        }
+    },
+    methods: {
+        load(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const r = new FileReader();
+            r.onload = ev => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    this.files = data
+                        .filter(f => !f.skipped && !f.error)
+                        .map(file => ({
+                            ...file,
+                            functions: (file.functions || []).filter(func => {
+                                const name = func.function_name || '';
+                                const path = file.file_path || '';
+                                const isTest = name.startsWith('test_') || path.includes('/test') || path.includes('/tests');
+                                const isPrivate = name.startsWith('_') && name !== '__init__';
+                                const isUtil = file.module && (
+                                    file.module.includes('utils') || 
+                                    file.module.includes('helpers') || 
+                                    file.module.includes('infra')
+                                );
+                                return !isTest && !isPrivate && !isUtil;
+                            })
+                        }))
+                        .filter(f => f.functions && f.functions.length > 0);
+                    this.applyFilter();
+                } catch (e) { 
+                    console.error(e);
+                    alert('Ошибка загрузки JSON: ' + e.message); 
+                }
+            };
+            r.readAsText(file);
+        },
+        applyFilter() {
+            let result = this.files;
+
+            // Фильтр: только с docstring
+            if (this.filterMode) {
+                result = result.map(file => ({
+                    ...file,
+                    functions: file.functions.filter(f => 
+                        f.docstring && typeof f.docstring === 'string' && f.docstring.trim()
+                    )
+                })).filter(f => f.functions.length > 0);
+            }
+
+            // Поиск
+            const q = (this.query || '').toLowerCase().trim();
+            if (q) {
+                result = result.map(file => ({
+                    ...file,
+                    functions: file.functions.filter(f => {
+                        const name = (f.function_name || '').toLowerCase();
+                        const doc = (f.docstring || '').toLowerCase();
+                        const calls = Array.isArray(f.calls) ? f.calls.map(c => c.toLowerCase()) : [];
+                        return name.includes(q) || doc.includes(q) || calls.some(c => c.includes(q));
+                    })
+                })).filter(f => f.functions.length > 0);
+            }
+
+            this.filtered = result;
+        },
+        select(func, file) {
+            this.selected = { ...func, file_path: file.file_path, module: file.module };
+        },
+        searchCall(name) {
+            this.query = name;
+            this.applyFilter();
+        },
+        basename(p) { return p.split(/[\\/]/).pop(); },
+        resizeStart(e) {
+            const tree = document.getElementById('tree');
+            const startX = e.clientX;
+            const startW = tree.offsetWidth;
+            const move = e => tree.style.width = `${startW + e.clientX - startX}px`;
+            const up = () => {
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('mouseup', up);
+            };
+            document.addEventListener('mousemove', move);
+            document.addEventListener('mouseup', up);
+        }
+    },
+    watch: {
+        filterMode() { this.applyFilter(); },
+        query() { this.applyFilter(); }
+    }
+});
+</script>
+
+</body>
+</html>
