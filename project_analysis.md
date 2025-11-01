@@ -84,7 +84,7 @@ Process LINE entity
 
 **Возвращает:** `dict`
 
-**Вызывает:** `convert_coords`, `safe_geojson_coords`
+**Вызывает:** `safe_geojson_coords`, `convert_coords`
 
 ---
 
@@ -99,7 +99,7 @@ Process POLYLINE entity
 
 **Возвращает:** `dict | None`
 
-**Вызывает:** `append`, `len`, `convert_coords`, `safe_geojson_coords`
+**Вызывает:** `len`, `append`, `safe_geojson_coords`, `convert_coords`
 
 ---
 
@@ -114,7 +114,7 @@ Process LWPOLYLINE entity
 
 **Возвращает:** `dict | None`
 
-**Вызывает:** `safe_geojson_coords`, `get_points`, `convert_coords`, `len`, `append`
+**Вызывает:** `len`, `append`, `convert_coords`, `get_points`, `safe_geojson_coords`
 
 ---
 
@@ -127,7 +127,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `dict`
 
-**Вызывает:** `ezdxf_readfile`, `Exception`, `warning`, `process_line`, `exception`, `dxftype`, `process_lwpolyline`, `len`, `modelspace`, `extract_elevation_from_str`, `process_polyline`, `append`, `info`, `items`
+**Вызывает:** `exception`, `modelspace`, `Exception`, `ezdxf_readfile`, `len`, `append`, `items`, `process_line`, `process_polyline`, `warning`, `info`, `dxftype`, `extract_elevation_from_str`, `process_lwpolyline`
 
 ---
 
@@ -156,8 +156,8 @@ Convert DXF file to GeoJSON format
 - `from app.road_net import RoadNetCleaner`
 - `from app.shift import ShiftLogic, ShiftConfigException`
 - `from app import SessionLocal`
-- `from roadnet.core import BaseSchemaValidator, RoadNetFactory, RoadNetGraph`
-- `from roadnet.exceptions import RoadNetException`
+- `from app.sim_engine.core.dummy_roadnet import *`
+- `from app.sim_engine.core.dummy_roadnet import *`
 
 ### Публичные функции
 
@@ -169,7 +169,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `List[str]`
 
-**Вызывает:** `list`, `startswith`, `dir`, `keys`, `hasattr`
+**Вызывает:** `startswith`, `hasattr`, `dir`, `list`, `keys`
 
 ---
 
@@ -183,7 +183,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `None`
 
-**Вызывает:** `flush`, `getattr`, `collect_model_field_names`, `type`, `get`, `hasattr`
+**Вызывает:** `get`, `hasattr`, `collect_model_field_names`, `type`, `getattr`, `flush`
 
 ---
 
@@ -196,7 +196,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `None`
 
-**Вызывает:** `values`, `getattr`, `update`, `where`, `collect_model_field_names`, `type`, `execute`
+**Вызывает:** `update`, `collect_model_field_names`, `values`, `type`, `execute`, `where`, `getattr`
 
 ---
 
@@ -208,7 +208,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `int`
 
-**Вызывает:** `all`, `execute`, `ValueError`, `astimezone`, `where`, `factory`, `delete`, `strptime`, `for_date`, `get`, `ZoneInfo`, `total_seconds`, `date`
+**Вызывает:** `get`, `strptime`, `delete`, `astimezone`, `execute`, `total_seconds`, `ValueError`, `date`, `where`, `ZoneInfo`, `factory`, `all`, `for_date`
 
 ---
 
@@ -219,7 +219,7 @@ Convert DXF file to GeoJSON format
 - `model`
 - `schedule_type`: str
 
-**Вызывает:** `str`, `delete_schedule_items`, `replace`, `append`, `add`, `len`, `JSONResponse`, `enumerate`, `commit`, `fromisoformat`, `rollback`, `getenv`, `get`, `ZoneInfo`, `model`
+**Вызывает:** `get`, `enumerate`, `len`, `append`, `rollback`, `replace`, `delete_schedule_items`, `fromisoformat`, `ZoneInfo`, `commit`, `add`, `JSONResponse`, `model`, `str`, `getenv`
 
 ---
 
@@ -230,7 +230,7 @@ Convert DXF file to GeoJSON format
 - `model`
 - `schedule_type`: str
 
-**Вызывает:** `delete_schedule_items`, `commit`, `JSONResponse`, `rollback`, `getenv`, `str`, `ZoneInfo`
+**Вызывает:** `rollback`, `commit`, `delete_schedule_items`, `ZoneInfo`, `JSONResponse`, `str`, `getenv`
 
 ---
 
@@ -240,7 +240,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `select`, `HTTPException`, `where`, `scalar`, `exists`, `execute`
+**Вызывает:** `scalar`, `select`, `HTTPException`, `exists`, `execute`, `where`
 
 ---
 
@@ -250,7 +250,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `select`, `getattr`, `add`, `where`, `scalar`, `execute`, `model`
+**Вызывает:** `scalar`, `model`, `select`, `add`, `execute`, `where`, `getattr`
 
 ---
 
@@ -267,7 +267,7 @@ Convert DXF file to GeoJSON format
 - `v`
 - `info`
 
-**Вызывает:** `field_validator`, `get`, `ValueError`
+**Вызывает:** `get`, `ValueError`, `field_validator`
 
 ---
 
@@ -276,7 +276,7 @@ Convert DXF file to GeoJSON format
 - `cls`
 - `v`
 
-**Вызывает:** `field_validator`, `list`, `ValueError`
+**Вызывает:** `list`, `ValueError`, `field_validator`
 
 ---
 
@@ -285,7 +285,7 @@ Convert DXF file to GeoJSON format
 - `cls`
 - `v`
 
-**Вызывает:** `field_validator`, `list`, `ValueError`
+**Вызывает:** `list`, `ValueError`, `field_validator`
 
 ---
 
@@ -294,7 +294,7 @@ Convert DXF file to GeoJSON format
 - `cls`
 - `v`
 
-**Вызывает:** `field_validator`, `list`, `ValueError`
+**Вызывает:** `list`, `ValueError`, `field_validator`
 
 ---
 
@@ -311,7 +311,7 @@ Convert DXF file to GeoJSON format
 - `cls`
 - `v`
 
-**Вызывает:** `field_validator`, `list`, `ValueError`
+**Вызывает:** `list`, `ValueError`, `field_validator`
 
 ---
 
@@ -319,7 +319,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `HTTPException`, `ZoneInfo`
+**Вызывает:** `ZoneInfo`, `HTTPException`
 
 ---
 
@@ -359,7 +359,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `create_from_geojson`, `RoadNetFactory`, `HTTPException`, `validate_points_bonds`, `RoadNetCleaner`, `BaseSchemaValidator`
+**Вызывает:** `validate_points_bonds`, `HTTPException`, `RoadNetCleaner`, `BaseSchemaValidator`, `RoadNetFactory`, `create_from_geojson`
 
 ---
 
@@ -368,7 +368,7 @@ Convert DXF file to GeoJSON format
 - `self`
 - `orm_obj`
 
-**Вызывает:** `create_from_geojson`, `RoadNetFactory`, `RoadNetGraph`, `update_graph_bonds`, `RoadNetCleaner`, `BaseSchemaValidator`, `graph_to_geojson`
+**Вызывает:** `RoadNetGraph`, `update_graph_bonds`, `RoadNetCleaner`, `BaseSchemaValidator`, `RoadNetFactory`, `create_from_geojson`, `graph_to_geojson`
 
 ---
 
@@ -376,7 +376,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `select`, `HTTPException`, `where`, `scalar`, `exists`, `execute`
+**Вызывает:** `scalar`, `select`, `HTTPException`, `exists`, `execute`, `where`
 
 ---
 
@@ -384,7 +384,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `select`, `HTTPException`, `where`, `scalar`, `execute`
+**Вызывает:** `scalar`, `select`, `HTTPException`, `execute`, `where`
 
 ---
 
@@ -393,7 +393,7 @@ Convert DXF file to GeoJSON format
 - `self`
 - `orm_obj`
 
-**Вызывает:** `select`, `Path`, `where`, `scalar`, `first`, `DXFConverter`, `convert_dxf_to_geojson`, `execute`
+**Вызывает:** `scalar`, `select`, `DXFConverter`, `first`, `execute`, `Path`, `where`, `convert_dxf_to_geojson`
 
 ---
 
@@ -402,7 +402,7 @@ Convert DXF file to GeoJSON format
 - `cls`
 - `v`
 
-**Вызывает:** `field_validator`, `ValueError`
+**Вызывает:** `ValueError`, `field_validator`
 
 ---
 
@@ -410,7 +410,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `select`, `next`, `HTTPException`, `filter`, `where`, `scalar`, `exists`, `execute`
+**Вызывает:** `scalar`, `select`, `next`, `execute`, `HTTPException`, `exists`, `filter`, `where`
 
 ---
 
@@ -418,7 +418,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `self`
 
-**Вызывает:** `select`, `or_`, `HTTPException`, `where`, `scalar`, `exists`, `and_`, `execute`
+**Вызывает:** `scalar`, `select`, `or_`, `HTTPException`, `exists`, `execute`, `where`, `and_`
 
 ---
 
@@ -463,6 +463,19 @@ Convert DXF file to GeoJSON format
 
 ### Импорты
 - `import os`
+
+## Файл: `C:\Сторонние\Цифровой двойник - документация\qsimmine12\app\main.py`
+
+### Импорты
+- `from fastapi import FastAPI`
+- `from app.routes import router`
+
+### Публичные функции
+
+#### read_root
+**Вызывает:** `get`
+
+---
 
 ## Файл: `C:\Сторонние\Цифровой двойник - документация\qsimmine12\app\models.py`
 
@@ -540,7 +553,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `bool`
 
-**Вызывает:** `returning`, `resolve`, `Path`, `where`, `scalar`, `delete`, `unlink`, `execute`
+**Вызывает:** `scalar`, `unlink`, `resolve`, `returning`, `execute`, `delete`, `Path`, `where`
 
 ---
 
@@ -548,7 +561,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `type`: str
 
-**Вызывает:** `HTTPException`, `list`, `keys`
+**Вызывает:** `list`, `HTTPException`, `keys`
 
 ---
 
@@ -556,7 +569,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `type`: str
 
-**Вызывает:** `HTTPException`, `list`, `keys`
+**Вызывает:** `list`, `HTTPException`, `keys`
 
 ---
 
@@ -565,7 +578,7 @@ Convert DXF file to GeoJSON format
 ### Импорты
 - `from collections import defaultdict`
 - `from sqlalchemy import select`
-- `from roadnet.core import RoadNetGraph, BaseRoadNetCleaner`
+- `from app.sim_engine.core.dummy_roadnet import *`
 - `from app import SessionLocal`
 - `from app.models import FuelStation, IdleArea, Shovel, Unload, TYPE_MODEL_MAP`
 
@@ -587,7 +600,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `None`
 
-**Вызывает:** `__clean_graph_bonds_by_data`, `__clean_graph_bonds_by_schema`
+**Вызывает:** `__clean_graph_bonds_by_schema`, `__clean_graph_bonds_by_data`
 
 ---
 
@@ -632,7 +645,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `request`: Request
 
-**Вызывает:** `FileResponse`, `get`
+**Вызывает:** `get`, `FileResponse`
 
 ---
 
@@ -640,7 +653,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `AllTemplatesListService`, `StartEndTimeGenerateService`, `QuarryDataService`, `Depends`, `model_dump`, `get`
+**Вызывает:** `get`, `model_dump`, `Depends`, `QuarryDataService`, `AllTemplatesListService`, `StartEndTimeGenerateService`
 
 ---
 
@@ -654,7 +667,7 @@ Convert DXF file to GeoJSON format
 - `end_time`: Optional[str] = None
 - `db` = Depends(get_db)
 
-**Вызывает:** `get`, `HTTPException`, `Depends`, `getenv`, `str`, `ZoneInfo`, `ScheduleDataService`, `service`
+**Вызывает:** `ScheduleDataService`, `get`, `Depends`, `HTTPException`, `ZoneInfo`, `str`, `service`, `getenv`
 
 ---
 
@@ -663,7 +676,7 @@ Convert DXF file to GeoJSON format
 - `data`: UpdateLocationRequest
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `select`, `execute`, `HTTPException`, `where`, `scalar`, `Depends`, `commit`, `post`, `get`
+**Вызывает:** `get`, `scalar`, `Depends`, `select`, `post`, `HTTPException`, `commit`, `execute`, `where`
 
 ---
 
@@ -671,7 +684,7 @@ Convert DXF file to GeoJSON format
 **Аргументы:**
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `ScenarioService`, `Depends`, `get`
+**Вызывает:** `get`, `ScenarioService`, `Depends`
 
 ---
 
@@ -680,12 +693,12 @@ Convert DXF file to GeoJSON format
 - `rn_id`: int
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `select`, `HTTPException`, `where`, `scalar`, `Depends`, `execute`, `get`
+**Вызывает:** `scalar`, `get`, `Depends`, `select`, `HTTPException`, `execute`, `where`
 
 ---
 
 #### defaults_data
-**Вызывает:** `collect_default_values_of_all_models`, `get`
+**Вызывает:** `get`, `collect_default_values_of_all_models`
 
 ---
 
@@ -696,7 +709,7 @@ Convert DXF file to GeoJSON format
 - `data`: ObjectActionRequest
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `str`, `HTTPException`, `update_object`, `Depends`, `create_object`, `post`, `ObjectService`, `get`
+**Вызывает:** `get`, `Depends`, `post`, `HTTPException`, `ObjectService`, `update_object`, `str`, `create_object`
 
 ---
 
@@ -708,7 +721,7 @@ Convert DXF file to GeoJSON format
 - `data`: ObjectActionRequest
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `ObjectService`, `HTTPException`, `update_object`, `Depends`, `put`, `str`
+**Вызывает:** `update_object`, `Depends`, `HTTPException`, `ObjectService`, `put`, `str`
 
 ---
 
@@ -717,7 +730,7 @@ Convert DXF file to GeoJSON format
 - `data`: DeleteObjectRequest
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `select`, `BlastingSchema`, `PlannedIdleSchema`, `returning`, `issubclass`, `execute`, `HTTPException`, `where`, `scalar`, `Depends`, `delete`, `commit`, `handle_schedule_delete`, `dict`, `delete_with_file`, `get`
+**Вызывает:** `get`, `scalar`, `issubclass`, `Depends`, `select`, `BlastingSchema`, `handle_schedule_delete`, `PlannedIdleSchema`, `where`, `HTTPException`, `commit`, `returning`, `delete_with_file`, `execute`, `delete`, `dict`
 
 ---
 
@@ -727,7 +740,7 @@ Convert DXF file to GeoJSON format
 - `db`: Session = Depends(get_db)
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `post`, `Depends`, `GetSimIdService`, `RedirectResponse`
+**Вызывает:** `post`, `GetSimIdService`, `Depends`, `RedirectResponse`
 
 ---
 
@@ -737,7 +750,7 @@ Convert DXF file to GeoJSON format
 - `db`: Session = Depends(get_db)
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `GetSimIdService`, `HTTPException`, `Depends`, `post`, `type`
+**Вызывает:** `Depends`, `post`, `GetSimIdService`, `HTTPException`, `type`
 
 ---
 
@@ -746,7 +759,7 @@ Convert DXF file to GeoJSON format
 - `sim_id`: str
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `loads`, `next`, `HTTPException`, `Depends`, `scan_iter`, `get`
+**Вызывает:** `get`, `Depends`, `scan_iter`, `next`, `loads`, `HTTPException`
 
 ---
 
@@ -756,7 +769,7 @@ Convert DXF file to GeoJSON format
 - `batch_index`: int
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `loads`, `next`, `HTTPException`, `Depends`, `scan_iter`, `get`
+**Вызывает:** `get`, `Depends`, `scan_iter`, `next`, `loads`, `HTTPException`
 
 ---
 
@@ -766,7 +779,7 @@ Convert DXF file to GeoJSON format
 - `indices`: List[int] = None
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `loads`, `extend`, `mget`, `next`, `HTTPException`, `Depends`, `scan_iter`, `replace`, `get`
+**Вызывает:** `get`, `Depends`, `scan_iter`, `next`, `loads`, `HTTPException`, `replace`, `mget`, `extend`
 
 ---
 
@@ -775,7 +788,7 @@ Convert DXF file to GeoJSON format
 - `sim_id`: str
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `loads`, `next`, `HTTPException`, `Depends`, `scan_iter`, `get`
+**Вызывает:** `get`, `Depends`, `scan_iter`, `next`, `loads`, `HTTPException`
 
 ---
 
@@ -784,7 +797,7 @@ Convert DXF file to GeoJSON format
 - `sim_id`: str
 - `redis_client` = Depends(get_redis)
 
-**Вызывает:** `loads`, `next`, `HTTPException`, `Depends`, `scan_iter`, `get`
+**Вызывает:** `get`, `Depends`, `scan_iter`, `next`, `loads`, `HTTPException`
 
 ---
 
@@ -793,7 +806,7 @@ Convert DXF file to GeoJSON format
 - `id_or_name`: str
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `select`, `int`, `HTTPException`, `isoformat`, `where`, `scalar`, `Depends`, `execute`, `get`
+**Вызывает:** `scalar`, `get`, `isoformat`, `Depends`, `select`, `HTTPException`, `execute`, `int`, `where`
 
 ---
 
@@ -804,7 +817,7 @@ Convert DXF file to GeoJSON format
 - `name`: str = Form(None)
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `write`, `stat`, `Form`, `Path`, `read`, `open`, `UploadedFile`, `add`, `secure_filename`, `Depends`, `exists`, `len`, `File`, `with_stem`, `commit`, `unlink`, `post`, `str`
+**Вызывает:** `stat`, `open`, `Depends`, `File`, `len`, `unlink`, `post`, `Form`, `read`, `commit`, `add`, `write`, `secure_filename`, `UploadedFile`, `exists`, `Path`, `str`, `with_stem`
 
 ---
 
@@ -813,7 +826,7 @@ Convert DXF file to GeoJSON format
 - `id_or_name`: str
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `int`, `HTTPException`, `Depends`, `delete`, `commit`, `delete_with_file`
+**Вызывает:** `Depends`, `HTTPException`, `commit`, `delete_with_file`, `delete`, `int`
 
 ---
 
@@ -822,7 +835,7 @@ Convert DXF file to GeoJSON format
 - `filename`: str
 - `request`: Request
 
-**Вызывает:** `FileResponse`, `resolve`, `get`, `Path`
+**Вызывает:** `get`, `Path`, `FileResponse`, `resolve`
 
 ---
 
@@ -831,7 +844,7 @@ Convert DXF file to GeoJSON format
 - `mo_id`: int
 - `db`: Session = Depends(get_db)
 
-**Вызывает:** `select`, `HTTPException`, `isoformat`, `where`, `scalar`, `Depends`, `execute`, `get`
+**Вызывает:** `scalar`, `get`, `isoformat`, `Depends`, `select`, `HTTPException`, `execute`, `where`
 
 ---
 
@@ -853,7 +866,7 @@ Convert DXF file to GeoJSON format
 - `message`: str
 - `status_code` = None
 
-**Вызывает:** `super`, `__init__`
+**Вызывает:** `__init__`, `super`
 
 ---
 
@@ -873,7 +886,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `'ShiftLogic'`
 
-**Вызывает:** `validate_shift_config`, `isinstance`, `loads`, `ShiftOffsetsDTO`, `ShiftConfigParseException`, `cls`, `tuple`, `timedelta`
+**Вызывает:** `ShiftConfigParseException`, `cls`, `loads`, `tuple`, `validate_shift_config`, `ShiftOffsetsDTO`, `isinstance`, `timedelta`
 
 ---
 
@@ -884,7 +897,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `None`
 
-**Вызывает:** `ShiftConfigSchemaException`, `ShiftConfigDataException`, `enumerate`, `validate`
+**Вызывает:** `enumerate`, `ShiftConfigDataException`, `ShiftConfigSchemaException`, `validate`
 
 ---
 
@@ -896,7 +909,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `list['ShiftDTO']`
 
-**Вызывает:** `append`, `enumerate`, `combine`, `ShiftDTO`
+**Вызывает:** `append`, `ShiftDTO`, `combine`, `enumerate`
 
 ---
 
@@ -907,7 +920,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `'ShiftDTO'`
 
-**Вызывает:** `date`, `ShiftConfigDataException`, `combine`, `ShiftDTO`, `enumerate`, `timedelta`
+**Вызывает:** `enumerate`, `ShiftConfigDataException`, `date`, `timedelta`, `ShiftDTO`, `combine`
 
 ---
 
@@ -919,7 +932,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `list['ShiftDTO']`
 
-**Вызывает:** `combine`, `ShiftDTO`, `for_datetime`, `len`, `append`, `timedelta`
+**Вызывает:** `for_datetime`, `len`, `append`, `timedelta`, `ShiftDTO`, `combine`
 
 ---
 
@@ -930,7 +943,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `'ShiftDTO'`
 
-**Вызывает:** `len`, `combine`, `ShiftDTO`, `timedelta`
+**Вызывает:** `combine`, `ShiftDTO`, `timedelta`, `len`
 
 ---
 
@@ -941,7 +954,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `'ShiftDTO'`
 
-**Вызывает:** `len`, `combine`, `ShiftDTO`, `timedelta`
+**Вызывает:** `combine`, `ShiftDTO`, `timedelta`, `len`
 
 ---
 
@@ -955,7 +968,7 @@ Convert DXF file to GeoJSON format
 ### Публичные функции
 
 #### generate_simulation_data
-**Вызывает:** `now`, `key`, `randint`, `range`, `min`, `append`, `str`, `timedelta`
+**Вызывает:** `min`, `append`, `randint`, `range`, `timedelta`, `str`, `key`, `now`
 
 ---
 
@@ -985,7 +998,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `datetime`
 
-**Вызывает:** `replace`, `ZoneInfo`, `fromisoformat`, `astimezone`
+**Вызывает:** `ZoneInfo`, `astimezone`, `replace`, `fromisoformat`
 
 ---
 
@@ -998,7 +1011,7 @@ Convert DXF file to GeoJSON format
 
 **Возвращает:** `datetime`
 
-**Вызывает:** `replace`, `ZoneInfo`, `fromisoformat`, `astimezone`
+**Вызывает:** `ZoneInfo`, `astimezone`, `replace`, `fromisoformat`
 
 ---
 
@@ -1044,7 +1057,7 @@ generate a random filename if the function returned an empty one.
 
 **Возвращает:** `str`
 
-**Вызывает:** `strip`, `sub`, `encode`, `split`, `decode`, `upper`, `normalize`, `replace`, `str`, `join`
+**Вызывает:** `encode`, `sub`, `join`, `decode`, `upper`, `replace`, `strip`, `split`, `normalize`, `str`
 
 ---
 
@@ -1098,7 +1111,7 @@ Return human-readable file size
 **Аргументы:**
 - `test_config` = None
 
-**Вызывает:** `FastAPI`, `Path`, `mount`, `add_middleware`, `mkdir`, `StaticFiles`, `getenv`, `include_router`
+**Вызывает:** `FastAPI`, `include_router`, `StaticFiles`, `mkdir`, `add_middleware`, `Path`, `mount`, `getenv`
 
 ---
 
@@ -1116,14 +1129,14 @@ Return human-readable file size
 #### run_migrations_offline
 Запуск миграций в оффлайн-режиме.
 
-**Вызывает:** `configure`, `run_migrations`, `replace`, `str`, `begin_transaction`
+**Вызывает:** `begin_transaction`, `str`, `replace`, `configure`, `run_migrations`
 
 ---
 
 #### run_migrations_online
 Запуск миграций в онлайн-режиме.
 
-**Вызывает:** `run_migrations`, `configure`, `connect`, `begin_transaction`
+**Вызывает:** `connect`, `begin_transaction`, `configure`, `run_migrations`
 
 ---
 
@@ -1136,12 +1149,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `Column`, `add_column`, `Float`
+**Вызывает:** `add_column`, `Column`, `Float`, `batch_alter_table`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_column`
+**Вызывает:** `drop_column`, `batch_alter_table`
 
 ---
 
@@ -1154,7 +1167,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `String`, `f`, `Boolean`, `PrimaryKeyConstraint`, `text`, `DateTime`, `Column`, `create_table`, `Integer`, `ForeignKeyConstraint`
+**Вызывает:** `create_table`, `f`, `ForeignKeyConstraint`, `String`, `text`, `Boolean`, `PrimaryKeyConstraint`, `Integer`, `DateTime`, `Column`
 
 ---
 
@@ -1173,7 +1186,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `f`, `PrimaryKeyConstraint`, `text`, `Column`, `DateTime`, `Text`, `create_table`, `Integer`, `JSONB`, `ForeignKeyConstraint`
+**Вызывает:** `create_table`, `JSONB`, `f`, `ForeignKeyConstraint`, `text`, `PrimaryKeyConstraint`, `Integer`, `DateTime`, `Text`, `Column`
 
 ---
 
@@ -1191,12 +1204,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `alter_column`, `drop_column`
+**Вызывает:** `drop_column`, `alter_column`, `batch_alter_table`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `DOUBLE_PRECISION`, `add_column`, `Column`, `INTEGER`, `drop_column`
+**Вызывает:** `DOUBLE_PRECISION`, `batch_alter_table`, `add_column`, `drop_column`, `INTEGER`, `Column`
 
 ---
 
@@ -1209,7 +1222,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `String`, `Integer`, `f`, `Boolean`, `Enum`, `PrimaryKeyConstraint`, `Column`, `DateTime`, `Text`, `Float`, `create_table`, `ForeignKeyConstraint`
+**Вызывает:** `create_table`, `f`, `ForeignKeyConstraint`, `String`, `Boolean`, `PrimaryKeyConstraint`, `Integer`, `Enum`, `Float`, `DateTime`, `Text`, `Column`
 
 ---
 
@@ -1228,12 +1241,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `String`, `batch_alter_table`, `create_foreign_key`, `f`, `ENUM`, `add_column`, `PrimaryKeyConstraint`, `Column`, `DateTime`, `create_table`, `Integer`, `Float`
+**Вызывает:** `create_foreign_key`, `create_table`, `f`, `ENUM`, `batch_alter_table`, `String`, `PrimaryKeyConstraint`, `add_column`, `Integer`, `Float`, `DateTime`, `Column`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `f`, `drop_constraint`, `drop_table`, `drop_column`
+**Вызывает:** `drop_constraint`, `f`, `batch_alter_table`, `drop_column`, `drop_table`
 
 ---
 
@@ -1246,12 +1259,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `Column`, `add_column`, `Integer`
+**Вызывает:** `add_column`, `Column`, `Integer`, `batch_alter_table`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_column`
+**Вызывает:** `drop_column`, `batch_alter_table`
 
 ---
 
@@ -1265,12 +1278,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `get_bind`, `now`, `create_foreign_key`, `f`, `execute`, `add_column`, `scalar`, `text`, `Column`, `Integer`, `bindparams`, `datetime`
+**Вызывает:** `create_foreign_key`, `scalar`, `f`, `batch_alter_table`, `text`, `datetime`, `add_column`, `Integer`, `get_bind`, `bindparams`, `execute`, `now`, `Column`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_column`, `drop_constraint`, `f`
+**Вызывает:** `drop_column`, `drop_constraint`, `f`, `batch_alter_table`
 
 ---
 
@@ -1283,12 +1296,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `drop_constraint`, `alter_column`, `create_primary_key`, `INTEGER`
+**Вызывает:** `drop_constraint`, `alter_column`, `batch_alter_table`, `create_primary_key`, `INTEGER`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_constraint`, `alter_column`, `create_primary_key`, `INTEGER`
+**Вызывает:** `drop_constraint`, `alter_column`, `batch_alter_table`, `create_primary_key`, `INTEGER`
 
 ---
 
@@ -1301,12 +1314,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `add_column`, `Column`, `rename_table`, `Boolean`
+**Вызывает:** `add_column`, `rename_table`, `Boolean`, `Column`
 
 ---
 
 #### downgrade
-**Вызывает:** `rename_table`, `drop_column`
+**Вызывает:** `drop_column`, `rename_table`
 
 ---
 
@@ -1319,12 +1332,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `Column`, `add_column`, `Integer`
+**Вызывает:** `add_column`, `Column`, `Integer`, `batch_alter_table`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_column`
+**Вызывает:** `drop_column`, `batch_alter_table`
 
 ---
 
@@ -1337,12 +1350,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `batch_alter_table`, `Boolean`, `add_column`, `Column`, `Float`, `Integer`
+**Вызывает:** `batch_alter_table`, `Boolean`, `add_column`, `Integer`, `Float`, `Column`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_column`
+**Вызывает:** `drop_column`, `batch_alter_table`
 
 ---
 
@@ -1355,12 +1368,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `String`, `batch_alter_table`, `Integer`, `f`, `add_column`, `PrimaryKeyConstraint`, `text`, `Column`, `DateTime`, `Float`, `create_table`, `ForeignKeyConstraint`
+**Вызывает:** `create_table`, `f`, `batch_alter_table`, `ForeignKeyConstraint`, `String`, `text`, `PrimaryKeyConstraint`, `add_column`, `Integer`, `Float`, `DateTime`, `Column`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_column`, `drop_table`
+**Вызывает:** `drop_column`, `drop_table`, `batch_alter_table`
 
 ---
 
@@ -1374,7 +1387,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `String`, `f`, `Boolean`, `UniqueConstraint`, `PrimaryKeyConstraint`, `text`, `DateTime`, `Column`, `Text`, `create_table`, `Integer`, `Float`, `ForeignKeyConstraint`, `JSONB`, `CheckConstraint`
+**Вызывает:** `create_table`, `f`, `JSONB`, `ForeignKeyConstraint`, `String`, `text`, `PrimaryKeyConstraint`, `Boolean`, `Integer`, `Float`, `DateTime`, `UniqueConstraint`, `CheckConstraint`, `Text`, `Column`
 
 ---
 
@@ -1392,12 +1405,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `create_foreign_key`, `f`, `Column`, `create_table`, `String`, `values`, `alter_column`, `PrimaryKeyConstraint`, `text`, `column`, `table`, `execute`, `update`, `DateTime`, `JSON`, `batch_alter_table`, `add_column`, `insert`, `Float`, `Integer`
+**Вызывает:** `create_foreign_key`, `column`, `create_table`, `update`, `alter_column`, `batch_alter_table`, `JSON`, `insert`, `Column`, `String`, `PrimaryKeyConstraint`, `Float`, `DateTime`, `execute`, `f`, `text`, `values`, `add_column`, `Integer`, `table`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `f`, `drop_constraint`, `drop_table`, `drop_column`
+**Вызывает:** `drop_constraint`, `f`, `batch_alter_table`, `drop_column`, `drop_table`
 
 ---
 
@@ -1410,12 +1423,12 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `String`, `batch_alter_table`, `f`, `PrimaryKeyConstraint`, `text`, `DateTime`, `Column`, `create_table`, `Integer`, `create_index`, `ForeignKeyConstraint`, `CheckConstraint`
+**Вызывает:** `create_table`, `f`, `batch_alter_table`, `ForeignKeyConstraint`, `String`, `text`, `PrimaryKeyConstraint`, `create_index`, `Integer`, `DateTime`, `CheckConstraint`, `Column`
 
 ---
 
 #### downgrade
-**Вызывает:** `batch_alter_table`, `drop_table`, `drop_index`
+**Вызывает:** `drop_index`, `drop_table`, `batch_alter_table`
 
 ---
 
@@ -1428,7 +1441,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `values`, `update`, `Enum`, `column`, `table`, `execute`
+**Вызывает:** `update`, `values`, `column`, `Enum`, `table`, `execute`
 
 ---
 
@@ -1444,7 +1457,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `add_column`, `Column`, `Boolean`
+**Вызывает:** `add_column`, `Boolean`, `Column`
 
 ---
 
@@ -1463,7 +1476,7 @@ Return human-readable file size
 ### Публичные функции
 
 #### upgrade
-**Вызывает:** `f`, `PrimaryKeyConstraint`, `text`, `DateTime`, `Column`, `Text`, `create_table`, `Integer`, `JSONB`, `ForeignKeyConstraint`
+**Вызывает:** `create_table`, `JSONB`, `f`, `ForeignKeyConstraint`, `text`, `PrimaryKeyConstraint`, `Integer`, `DateTime`, `Text`, `Column`
 
 ---
 
@@ -1495,7 +1508,7 @@ Return human-readable file size
 - `start_hour`: int = 10
 - `end_hour`: int = 18
 
-**Вызывает:** `getenv`, `_load_zone`, `int`
+**Вызывает:** `_load_zone`, `int`, `getenv`
 
 ---
 
@@ -1525,7 +1538,7 @@ Return human-readable file size
 - `model`
 - `obj_id`: int
 
-**Вызывает:** `select`, `execute`, `scalar`, `where`
+**Вызывает:** `scalar`, `where`, `execute`, `select`
 
 ---
 
@@ -1534,7 +1547,7 @@ Return human-readable file size
 - `self`
 - `scenario_id`: int
 
-**Вызывает:** `delete`, `execute`, `where`
+**Вызывает:** `execute`, `delete`, `where`
 
 ---
 
@@ -1547,7 +1560,7 @@ Return human-readable file size
 
 **Возвращает:** `bool`
 
-**Вызывает:** `select`, `execute`, `scalar`, `where`
+**Вызывает:** `scalar`, `where`, `execute`, `select`
 
 ---
 
@@ -1606,7 +1619,7 @@ Return human-readable file size
 - `data`: ObjectActionRequest
 - `action`: str
 
-**Вызывает:** `str`, `_prepare_data`, `isinstance`, `save_geojson_data`, `_apply_form`, `_validate_form`, `HTTPException`, `_get_or_create`, `verify_template_bond`, `verify_template_bond_reversed`, `commit`, `refresh`, `convert_dxf`, `get`
+**Вызывает:** `get`, `refresh`, `convert_dxf`, `_validate_form`, `_apply_form`, `HTTPException`, `commit`, `save_geojson_data`, `isinstance`, `verify_template_bond_reversed`, `_prepare_data`, `str`, `verify_template_bond`, `_get_or_create`
 
 ---
 
@@ -1616,7 +1629,7 @@ Return human-readable file size
 - `data`: ObjectActionRequest
 - `action`: str
 
-**Вызывает:** `_prepare_data`, `isinstance`, `_apply_form`, `_validate_form`, `_get_or_create`, `handle_schedule_create`, `commit`, `refresh`, `get`
+**Вызывает:** `get`, `refresh`, `_validate_form`, `_apply_form`, `commit`, `handle_schedule_create`, `isinstance`, `_prepare_data`, `_get_or_create`
 
 ---
 
@@ -1626,7 +1639,7 @@ Return human-readable file size
 - `data`: ObjectActionRequest
 - `action`: str
 
-**Вызывает:** `_prepare_data`, `create_association`, `isinstance`, `_apply_form`, `_validate_form`, `delete_scenario_associations`, `_get_or_create`, `verify_template_bond`, `association_exists`, `commit`, `refresh`, `get`
+**Вызывает:** `get`, `refresh`, `_validate_form`, `_apply_form`, `commit`, `create_association`, `delete_scenario_associations`, `association_exists`, `isinstance`, `_prepare_data`, `verify_template_bond`, `_get_or_create`
 
 ---
 
@@ -1659,7 +1672,7 @@ Return human-readable file size
 
 **Возвращает:** `List`
 
-**Вызывает:** `select`, `all`, `scalars`, `order_by`, `asc`, `execute`
+**Вызывает:** `select`, `scalars`, `order_by`, `execute`, `all`, `asc`
 
 ---
 
@@ -1671,7 +1684,7 @@ Return human-readable file size
 
 **Возвращает:** `List[Tuple[int, int]]`
 
-**Вызывает:** `select`, `all`, `order_by`, `asc`, `execute`
+**Вызывает:** `select`, `order_by`, `execute`, `all`, `asc`
 
 ---
 
@@ -1683,7 +1696,7 @@ Return human-readable file size
 
 **Возвращает:** `List`
 
-**Вызывает:** `select`, `all`, `scalars`, `order_by`, `asc`, `defer`, `options`, `execute`
+**Вызывает:** `all`, `select`, `scalars`, `options`, `order_by`, `execute`, `defer`, `asc`
 
 ---
 
@@ -1696,7 +1709,7 @@ Return human-readable file size
 
 **Возвращает:** `List[Tuple['Trail', int]]`
 
-**Вызывает:** `select`, `all`, `options`, `order_by`, `asc`, `join`, `selectinload`, `execute`
+**Вызывает:** `join`, `selectinload`, `select`, `options`, `order_by`, `execute`, `all`, `asc`
 
 ---
 
@@ -1738,7 +1751,7 @@ Return human-readable file size
 
 **Возвращает:** `List[Scenario]`
 
-**Вызывает:** `select`, `all`, `scalars`, `options`, `order_by`, `asc`, `selectinload`, `execute`
+**Вызывает:** `selectinload`, `select`, `scalars`, `options`, `order_by`, `execute`, `all`, `asc`
 
 ---
 
@@ -1751,7 +1764,7 @@ Return human-readable file size
 
 **Возвращает:** `List[Trail]`
 
-**Вызывает:** `select`, `selectinload`, `all`, `scalars`, `where`, `order_by`, `asc`, `join`, `options`, `execute`
+**Вызывает:** `join`, `select`, `selectinload`, `scalars`, `options`, `order_by`, `execute`, `all`, `asc`, `where`
 
 ---
 
@@ -1800,7 +1813,7 @@ Return human-readable file size
 
 **Возвращает:** `List[ScheduleItemDTO]`
 
-**Вызывает:** `select`, `isinstance`, `all`, `getattr`, `scalars`, `loads`, `where`, `keys`, `order_by`, `ScheduleItemDTO`, `asc`, `set`, `append`, `execute`, `get`
+**Вызывает:** `get`, `select`, `scalars`, `set`, `loads`, `append`, `ScheduleItemDTO`, `order_by`, `isinstance`, `execute`, `all`, `asc`, `where`, `getattr`, `keys`
 
 ---
 
@@ -1838,7 +1851,7 @@ Return human-readable file size
 - `cls`
 - `v`
 
-**Вызывает:** `field_validator`, `ValueError`
+**Вызывает:** `ValueError`, `field_validator`
 
 ---
 
@@ -1848,7 +1861,7 @@ Return human-readable file size
 - `v`: str
 - `info`: ValidationInfo
 
-**Вызывает:** `ValueError`, `field_validator`, `replace`, `get`, `fromisoformat`
+**Вызывает:** `get`, `field_validator`, `ValueError`, `replace`, `fromisoformat`
 
 ---
 
@@ -1864,7 +1877,7 @@ Return human-readable file size
 - `self`
 - `road_net_id`: int
 
-**Вызывает:** `select`, `execute`, `scalar`, `where`
+**Вызывает:** `scalar`, `where`, `execute`, `select`
 
 ---
 
@@ -1879,7 +1892,7 @@ Return human-readable file size
 
 **Возвращает:** `list`
 
-**Вызывает:** `select`, `isinstance`, `set`, `getattr`, `scalars`, `loads`, `where`, `order_by`, `asc`, `keys`, `append`, `execute`
+**Вызывает:** `select`, `set`, `scalars`, `loads`, `append`, `order_by`, `isinstance`, `execute`, `asc`, `where`, `getattr`, `keys`
 
 ---
 
@@ -1894,7 +1907,7 @@ Return human-readable file size
 
 **Возвращает:** `dict`
 
-**Вызывает:** `get_filtered_schedule_items`, `get`
+**Вызывает:** `get`, `get_filtered_schedule_items`
 
 ---
 
@@ -1936,7 +1949,7 @@ Return human-readable file size
 
 **Возвращает:** `List`
 
-**Вызывает:** `select`, `all`, `scalars`, `order_by`, `asc`, `execute`
+**Вызывает:** `select`, `scalars`, `order_by`, `execute`, `all`, `asc`
 
 ---
 
@@ -2099,7 +2112,7 @@ Return human-readable file size
 
 **Возвращает:** `int`
 
-**Вызывает:** `floor`, `max`, `min`, `keys`
+**Вызывает:** `min`, `floor`, `keys`, `max`
 
 ---
 
@@ -2153,7 +2166,7 @@ Return human-readable file size
 **Аргументы:**
 - `inst`: InputPlanningData
 
-**Вызывает:** `int`, `ValueError`, `cpu_count`, `value`, `PULP_CBC_CMD`, `solve`, `range`, `HiGHS_CMD`, `round`, `append`, `build_model`, `info`, `sim_conf`, `sort`
+**Вызывает:** `build_model`, `round`, `cpu_count`, `sort`, `append`, `value`, `range`, `ValueError`, `info`, `PULP_CBC_CMD`, `int`, `sim_conf`, `solve`, `HiGHS_CMD`
 
 ---
 
@@ -2162,7 +2175,7 @@ Return human-readable file size
 - `inst`: InputPlanningData
 - `use_individual_kmax`: bool = True
 
-**Вызывает:** `int`, `CpModel`, `OnlyEnforceIf`, `sum`, `Add`, `values`, `range`, `max`, `dict`, `round`, `compute_Kmax_i`, `NewBoolVar`, `append`, `AddNoOverlap`, `Maximize`, `Not`, `NewOptionalIntervalVar`, `AddBoolOr`, `NewIntVar`
+**Вызывает:** `NewBoolVar`, `OnlyEnforceIf`, `int`, `max`, `NewOptionalIntervalVar`, `Maximize`, `NewIntVar`, `compute_Kmax_i`, `AddBoolOr`, `AddNoOverlap`, `round`, `append`, `range`, `sum`, `Add`, `dict`, `CpModel`, `Not`, `values`
 
 ---
 
@@ -2174,7 +2187,7 @@ Return human-readable file size
 - `time_limit`: Optional[int] = None
 - `num_workers`: int = 16
 
-**Вызывает:** `build_cp_model`, `int`, `float`, `range`, `BooleanValue`, `Solve`, `ObjectiveValue`, `CpSolver`, `append`, `Value`, `get`, `info`, `sim_conf`, `sort`
+**Вызывает:** `get`, `BooleanValue`, `float`, `CpSolver`, `ObjectiveValue`, `build_cp_model`, `sort`, `append`, `range`, `info`, `Value`, `int`, `sim_conf`, `Solve`
 
 ---
 
@@ -2199,7 +2212,7 @@ Return human-readable file size
 
 **Возвращает:** `InputPlanningData`
 
-**Вызывает:** `values`, `int`, `build_route_edges_by_road_net_from_position`, `unload_calculation_by_norm`, `len`, `build_route_edges_by_road_net`, `calculate_load_cycles`, `dict`, `calculate_time_motion_by_edges`, `InputPlanningData`
+**Вызывает:** `build_route_edges_by_road_net`, `len`, `calculate_time_motion_by_edges`, `values`, `InputPlanningData`, `unload_calculation_by_norm`, `build_route_edges_by_road_net_from_position`, `int`, `dict`, `calculate_load_cycles`
 
 ---
 
@@ -2207,7 +2220,7 @@ Return human-readable file size
 **Аргументы:**
 - `simdata`: SimData
 
-**Вызывает:** `get_planning_data`, `solve_and_extract_cp`, `info`, `sim_conf`
+**Вызывает:** `get_planning_data`, `solve_and_extract_cp`, `sim_conf`, `info`
 
 ---
 
@@ -2218,7 +2231,7 @@ Return human-readable file size
 
 **Возвращает:** `dict`
 
-**Вызывает:** `defaultdict`, `int`, `run_planning`, `PlannedTrip`, `append`, `pop`, `total_seconds`
+**Вызывает:** `PlannedTrip`, `defaultdict`, `append`, `total_seconds`, `run_planning`, `pop`, `int`
 
 ---
 
@@ -2248,7 +2261,7 @@ Return human-readable file size
 
 **Возвращает:** `np.ndarray`
 
-**Вызывает:** `ValueError`, `float`, `append`, `asarray`, `isnan`, `get`
+**Вызывает:** `get`, `float`, `append`, `asarray`, `isnan`, `ValueError`
 
 ---
 
@@ -2271,7 +2284,7 @@ Return human-readable file size
 
 **Возвращает:** `dict`
 
-**Вызывает:** `quantile`, `kurtosis`, `float`, `len`, `skew`, `max`, `median`, `dict`, `std`, `min`, `mean`, `asarray`
+**Вызывает:** `skew`, `float`, `min`, `len`, `asarray`, `median`, `kurtosis`, `dict`, `std`, `mean`, `max`, `quantile`
 
 ---
 
@@ -2292,7 +2305,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `ppf`, `float`, `len`, `sqrt`, `std`, `mean`, `asarray`
+**Вызывает:** `ppf`, `float`, `sqrt`, `len`, `asarray`, `std`, `mean`
 
 ---
 
@@ -2309,7 +2322,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `float`, `len`, `asarray`, `quantile`
+**Вызывает:** `asarray`, `quantile`, `float`, `len`
 
 ---
 
@@ -2329,7 +2342,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `clip`, `int`, `ceil`, `float`, `partition`, `shuffle`, `abs`, `sort`, `default_rng`, `len`, `mean`, `asarray`, `copy`
+**Вызывает:** `ceil`, `clip`, `float`, `abs`, `default_rng`, `partition`, `len`, `sort`, `asarray`, `copy`, `mean`, `int`, `shuffle`
 
 ---
 
@@ -2342,7 +2355,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `ppf`, `predictive_interval_t`, `float`, `log`, `len`, `any`, `sqrt`, `std`, `mean`, `asarray`, `exp`
+**Вызывает:** `ppf`, `float`, `sqrt`, `predictive_interval_t`, `len`, `asarray`, `exp`, `log`, `std`, `mean`, `any`
 
 ---
 
@@ -2356,7 +2369,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `gaussian_kde`, `float`, `linspace`, `kde`, `argsort`, `max`, `cumsum`, `min`, `len`, `asarray`, `sort`
+**Вызывает:** `kde`, `min`, `float`, `gaussian_kde`, `sort`, `argsort`, `len`, `asarray`, `cumsum`, `max`, `linspace`
 
 ---
 
@@ -2371,7 +2384,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `quantile`, `float`, `default_rng`, `choice`, `asarray`
+**Вызывает:** `float`, `default_rng`, `asarray`, `choice`, `quantile`
 
 ---
 
@@ -2384,7 +2397,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `quantile`, `predictive_interval_t`, `float`, `abs`, `array`, `len`, `sum`, `mean`, `asarray`
+**Вызывает:** `float`, `array`, `abs`, `predictive_interval_t`, `len`, `asarray`, `sum`, `mean`, `quantile`
 
 ---
 
@@ -2398,7 +2411,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `quantile`, `float`, `shuffle`, `default_rng`, `len`, `mean`, `asarray`, `copy`
+**Вызывает:** `float`, `default_rng`, `len`, `asarray`, `copy`, `mean`, `shuffle`, `quantile`
 
 ---
 
@@ -2409,7 +2422,7 @@ Return human-readable file size
 
 **Возвращает:** `np.ndarray`
 
-**Вызывает:** `finfo`, `empty_like`, `power`, `abs`, `errstate`, `any`, `expm1`, `maximum`, `exp`, `asarray`
+**Вызывает:** `expm1`, `asarray`, `exp`, `errstate`, `finfo`, `power`, `maximum`, `empty_like`, `abs`, `any`
 
 ---
 
@@ -2422,7 +2435,7 @@ Return human-readable file size
 
 **Возвращает:** `tuple[float, float]`
 
-**Вызывает:** `finfo`, `empty_like`, `power`, `abs`, `errstate`, `any`, `expm1`, `maximum`, `exp`, `asarray`
+**Вызывает:** `expm1`, `asarray`, `exp`, `errstate`, `finfo`, `power`, `maximum`, `empty_like`, `abs`, `any`
 
 ---
 
@@ -2434,7 +2447,7 @@ Return human-readable file size
 
 **Возвращает:** `float`
 
-**Вызывает:** `argmin`, `int`, `float`, `len`, `half_sample_mode`, `mean`, `asarray`, `sort`
+**Вызывает:** `float`, `sort`, `len`, `asarray`, `half_sample_mode`, `argmin`, `int`, `mean`
 
 ---
 
@@ -2447,7 +2460,7 @@ Return human-readable file size
 
 **Возвращает:** `float`
 
-**Вызывает:** `gaussian_kde`, `float`, `linspace`, `kde`, `max`, `min`, `argmax`
+**Вызывает:** `argmax`, `kde`, `min`, `float`, `gaussian_kde`, `max`, `linspace`
 
 ---
 
@@ -2462,7 +2475,7 @@ Return human-readable file size
 
 **Возвращает:** `float`
 
-**Вызывает:** `int`, `get_interval`, `range`, `len`, `delete`, `asarray`
+**Вызывает:** `len`, `asarray`, `range`, `delete`, `int`, `get_interval`
 
 ---
 
@@ -2474,7 +2487,7 @@ PIT (вероятностное преобразование) для t-пред�
 
 **Возвращает:** `np.ndarray`
 
-**Вызывает:** `float`, `len`, `max`, `sqrt`, `cdf`, `std`, `mean`, `asarray`
+**Вызывает:** `cdf`, `float`, `sqrt`, `len`, `asarray`, `std`, `mean`, `max`
 
 ---
 
@@ -2495,7 +2508,7 @@ PIT (вероятностное преобразование) для t-пред�
 **Аргументы:**
 - `name`: str
 
-**Вызывает:** `interval_width`, `max`, `abs`, `isnan`, `get`
+**Вызывает:** `get`, `interval_width`, `isnan`, `abs`, `max`
 
 ---
 
@@ -2519,7 +2532,7 @@ PIT (вероятностное преобразование) для t-пред�
 
 **Возвращает:** `tuple[str, tuple[float, float], str]`
 
-**Вызывает:** `interval_width`, `max`, `abs`, `isnan`, `get`
+**Вызывает:** `get`, `interval_width`, `isnan`, `abs`, `max`
 
 ---
 
@@ -2551,7 +2564,7 @@ PIT (вероятностное преобразование) для t-пред�
 
 **Возвращает:** `tuple[bool, np.ndarray, float, int]`
 
-**Вызывает:** `predictive_interval_t`, `float`, `extract_metric`, `len`, `max`, `median`, `abs`, `info`
+**Вызывает:** `float`, `predictive_interval_t`, `len`, `median`, `extract_metric`, `info`, `abs`, `max`
 
 ---
 
@@ -2566,7 +2579,7 @@ PIT (вероятностное преобразование) для t-пред�
 
 **Возвращает:** `tuple[float, float, float]`
 
-**Вызывает:** `bootstrap_pi`, `split_conformal_pi`, `interval_width`, `kstest`, `descriptive_stats`, `jackknife_plus_pi`, `pit_values_t_predictive`, `anderson`, `float`, `kde_hdi`, `half_sample_mode`, `median`, `lognormal_pi`, `info`, `isnan`, `split_conformal_asymmetric`, `yeojohnson_pi`, `loo_coverage`, `getrandbits`, `kde_mode`, `mean`, `get`, `items`, `predictive_interval_t`, `shapiro`, `len`, `select_best_interval`, `robust_pi_quantiles`
+**Вызывает:** `pit_values_t_predictive`, `lognormal_pi`, `jackknife_plus_pi`, `select_best_interval`, `shapiro`, `yeojohnson_pi`, `loo_coverage`, `len`, `items`, `isnan`, `robust_pi_quantiles`, `info`, `split_conformal_pi`, `descriptive_stats`, `mean`, `get`, `float`, `bootstrap_pi`, `kde_hdi`, `interval_width`, `median`, `kde_mode`, `split_conformal_asymmetric`, `anderson`, `predictive_interval_t`, `getrandbits`, `half_sample_mode`, `kstest`
 
 ---
 
@@ -2605,7 +2618,7 @@ PIT (вероятностное преобразование) для t-пред�
 - `lunch_break_offset`: int
 - `lunch_break_duration`: int
 
-**Вызывает:** `append`, `sort`, `max`, `any`, `min`, `replace`, `abs`, `total_seconds`, `timedelta`
+**Вызывает:** `min`, `sort`, `append`, `total_seconds`, `replace`, `timedelta`, `max`, `abs`, `any`
 
 ---
 
@@ -2623,7 +2636,7 @@ Returns:
 **Аргументы:**
 - `idles_data`: list[dict]
 
-**Вызывает:** `values`, `isinstance`, `PlannedIdle`, `isoformat`, `utc_to_enterprise`, `append`, `sort`
+**Вызывает:** `isoformat`, `utc_to_enterprise`, `sort`, `append`, `values`, `isinstance`, `PlannedIdle`
 
 ---
 
@@ -2643,7 +2656,7 @@ Returns:
 
 **Возвращает:** `list[Blasting]`
 
-**Вызывает:** `isinstance`, `utc_to_enterprise`, `isoformat`, `Blasting`, `append`, `sort`
+**Вызывает:** `isoformat`, `Blasting`, `utc_to_enterprise`, `sort`, `append`, `isinstance`
 
 ---
 
@@ -2654,7 +2667,7 @@ Returns:
 
 **Возвращает:** `SimData`
 
-**Вызывает:** `collect_planned_idles`, `int`, `ShovelProperties`, `Shovel`, `create_blasting_list`, `calculate_lunch_breaks`, `Point`, `utc_to_enterprise`, `IdleAreaStorage`, `Segment`, `append`, `UnlProperties`, `get`, `SimData`, `Unload`, `FuelStationProperties`, `FuelStation`, `TruckProperties`, `IdleArea`, `Route`, `Truck`, `total_seconds`
+**Вызывает:** `TruckProperties`, `FuelStation`, `IdleArea`, `int`, `ShovelProperties`, `Route`, `Truck`, `Point`, `get`, `Unload`, `FuelStationProperties`, `utc_to_enterprise`, `collect_planned_idles`, `append`, `IdleAreaStorage`, `total_seconds`, `UnlProperties`, `Segment`, `calculate_lunch_breaks`, `SimData`, `Shovel`, `create_blasting_list`
 
 ---
 
@@ -2684,7 +2697,7 @@ Returns:
 - `*args` (vararg)
 - `**kwargs` (kwarg)
 
-**Вызывает:** `func`, `wraps`, `DataValidateError`
+**Вызывает:** `DataValidateError`, `wraps`, `func`
 
 ---
 
@@ -2692,7 +2705,7 @@ Returns:
 **Аргументы:**
 - `func`
 
-**Вызывает:** `func`, `wraps`, `DataValidateError`
+**Вызывает:** `DataValidateError`, `wraps`, `func`
 
 ---
 
@@ -2708,7 +2721,7 @@ This func needs to be **picklable** for `run_reliability` (multiprocessing limit
 
 **Возвращает:** `dict`
 
-**Вызывает:** `Shovel`, `QSimEnvironment`, `values`, `PlannedTrip`, `get_summary`, `info`, `Point`, `getattr`, `build_route_by_road_net`, `run`, `build_route_edges_by_road_net`, `append`, `finalize`, `Quarry`, `prepare_seeded_random`, `Unload`, `FuelStation`, `update_data`, `Truck`
+**Вызывает:** `build_route_edges_by_road_net`, `FuelStation`, `update_data`, `Quarry`, `getattr`, `get_summary`, `PlannedTrip`, `Truck`, `Point`, `info`, `QSimEnvironment`, `Unload`, `build_route_by_road_net`, `run`, `append`, `prepare_seeded_random`, `values`, `Shovel`, `finalize`
 
 ---
 
@@ -2725,7 +2738,7 @@ This func needs to be **picklable** for `run_reliability` (multiprocessing limit
 
 **Возвращает:** `dict`
 
-**Вызывает:** `Unload`, `finalize`, `values`, `Quarry`, `get_summary`, `run`, `FuelStation`, `update_data`, `Shovel`, `info`, `append`, `Truck`, `QSimEnvironment`, `get`, `Point`, `prepare_seeded_random`
+**Вызывает:** `Unload`, `get`, `run`, `prepare_seeded_random`, `get_summary`, `FuelStation`, `Truck`, `update_data`, `append`, `values`, `Point`, `Shovel`, `info`, `Quarry`, `finalize`, `QSimEnvironment`
 
 ---
 
@@ -2743,7 +2756,7 @@ Run given simulation engaging reliablility calculation
 
 **Возвращает:** `dict`
 
-**Вызывает:** `calc_reliability`, `int`, `extend`, `assess_stability`, `get_context`, `Pool`, `round`, `info`, `range`, `len`, `DictReliabilityWriter`, `run_func`, `find_closest_result`, `starmap`, `cpu_count`
+**Вызывает:** `DictReliabilityWriter`, `Pool`, `round`, `cpu_count`, `len`, `calc_reliability`, `range`, `assess_stability`, `get_context`, `run_func`, `info`, `find_closest_result`, `int`, `extend`, `starmap`
 
 ---
 
@@ -2782,7 +2795,7 @@ Run given simulation engaging reliablility calculation
 
 **Возвращает:** `dict`
 
-**Вызывает:** `SimDataValidationError`, `isinstance`
+**Вызывает:** `isinstance`, `SimDataValidationError`
 
 ---
 
@@ -2792,7 +2805,7 @@ Run given simulation engaging reliablility calculation
 
 **Возвращает:** `dict`
 
-**Вызывает:** `isinstance`, `SimConfigValidationError`
+**Вызывает:** `SimConfigValidationError`, `isinstance`
 
 ---
 
@@ -2817,7 +2830,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `None`
 
-**Вызывает:** `validate_validator`, `__set_default_config`, `set_options`, `validate_writer`, `validate`, `serialize`
+**Вызывает:** `validate_writer`, `set_options`, `validate_validator`, `serialize`, `validate`, `__set_default_config`
 
 ---
 
@@ -2898,7 +2911,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `IWriter`
 
-**Вызывает:** `isinstance`, `issubclass`, `SimWriterValidationError`, `writer`, `isclass`
+**Вызывает:** `issubclass`, `SimWriterValidationError`, `writer`, `isclass`, `isinstance`
 
 ---
 
@@ -2910,7 +2923,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `IManagerValidator`
 
-**Вызывает:** `ValidatorValidationError`, `isinstance`, `issubclass`, `isclass`, `validator`
+**Вызывает:** `issubclass`, `validator`, `isclass`, `isinstance`, `ValidatorValidationError`
 
 ---
 
@@ -3101,7 +3114,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `None`
 
-**Вызывает:** `to_dict`, `append`
+**Вызывает:** `append`, `to_dict`
 
 ---
 
@@ -3130,7 +3143,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `None`
 
-**Вызывает:** `super`, `__init__`, `pop`
+**Вызывает:** `__init__`, `pop`, `super`
 
 ---
 
@@ -3180,7 +3193,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `None`
 
-**Вызывает:** `to_dict`, `append`
+**Вызывает:** `append`, `to_dict`
 
 ---
 
@@ -3201,7 +3214,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `dict`
 
-**Вызывает:** `len`, `list`, `keys`
+**Вызывает:** `list`, `keys`, `len`
 
 ---
 
@@ -3223,7 +3236,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `float`
 
-**Вызывает:** `max`, `min`
+**Вызывает:** `min`, `max`
 
 ---
 
@@ -3253,7 +3266,7 @@ options_validator - валидатор опций конфигурации
 - `writer`: IWriter
 - `sim_conf`: dict
 
-**Вызывает:** `__init__`, `GreedySolver`, `SimContext`, `unbind_all`, `TripService`, `super`, `IdleAreaService`, `bind`
+**Вызывает:** `GreedySolver`, `unbind_all`, `TripService`, `__init__`, `super`, `bind`, `SimContext`, `IdleAreaService`
 
 ---
 
@@ -3264,7 +3277,7 @@ options_validator - валидатор опций конфигурации
 - `import copy`
 - `from dataclasses import dataclass`
 - `from typing import Tuple`
-- `from roadnet.core import Edge, Vertex, RoadNetFactory`
+- `from app.sim_engine.core.dummy_roadnet import *`
 - `from app.sim_engine.core.props import Route, SimData`
 - `from app.sim_engine.enums import ObjectType`
 
@@ -3349,7 +3362,7 @@ options_validator - валидатор опций конфигурации
 - `b`
 - `c`
 
-**Вызывает:** `max`, `min`
+**Вызывает:** `min`, `max`
 
 ---
 
@@ -3364,7 +3377,7 @@ options_validator - валидатор опций конфигурации
 
 **Возвращает:** `bool`
 
-**Вызывает:** `max`, `min`
+**Вызывает:** `min`, `max`
 
 ---
 
@@ -3382,7 +3395,7 @@ Returns:
 - `path`: RouteEdge
 - `polygons`: Tuple[Tuple[Tuple[float, float]]] | list[list[list[float]]]
 
-**Вызывает:** `move_along_edges_gen`, `zip`, `segments_intersect`, `list`
+**Вызывает:** `zip`, `segments_intersect`, `list`, `move_along_edges_gen`
 
 ---
 
@@ -3395,7 +3408,7 @@ Returns:
 
 **Возвращает:** `Route`
 
-**Вызывает:** `add`, `Route`, `set`, `append`, `Point`
+**Вызывает:** `Route`, `set`, `append`, `Point`, `add`
 
 ---
 
@@ -3407,7 +3420,7 @@ Returns:
 
 **Возвращает:** `Route`
 
-**Вызывает:** `create_from_geojson`, `key`, `RoadNetFactory`, `add`, `Route`, `set`, `append`, `search_path_dijkstra`, `Point`
+**Вызывает:** `Route`, `search_path_dijkstra`, `set`, `append`, `Point`, `add`, `RoadNetFactory`, `create_from_geojson`, `key`
 
 ---
 
@@ -3421,7 +3434,7 @@ Returns:
 
 **Возвращает:** `RouteEdge`
 
-**Вызывает:** `create_from_geojson`, `key`, `RoadNetFactory`, `RouteEdge`, `search_path_dijkstra`
+**Вызывает:** `search_path_dijkstra`, `RouteEdge`, `RoadNetFactory`, `create_from_geojson`, `key`
 
 ---
 
@@ -3437,7 +3450,7 @@ Returns:
 
 **Возвращает:** `RouteEdge`
 
-**Вызывает:** `create_from_geojson`, `key`, `RoadNetFactory`, `RouteEdge`, `search_path_dijkstra`
+**Вызывает:** `search_path_dijkstra`, `RouteEdge`, `RoadNetFactory`, `create_from_geojson`, `key`
 
 ---
 
@@ -3475,7 +3488,7 @@ Returns:
 - `end_edge_idx`: int | None
 - `road_net`: dict
 
-**Вызывает:** `create_from_geojson`, `RoadNetFactory`, `search_all_paths`, `RouteEdge`, `sum`, `sort`
+**Вызывает:** `sort`, `search_all_paths`, `RouteEdge`, `sum`, `RoadNetFactory`, `create_from_geojson`
 
 ---
 
@@ -3491,7 +3504,7 @@ Returns:
 - `to_object_type`: ObjectType
 - `road_net`: dict
 
-**Вызывает:** `create_from_geojson`, `key`, `RoadNetFactory`, `search_all_paths`, `RouteEdge`, `sum`, `sort`
+**Вызывает:** `sort`, `RouteEdge`, `search_all_paths`, `sum`, `RoadNetFactory`, `create_from_geojson`, `key`
 
 ---
 
@@ -3505,7 +3518,7 @@ Returns:
 - `to_object_type`: ObjectType
 - `road_net`: dict
 
-**Вызывает:** `create_from_geojson`, `key`, `RoadNetFactory`, `search_all_paths`, `RouteEdge`, `sum`, `sort`
+**Вызывает:** `sort`, `RouteEdge`, `search_all_paths`, `sum`, `RoadNetFactory`, `create_from_geojson`, `key`
 
 ---
 
@@ -3528,7 +3541,7 @@ Returns:
 
 **Возвращает:** `float`
 
-**Вызывает:** `radians`, `atan2`, `sqrt`, `sin`, `cos`
+**Вызывает:** `sin`, `sqrt`, `cos`, `atan2`, `radians`
 
 ---
 
@@ -3537,7 +3550,7 @@ Returns:
 - `point`: Point
 - `point_list`: list[Point]
 
-**Вызывает:** `haversine_km`, `min`
+**Вызывает:** `min`, `haversine_km`
 
 ---
 
@@ -3551,7 +3564,7 @@ Returns:
 
 **Возвращает:** `RouteEdge | None`
 
-**Вызывает:** `find_all_route_edges_by_road_net_from_position_to_position`, `path_intersects_polygons`
+**Вызывает:** `path_intersects_polygons`, `find_all_route_edges_by_road_net_from_position_to_position`
 
 ---
 
@@ -3569,7 +3582,7 @@ Returns:
 
 **Возвращает:** `RouteEdge | None`
 
-**Вызывает:** `find_all_route_edges_by_road_net_from_position`, `path_intersects_polygons`
+**Вызывает:** `path_intersects_polygons`, `find_all_route_edges_by_road_net_from_position`
 
 ---
 
@@ -3627,7 +3640,7 @@ Returns:
 
 **Возвращает:** `dict`
 
-**Вызывает:** `key`, `int`, `is_finished`, `isoformat`, `RuntimeError`
+**Вызывает:** `isoformat`, `RuntimeError`, `key`, `int`, `is_finished`
 
 ---
 
@@ -3727,7 +3740,7 @@ Returns:
 
 **Возвращает:** `dict`
 
-**Вызывает:** `get_koef`, `sum`, `idle`
+**Вызывает:** `idle`, `get_koef`, `sum`
 
 ---
 
@@ -3825,7 +3838,7 @@ Notes
 ### Импорты
 - `from typing import Generator`
 - `import numpy`
-- `from roadnet.core import Edge`
+- `from app.sim_engine.core.dummy_roadnet import *`
 - `from app.sim_engine.core.geometry import Point, interpolate_position, haversine_km, RouteEdge`
 
 ### Публичные функции
@@ -3844,7 +3857,7 @@ Notes
 
 **Возвращает:** `Generator[tuple[float, Point], None, None]`
 
-**Вызывает:** `interpolate_position`, `haversine_km`, `min`
+**Вызывает:** `haversine_km`, `interpolate_position`, `min`
 
 ---
 
@@ -3857,7 +3870,7 @@ Notes
 - `props`
 - `forward`
 
-**Вызывает:** `list`, `calculate_segment_motion`, `range`, `len`, `reversed`
+**Вызывает:** `reversed`, `len`, `range`, `calculate_segment_motion`, `list`
 
 ---
 
@@ -3874,7 +3887,7 @@ Notes
 
 **Возвращает:** `Generator[tuple[float, Point], None, None]`
 
-**Вызывает:** `interpolate_position`, `min`
+**Вызывает:** `min`, `interpolate_position`
 
 ---
 
@@ -3913,7 +3926,7 @@ Notes
 
 **Возвращает:** `int`
 
-**Вызывает:** `int`, `ceil`
+**Вызывает:** `ceil`, `int`
 
 ---
 
@@ -3927,7 +3940,7 @@ Notes
 
 **Возвращает:** `int`
 
-**Вызывает:** `int`, `ceil`
+**Вызывает:** `ceil`, `int`
 
 ---
 
@@ -3957,7 +3970,7 @@ Notes
 - `props`: UnlProperties
 - `truck_volume`
 
-**Вызывает:** `max`, `dict`
+**Вызывает:** `dict`, `max`
 
 ---
 
@@ -3979,7 +3992,7 @@ Notes
 - `unload_props`: UnlProperties
 - `truck_props`: TruckProperties
 
-**Вызывает:** `max`, `dict`
+**Вызывает:** `dict`, `max`
 
 ---
 
@@ -4058,7 +4071,7 @@ Notes
 
 **Возвращает:** `InputPlanningData`
 
-**Вызывает:** `values`, `int`, `build_route_edges_by_road_net_from_position`, `unload_calculation_by_norm`, `len`, `build_route_edges_by_road_net`, `calculate_load_cycles`, `dict`, `calculate_time_motion_by_edges`, `InputPlanningData`
+**Вызывает:** `build_route_edges_by_road_net`, `len`, `calculate_time_motion_by_edges`, `values`, `InputPlanningData`, `unload_calculation_by_norm`, `build_route_edges_by_road_net_from_position`, `int`, `dict`, `calculate_load_cycles`
 
 ---
 
@@ -4070,7 +4083,7 @@ Notes
 
 **Возвращает:** `dict`
 
-**Вызывает:** `defaultdict`, `int`, `run`, `PlannedTrip`, `append`, `pop`, `info`, `total_seconds`
+**Вызывает:** `run`, `PlannedTrip`, `defaultdict`, `append`, `total_seconds`, `info`, `pop`, `int`
 
 ---
 
@@ -4079,7 +4092,7 @@ Notes
 - `self`
 - `simdata`: SimData
 
-**Вызывает:** `get_planning_data`, `run`, `_init_solver`, `info`
+**Вызывает:** `run`, `get_planning_data`, `info`, `_init_solver`
 
 ---
 
@@ -4104,7 +4117,7 @@ Notes
 
 **Возвращает:** `InputPlanningData`
 
-**Вызывает:** `values`, `int`, `build_route_edges_by_road_net_from_position`, `unload_calculation_by_norm`, `len`, `build_route_edges_by_road_net`, `calculate_load_cycles`, `dict`, `calculate_time_motion_by_edges`, `InputPlanningData`
+**Вызывает:** `build_route_edges_by_road_net`, `len`, `calculate_time_motion_by_edges`, `values`, `InputPlanningData`, `unload_calculation_by_norm`, `build_route_edges_by_road_net_from_position`, `int`, `dict`, `calculate_load_cycles`
 
 ---
 
@@ -4129,7 +4142,7 @@ Notes
 
 **Возвращает:** `int`
 
-**Вызывает:** `floor`, `max`, `min`, `keys`
+**Вызывает:** `min`, `floor`, `keys`, `max`
 
 ---
 
@@ -4139,7 +4152,7 @@ Notes
 - `inst`: InputPlanningData
 - `use_individual_kmax`: bool = True
 
-**Вызывает:** `int`, `CpModel`, `OnlyEnforceIf`, `sum`, `Add`, `values`, `range`, `max`, `dict`, `round`, `compute_Kmax_i`, `NewBoolVar`, `append`, `AddNoOverlap`, `Maximize`, `Not`, `NewOptionalIntervalVar`, `AddBoolOr`, `NewIntVar`
+**Вызывает:** `NewBoolVar`, `OnlyEnforceIf`, `int`, `max`, `NewOptionalIntervalVar`, `Maximize`, `NewIntVar`, `compute_Kmax_i`, `AddBoolOr`, `AddNoOverlap`, `round`, `append`, `range`, `sum`, `Add`, `dict`, `CpModel`, `Not`, `values`
 
 ---
 
@@ -4150,7 +4163,7 @@ Notes
 - `cls`
 - `inst`: InputPlanningData
 
-**Вызывает:** `build_cp_model`, `int`, `float`, `range`, `BooleanValue`, `Solve`, `ObjectiveValue`, `CpSolver`, `append`, `Value`, `get`, `info`, `sort`
+**Вызывает:** `get`, `BooleanValue`, `float`, `CpSolver`, `ObjectiveValue`, `build_cp_model`, `sort`, `append`, `range`, `info`, `Value`, `int`, `Solve`
 
 ---
 
@@ -4196,7 +4209,7 @@ Notes
 - `excluded_object`: tuple[int, ObjectType] = None
 - `included_object`: tuple[int, ObjectType] = None
 
-**Вызывает:** `debug`, `_update_trucks_position`, `_included_object`, `_reset_cycle`, `_excluded_object`, `items`
+**Вызывает:** `items`, `_excluded_object`, `_included_object`, `_reset_cycle`, `_update_trucks_position`, `debug`
 
 ---
 
@@ -4208,7 +4221,7 @@ Notes
 - `excluded_objects`: List[tuple[int, ObjectType]] | None = None
 - `included_objects`: List[tuple[int, ObjectType]] | None = None
 
-**Вызывает:** `debug`, `_update_trucks_position`, `_included_objects`, `_reset_cycle`, `_excluded_objects`, `items`
+**Вызывает:** `items`, `_excluded_objects`, `_reset_cycle`, `_update_trucks_position`, `debug`, `_included_objects`
 
 ---
 
@@ -4228,7 +4241,7 @@ Notes
 - `truck`
 - `now`: int
 
-**Вызывает:** `find_trucks_to_shovel`, `debug`, `values`, `len`, `append`
+**Вызывает:** `len`, `append`, `values`, `debug`, `find_trucks_to_shovel`
 
 ---
 
@@ -4267,7 +4280,7 @@ Notes
 
 **Возвращает:** `int`
 
-**Вызывает:** `floor`, `max`, `min`, `keys`
+**Вызывает:** `min`, `floor`, `keys`, `max`
 
 ---
 
@@ -4324,7 +4337,7 @@ Notes
 - `cls`
 - `inst`: InputPlanningData
 
-**Вызывает:** `int`, `ValueError`, `value`, `PULP_CBC_CMD`, `solve`, `range`, `HiGHS_CMD`, `round`, `append`, `build_model`, `info`, `sim_conf`, `sort`
+**Вызывает:** `build_model`, `round`, `sort`, `append`, `value`, `range`, `ValueError`, `info`, `PULP_CBC_CMD`, `int`, `sim_conf`, `solve`, `HiGHS_CMD`
 
 ---
 
@@ -4343,7 +4356,7 @@ Notes
 - `tick`
 - `data_callback`
 
-**Вызывает:** `process`, `env`, `run`, `writer`
+**Вызывает:** `run`, `process`, `env`, `writer`
 
 ---
 
@@ -4411,7 +4424,7 @@ Notes
 - `initial_position`
 - `tick` = 1
 
-**Вызывает:** `BaseTickBehavior`, `env`, `writer`, `Resource`
+**Вызывает:** `Resource`, `BaseTickBehavior`, `env`, `writer`
 
 ---
 
@@ -4419,7 +4432,7 @@ Notes
 **Аргументы:**
 - `self`
 
-**Вызывает:** `timestamp`, `timedelta`
+**Вызывает:** `timedelta`, `timestamp`
 
 ---
 
@@ -4428,7 +4441,7 @@ Notes
 - `self`
 - `truck`
 
-**Вызывает:** `remove`, `push_event`, `int`, `timeout`, `request`, `range`, `append`, `copy`
+**Вызывает:** `append`, `request`, `range`, `copy`, `timeout`, `int`, `push_event`, `remove`
 
 ---
 
@@ -4444,7 +4457,7 @@ Notes
 - `event_type`: EventType
 - `truck`
 
-**Вызывает:** `FuelStationEvent`, `ru`, `push_event`, `code`
+**Вызывает:** `push_event`, `ru`, `code`, `FuelStationEvent`
 
 ---
 
@@ -4478,7 +4491,7 @@ Notes
 **Аргументы:**
 - `self`
 
-**Вызывает:** `trip_service`, `solver`, `env`, `writer`, `QuarryBlastingWatcher`, `sim_conf`
+**Вызывает:** `env`, `sim_conf`, `QuarryBlastingWatcher`, `writer`, `trip_service`, `solver`
 
 ---
 
@@ -4541,7 +4554,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `deepcopy`, `Planner`, `run_with_exclude`, `update_trucks_position`, `update_planned_trips`, `append`
+**Вызывает:** `run_with_exclude`, `deepcopy`, `append`, `Planner`, `update_planned_trips`, `update_trucks_position`
 
 ---
 
@@ -4555,7 +4568,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `remove`, `deepcopy`, `run_with_exclude`, `Planner`, `update_trucks_position`, `update_planned_trips`
+**Вызывает:** `run_with_exclude`, `update_trucks_position`, `deepcopy`, `Planner`, `update_planned_trips`, `remove`
 
 ---
 
@@ -4577,7 +4590,7 @@ Needs to be called when we already have `self.sim_data`
 - `*args` (vararg)
 - `**kwargs` (kwarg)
 
-**Вызывает:** `ru`, `key`, `push_event`, `strftime`, `check_trucks_state`, `Event`, `rebuild_planning_data_cascade`, `get`, `code`
+**Вызывает:** `get`, `Event`, `code`, `ru`, `check_trucks_state`, `strftime`, `rebuild_planning_data_cascade`, `push_event`, `key`
 
 ---
 
@@ -4610,7 +4623,7 @@ Needs to be called when we already have `self.sim_data`
 - `properties`: ShovelProperties
 - `tick` = 1
 
-**Вызывает:** `solver`, `ShovelBlastingWatcher`, `env`, `PlannedIdleBehavior`, `writer`, `BaseTickBehavior`, `get`, `BreakdownBehavior`, `sim_conf`, `Resource`
+**Вызывает:** `get`, `BaseTickBehavior`, `env`, `sim_conf`, `writer`, `Resource`, `BreakdownBehavior`, `solver`, `ShovelBlastingWatcher`, `PlannedIdleBehavior`
 
 ---
 
@@ -4635,7 +4648,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `truck`
 
-**Вызывает:** `remove`, `timeout`, `request`, `calculate_load_cycles_cumulative_generator`, `release`, `append`
+**Вызывает:** `calculate_load_cycles_cumulative_generator`, `release`, `append`, `request`, `timeout`, `remove`
 
 ---
 
@@ -4651,7 +4664,7 @@ Needs to be called when we already have `self.sim_data`
 - `event_type`: EventType
 - `write_event`: bool = True
 
-**Вызывает:** `ru`, `push_event`, `rebuild_plan_by_add_exclude`, `Event`, `rebuild_planning_data`, `rebuild_plan_by_del_exclude`, `code`
+**Вызывает:** `rebuild_plan_by_add_exclude`, `Event`, `rebuild_planning_data`, `code`, `ru`, `rebuild_plan_by_del_exclude`, `push_event`
 
 ---
 
@@ -4659,7 +4672,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `writerow`, `ru`, `key`, `round`
+**Вызывает:** `writerow`, `ru`, `round`, `key`
 
 ---
 
@@ -4702,7 +4715,7 @@ Needs to be called when we already have `self.sim_data`
 - `fuel_stations`: list[FuelStation]
 - `tick` = 1
 
-**Вызывает:** `TruckBlastingWatcher`, `trip_service`, `key`, `solver`, `idle_area_service`, `process`, `env`, `run`, `FuelBehavior`, `writer`, `BaseTickBehavior`, `LunchBehavior`, `get`, `BreakdownBehavior`, `sim_conf`, `PlannedIdleBehavior`
+**Вызывает:** `get`, `run`, `TruckBlastingWatcher`, `idle_area_service`, `BaseTickBehavior`, `env`, `sim_conf`, `writer`, `process`, `trip_service`, `LunchBehavior`, `BreakdownBehavior`, `solver`, `FuelBehavior`, `key`, `PlannedIdleBehavior`
 
 ---
 
@@ -4712,7 +4725,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `FuelStation`
 
-**Вызывает:** `len`, `haversine_km`, `min`
+**Вызывает:** `min`, `haversine_km`, `len`
 
 ---
 
@@ -4740,7 +4753,7 @@ Needs to be called when we already have `self.sim_data`
 - `speed_limit`
 - `acceleration`
 
-**Вызывает:** `timeout`, `calculate_segment_motion`
+**Вызывает:** `calculate_segment_motion`, `timeout`
 
 ---
 
@@ -4758,7 +4771,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `process`, `moving`, `build_route_edges_by_road_net_from_position`, `refuelling`
+**Вызывает:** `process`, `build_route_edges_by_road_net_from_position`, `refuelling`, `moving`
 
 ---
 
@@ -4799,7 +4812,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `wait_blasting`, `find_route_edges_around_restricted_zones_from_base_route`, `moving`, `path_intersects_polygons`, `build_route_edges_by_road_net_from_position_to_position`, `move_to_area`
+**Вызывает:** `path_intersects_polygons`, `find_route_edges_around_restricted_zones_from_base_route`, `moving`, `move_to_area`, `wait_blasting`, `build_route_edges_by_road_net_from_position_to_position`
 
 ---
 
@@ -4811,7 +4824,7 @@ Needs to be called when we already have `self.sim_data`
 - `area_type`: IdleAreaType
 - `actions`: Optional[List[Callable]] = None
 
-**Вызывает:** `wait_blasting`, `get_areas`, `moving`, `path_intersects_polygons`, `find_nearest`
+**Вызывает:** `find_nearest`, `path_intersects_polygons`, `get_areas`, `moving`, `wait_blasting`
 
 ---
 
@@ -4824,7 +4837,7 @@ Needs to be called when we already have `self.sim_data`
 - `forward`: bool
 - `actions`: Optional[List[Callable]] = None
 
-**Вызывает:** `timeout`, `build_route_edges_by_road_net_from_position_to_position`, `calculate_motion_by_edges`, `action`
+**Вызывает:** `timeout`, `build_route_edges_by_road_net_from_position_to_position`, `action`, `calculate_motion_by_edges`
 
 ---
 
@@ -4834,7 +4847,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `build_route_edges_by_road_net`, `pop`
+**Вызывает:** `pop`, `build_route_edges_by_road_net`
 
 ---
 
@@ -4852,7 +4865,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `remove`, `set_shift_change_area`, `process`, `timeout`, `set_start_route`, `moving`, `set_route`, `load_truck`, `current_trip_data`, `unload_truck`, `begin`, `cancel`, `len`, `append`, `assign_trip`, `finish`
+**Вызывает:** `load_truck`, `finish`, `remove`, `set_route`, `assign_trip`, `len`, `append`, `begin`, `set_start_route`, `moving`, `cancel`, `process`, `current_trip_data`, `timeout`, `unload_truck`, `set_shift_change_area`
 
 ---
 
@@ -4864,7 +4877,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `ru`, `push_event`, `rebuild_plan_by_add_exclude`, `Event`, `rebuild_planning_data`, `rebuild_plan_by_del_exclude`, `code`
+**Вызывает:** `rebuild_plan_by_add_exclude`, `Event`, `rebuild_planning_data`, `code`, `ru`, `rebuild_plan_by_del_exclude`, `push_event`
 
 ---
 
@@ -4872,7 +4885,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `writerow`, `ru`, `key`, `round`
+**Вызывает:** `writerow`, `ru`, `round`, `key`
 
 ---
 
@@ -4911,7 +4924,7 @@ Needs to be called when we already have `self.sim_data`
 - `quarry`: Quarry
 - `tick` = 1
 
-**Вызывает:** `solver`, `UnloadBlastingWatcher`, `env`, `writer`, `BaseTickBehavior`, `BreakdownBehavior`, `sim_conf`, `Resource`
+**Вызывает:** `BaseTickBehavior`, `env`, `sim_conf`, `writer`, `Resource`, `UnloadBlastingWatcher`, `BreakdownBehavior`, `solver`
 
 ---
 
@@ -4936,7 +4949,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `truck`
 
-**Вызывает:** `remove`, `unload_calculation`, `int`, `timeout`, `request`, `range`, `append`
+**Вызывает:** `append`, `unload_calculation`, `request`, `range`, `timeout`, `int`, `remove`
 
 ---
 
@@ -4946,7 +4959,7 @@ Needs to be called when we already have `self.sim_data`
 - `event_type`: EventType
 - `write_event`: bool = True
 
-**Вызывает:** `ru`, `push_event`, `rebuild_plan_by_add_exclude`, `Event`, `rebuild_planning_data`, `rebuild_plan_by_del_exclude`, `code`
+**Вызывает:** `rebuild_plan_by_add_exclude`, `Event`, `rebuild_planning_data`, `code`, `ru`, `rebuild_plan_by_del_exclude`, `push_event`
 
 ---
 
@@ -4985,7 +4998,7 @@ Needs to be called when we already have `self.sim_data`
 - `target`: Any
 - `props`: Any = None
 
-**Вызывает:** `process`, `env`, `run`
+**Вызывает:** `run`, `process`, `env`
 
 ---
 
@@ -5004,7 +5017,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `target`
 
-**Вызывает:** `process`, `env`, `run`
+**Вызывает:** `run`, `process`, `env`
 
 ---
 
@@ -5012,7 +5025,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `main_tic_process`, `timeout`, `hasattr`, `telemetry_process`
+**Вызывает:** `timeout`, `main_tic_process`, `hasattr`, `telemetry_process`
 
 ---
 
@@ -5022,7 +5035,7 @@ Needs to be called when we already have `self.sim_data`
 - `target`
 - `props`
 
-**Вызывает:** `super`, `__init__`, `BreakdownCalc`
+**Вызывает:** `__init__`, `BreakdownCalc`, `super`
 
 ---
 
@@ -5030,7 +5043,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `push_event`, `int`, `timeout`, `calculate_repair_time`, `calculate_failure_time`
+**Вызывает:** `calculate_repair_time`, `calculate_failure_time`, `timeout`, `int`, `push_event`
 
 ---
 
@@ -5040,7 +5053,7 @@ Needs to be called when we already have `self.sim_data`
 - `target`
 - `props`
 
-**Вызывает:** `super`, `__init__`, `FuelCalc`
+**Вызывает:** `__init__`, `FuelCalc`, `super`
 
 ---
 
@@ -5048,7 +5061,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `calculate_fuel_level_while_idle`, `timeout`, `calculate_fuel_level_while_moving`
+**Вызывает:** `calculate_fuel_level_while_idle`, `calculate_fuel_level_while_moving`, `timeout`
 
 ---
 
@@ -5057,7 +5070,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `target`
 
-**Вызывает:** `super`, `__init__`, `LunchCalc`
+**Вызывает:** `__init__`, `LunchCalc`, `super`
 
 ---
 
@@ -5065,7 +5078,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `timeout`, `push_event`, `pop`, `calculate_lunch_times`
+**Вызывает:** `pop`, `timeout`, `calculate_lunch_times`, `push_event`
 
 ---
 
@@ -5075,7 +5088,7 @@ Needs to be called when we already have `self.sim_data`
 - `target`
 - `object_type`: ObjectType
 
-**Вызывает:** `super`, `__init__`
+**Вызывает:** `__init__`, `super`
 
 ---
 
@@ -5083,7 +5096,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `_should_start_planned_idle`, `push_event`, `_calculate_idles_times`, `timeout`, `pop`
+**Вызывает:** `_calculate_idles_times`, `pop`, `timeout`, `push_event`, `_should_start_planned_idle`
 
 ---
 
@@ -5107,7 +5120,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `target`
 
-**Вызывает:** `super`, `__init__`
+**Вызывает:** `__init__`, `super`
 
 ---
 
@@ -5131,7 +5144,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `remove`, `append`, `values`
+**Вызывает:** `append`, `values`, `remove`
 
 ---
 
@@ -5139,7 +5152,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `push_event`, `set`, `timeout`, `dict`, `keys`, `pop`, `generate_blasting_list`, `timedelta`
+**Вызывает:** `set`, `timedelta`, `timeout`, `pop`, `generate_blasting_list`, `dict`, `push_event`, `keys`
 
 ---
 
@@ -5148,7 +5161,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `target`
 
-**Вызывает:** `super`, `__init__`
+**Вызывает:** `__init__`, `super`
 
 ---
 
@@ -5165,7 +5178,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `target`
 
-**Вызывает:** `super`, `__init__`
+**Вызывает:** `__init__`, `super`
 
 ---
 
@@ -5181,7 +5194,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `values`, `push_event`, `timeout`, `path_intersects_polygons`, `wait_blasting_changing`, `find_all_route_edges_by_road_net_from_object_to_object`
+**Вызывает:** `path_intersects_polygons`, `wait_blasting_changing`, `values`, `timeout`, `find_all_route_edges_by_road_net_from_object_to_object`, `push_event`
 
 ---
 
@@ -5190,7 +5203,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `target`
 
-**Вызывает:** `super`, `__init__`
+**Вызывает:** `__init__`, `super`
 
 ---
 
@@ -5206,7 +5219,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `self`
 
-**Вызывает:** `values`, `push_event`, `timeout`, `path_intersects_polygons`, `wait_blasting_changing`, `find_all_route_edges_by_road_net_from_object_to_object`
+**Вызывает:** `path_intersects_polygons`, `wait_blasting_changing`, `values`, `timeout`, `find_all_route_edges_by_road_net_from_object_to_object`, `push_event`
 
 ---
 
@@ -5296,7 +5309,7 @@ Needs to be called when we already have `self.sim_data`
 #### sim_current_timestamp
 **Возвращает:** `float`
 
-**Вызывает:** `timestamp`, `sim_current_time`
+**Вызывает:** `sim_current_time`, `timestamp`
 
 ---
 
@@ -5370,7 +5383,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `Tuple[IdleArea, RouteEdge] | Tuple[None, None]`
 
-**Вызывает:** `find_route_edges_around_restricted_zones_from_position_to_object`, `sum`, `get_areas`
+**Вызывает:** `find_route_edges_around_restricted_zones_from_position_to_object`, `get_areas`, `sum`
 
 ---
 
@@ -5387,7 +5400,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `field_value`: Any
 
-**Вызывает:** `str`, `isinstance`
+**Вызывает:** `isinstance`, `str`
 
 ---
 
@@ -5397,7 +5410,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `dict`
 
-**Вызывает:** `str`, `isinstance`
+**Вызывает:** `isinstance`, `str`
 
 ---
 
@@ -5416,7 +5429,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `has`, `RuntimeError`
+**Вызывает:** `RuntimeError`, `has`
 
 ---
 
@@ -5428,7 +5441,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `Any`
 
-**Вызывает:** `RuntimeError`, `get`
+**Вызывает:** `get`, `RuntimeError`
 
 ---
 
@@ -5488,7 +5501,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `defaultdict`, `set`
+**Вызывает:** `set`, `defaultdict`
 
 ---
 
@@ -5508,7 +5521,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `debug`, `sim_current_time`, `QuarryObject`, `RuntimeError`, `ActualTrip`
+**Вызывает:** `RuntimeError`, `ActualTrip`, `sim_current_time`, `QuarryObject`, `debug`
 
 ---
 
@@ -5519,7 +5532,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `None`
 
-**Вызывает:** `append`, `to_telemetry`, `__finish_actual_trip`, `__update_summary_metrics`
+**Вызывает:** `__update_summary_metrics`, `__finish_actual_trip`, `append`, `to_telemetry`
 
 ---
 
@@ -5530,7 +5543,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `dict`
 
-**Вызывает:** `list`, `floor`, `sim_start_time`, `range`, `len`, `append`, `get`
+**Вызывает:** `get`, `len`, `sim_start_time`, `append`, `range`, `floor`, `list`
 
 ---
 
@@ -5558,7 +5571,7 @@ Needs to be called when we already have `self.sim_data`
 - `*args` (vararg)
 - `**kwargs` (kwarg)
 
-**Вызывает:** `wraps`, `getLogger`, `error`, `RunSimulationError`, `func`, `format_exc`
+**Вызывает:** `getLogger`, `format_exc`, `error`, `func`, `wraps`, `RunSimulationError`
 
 ---
 
@@ -5566,7 +5579,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `func`
 
-**Вызывает:** `wraps`, `getLogger`, `error`, `RunSimulationError`, `func`, `format_exc`
+**Вызывает:** `getLogger`, `format_exc`, `error`, `func`, `wraps`, `RunSimulationError`
 
 ---
 
@@ -5593,7 +5606,7 @@ Needs to be called when we already have `self.sim_data`
 
 **Возвращает:** `str`
 
-**Вызывает:** `getMessage`, `isinstance`, `update`, `dumps`, `isoformat`, `fromtimestamp`
+**Вызывает:** `isoformat`, `update`, `getMessage`, `dumps`, `isinstance`, `fromtimestamp`
 
 ---
 
@@ -5636,7 +5649,7 @@ Needs to be called when we already have `self.sim_data`
 ### Публичные функции
 
 #### input_data
-**Вызывает:** `open`, `dirname`, `load`, `join`
+**Вызывает:** `open`, `dirname`, `join`, `load`
 
 ---
 
@@ -5644,7 +5657,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `result`: dict
 
-**Вызывает:** `floor`, `isinstance`
+**Вызывает:** `isinstance`, `floor`
 
 ---
 
@@ -5652,7 +5665,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `isinstance`, `key`, `SimulationManager`, `run`, `len`, `validate_result`, `keys`
+**Вызывает:** `run`, `SimulationManager`, `len`, `validate_result`, `isinstance`, `keys`, `key`
 
 ---
 
@@ -5660,7 +5673,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `isinstance`, `key`, `SimulationManager`, `run`, `len`, `validate_result`, `keys`
+**Вызывает:** `run`, `SimulationManager`, `len`, `validate_result`, `isinstance`, `keys`, `key`
 
 ---
 
@@ -5668,7 +5681,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `isinstance`, `key`, `SimulationManager`, `run`, `len`, `validate_result`, `keys`
+**Вызывает:** `run`, `SimulationManager`, `len`, `validate_result`, `isinstance`, `keys`, `key`
 
 ---
 
@@ -5676,7 +5689,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `isinstance`, `key`, `SimulationManager`, `run`, `len`, `validate_result`, `keys`
+**Вызывает:** `run`, `SimulationManager`, `len`, `validate_result`, `isinstance`, `keys`, `key`
 
 ---
 
@@ -5684,7 +5697,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `isinstance`, `key`, `SimulationManager`, `run`, `len`, `validate_result`, `keys`
+**Вызывает:** `run`, `SimulationManager`, `len`, `validate_result`, `isinstance`, `keys`, `key`
 
 ---
 
@@ -5692,7 +5705,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`
 
 ---
 
@@ -5700,7 +5713,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `isinstance`, `SimulationManager`, `run`, `len`, `validate_result`, `keys`
+**Вызывает:** `run`, `SimulationManager`, `len`, `validate_result`, `isinstance`, `keys`
 
 ---
 
@@ -5708,7 +5721,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`
 
 ---
 
@@ -5716,7 +5729,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `len`, `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`, `len`
 
 ---
 
@@ -5724,7 +5737,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`
 
 ---
 
@@ -5732,7 +5745,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `len`, `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`, `len`
 
 ---
 
@@ -5740,7 +5753,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`
 
 ---
 
@@ -5748,7 +5761,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `len`, `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`, `len`
 
 ---
 
@@ -5756,7 +5769,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`
 
 ---
 
@@ -5764,7 +5777,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `len`, `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`, `len`
 
 ---
 
@@ -5772,7 +5785,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `len`, `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`, `len`
 
 ---
 
@@ -5780,7 +5793,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `input_data`
 
-**Вызывает:** `run`, `validate_result`, `SimulationManager`
+**Вызывает:** `validate_result`, `run`, `SimulationManager`
 
 ---
 
@@ -5819,14 +5832,14 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `app`
 
-**Вызывает:** `fixture`, `TestClient`
+**Вызывает:** `TestClient`, `fixture`
 
 ---
 
 #### db_session
 Создает мок-сессию базы данных
 
-**Вызывает:** `Mock`, `fixture`, `patch`
+**Вызывает:** `fixture`, `Mock`, `patch`
 
 ---
 
@@ -5861,7 +5874,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `client`
 
-**Вызывает:** `isinstance`, `get`, `json`
+**Вызывает:** `get`, `isinstance`, `json`
 
 ---
 
@@ -5869,7 +5882,7 @@ Needs to be called when we already have `self.sim_data`
 **Аргументы:**
 - `client`
 
-**Вызывает:** `isinstance`, `get`, `json`
+**Вызывает:** `get`, `isinstance`, `json`
 
 ---
 
@@ -5878,7 +5891,7 @@ Needs to be called when we already have `self.sim_data`
 - `self`
 - `client`
 
-**Вызывает:** `isinstance`, `get`, `json`
+**Вызывает:** `get`, `isinstance`, `json`
 
 ---
 
@@ -5986,7 +5999,7 @@ Needs to be called when we already have `self.sim_data`
 - `client`
 - `endpoint`
 
-**Вызывает:** `parametrize`, `get`
+**Вызывает:** `get`, `parametrize`
 
 ---
 

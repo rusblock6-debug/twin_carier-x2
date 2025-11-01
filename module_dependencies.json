@@ -28,7 +28,6 @@
     "os",
     "pathlib",
     "pydantic",
-    "roadnet",
     "sqlalchemy",
     "typing",
     "zoneinfo"
@@ -39,6 +38,10 @@
   ],
   "gunicorn.conf": [
     "os"
+  ],
+  "main": [
+    "app",
+    "fastapi"
   ],
   "models": [
     "app",
@@ -52,7 +55,6 @@
   "road_net": [
     "app",
     "collections",
-    "roadnet",
     "sqlalchemy"
   ],
   "routes": [
@@ -305,7 +307,6 @@
     "copy",
     "dataclasses",
     "math",
-    "roadnet",
     "typing"
   ],
   "props": [
@@ -332,7 +333,6 @@
     "app",
     "datetime",
     "numpy",
-    "roadnet",
     "simpy",
     "typing"
   ],
