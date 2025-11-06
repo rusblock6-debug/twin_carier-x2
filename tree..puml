@@ -1,0 +1,193 @@
+qsimmine12
+ ┣ .helm
+ ┃ ┣ templates
+ ┃ ┃ ┣ deployment.yaml
+ ┃ ┃ ┣ ingress.yaml
+ ┃ ┃ ┣ pvc.yaml
+ ┃ ┃ ┣ service.yaml
+ ┃ ┃ ┣ serviceaccount.yaml
+ ┃ ┃ ┗ _helpers.tpl
+ ┃ ┣ Chart.yaml
+ ┃ ┗ values.yaml
+ ┣ .husky
+ ┃ ┗ pre-commit
+ ┣ app
+ ┃ ┣ migrations
+ ┃ ┃ ┣ versions
+ ┃ ┃ ┃ ┣ 049327069ed2_add_arm_turn_angle_to_shovel.py
+ ┃ ┃ ┃ ┣ 173b757501f6_add_scenario_model.py
+ ┃ ┃ ┃ ┣ 2f3ca3217c27_add_blasting_model.py
+ ┃ ┃ ┃ ┣ 34d2db5b9f3c_drop_columns.py
+ ┃ ┃ ┃ ┣ 5e034f7cece7_initial_migration_attempt_3.py
+ ┃ ┃ ┃ ┣ 660043dae00e_add_shoveltemplate_trucktemplate_.py
+ ┃ ┃ ┃ ┣ 689dff3c9f22_new_fields_for_shovel_truck_and_unload.py
+ ┃ ┃ ┃ ┣ 741a88f7abe1_add_scenario_relation_to_.py
+ ┃ ┃ ┃ ┣ 77aa09bc992e_add_primary_key_to_scenario_id_in_.py
+ ┃ ┃ ┃ ┣ 8520318762c4_rename_shiftchangearea_to_idlearea.py
+ ┃ ┃ ┃ ┣ 8d394792dc14_add_shift_change_fields_to_quarry.py
+ ┃ ┃ ┃ ┣ 9daa452a370b_new_reliability_related_fields_for_.py
+ ┃ ┃ ┃ ┣ a06b87cc0807_add_shiftchangearea_and_fuelstation_.py
+ ┃ ┃ ┃ ┣ a43abb6acab2_add_uploadedfile_and_mapoverlay.py
+ ┃ ┃ ┃ ┣ b7dcacd91b4a_add_quarry.py
+ ┃ ┃ ┃ ┣ c5fb8550f985_add_plannedidle.py
+ ┃ ┃ ┃ ┣ f07a8f73270d_update_unload_payload_type_values.py
+ ┃ ┃ ┃ ┣ fa791c45aefa_add_field_is_repair_area_to_idlearea.py
+ ┃ ┃ ┃ ┗ fea74ce0faa7_add_roadnet.py
+ ┃ ┃ ┣ alembic.ini
+ ┃ ┃ ┣ env.py
+ ┃ ┃ ┣ README
+ ┃ ┃ ┗ script.py.mako
+ ┃ ┣ services
+ ┃ ┃ ┣ date_time_service.py
+ ┃ ┃ ┣ object_service.py
+ ┃ ┃ ┣ quarry_data_service.py
+ ┃ ┃ ┣ scenario_service.py
+ ┃ ┃ ┣ schedule_data_service.py
+ ┃ ┃ ┣ simulation_id_service.py
+ ┃ ┃ ┗ template_service.py
+ ┃ ┣ sim_engine
+ ┃ ┃ ┣ core
+ ┃ ┃ ┃ ┣ calculations
+ ┃ ┃ ┃ ┃ ┣ base.py
+ ┃ ┃ ┃ ┃ ┣ shovel.py
+ ┃ ┃ ┃ ┃ ┣ truck.py
+ ┃ ┃ ┃ ┃ ┣ unload.py
+ ┃ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┃ ┣ planner
+ ┃ ┃ ┃ ┃ ┣ solvers
+ ┃ ┃ ┃ ┃ ┃ ┣ cp.py
+ ┃ ┃ ┃ ┃ ┃ ┣ greedy.py
+ ┃ ┃ ┃ ┃ ┃ ┣ milp.py
+ ┃ ┃ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┃ ┃ ┣ entities.py
+ ┃ ┃ ┃ ┃ ┣ manage.py
+ ┃ ┃ ┃ ┃ ┣ planning_matrix.py
+ ┃ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┃ ┣ simulations
+ ┃ ┃ ┃ ┃ ┣ behaviors
+ ┃ ┃ ┃ ┃ ┃ ┣ base.py
+ ┃ ┃ ┃ ┃ ┃ ┣ blasting.py
+ ┃ ┃ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┃ ┃ ┣ utils
+ ┃ ┃ ┃ ┃ ┃ ┣ dependency_resolver.py
+ ┃ ┃ ┃ ┃ ┃ ┣ helpers.py
+ ┃ ┃ ┃ ┃ ┃ ┣ idle_area_service.py
+ ┃ ┃ ┃ ┃ ┃ ┣ mixins.py
+ ┃ ┃ ┃ ┃ ┃ ┣ service_locator.py
+ ┃ ┃ ┃ ┃ ┃ ┣ trip_service.py
+ ┃ ┃ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┃ ┃ ┣ base.py
+ ┃ ┃ ┃ ┃ ┣ entities.py
+ ┃ ┃ ┃ ┃ ┣ fuel_station.py
+ ┃ ┃ ┃ ┃ ┣ quarry.py
+ ┃ ┃ ┃ ┃ ┣ shovel.py
+ ┃ ┃ ┃ ┃ ┣ truck.py
+ ┃ ┃ ┃ ┃ ┣ unload.py
+ ┃ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┃ ┣ coefficients.py
+ ┃ ┃ ┃ ┣ constants.py
+ ┃ ┃ ┃ ┣ dummy_roadnet.py
+ ┃ ┃ ┃ ┣ environment.py
+ ┃ ┃ ┃ ┣ geometry.py
+ ┃ ┃ ┃ ┣ props.py
+ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┣ infra
+ ┃ ┃ ┃ ┣ logger
+ ┃ ┃ ┃ ┃ ┣ config.py
+ ┃ ┃ ┃ ┃ ┣ json_formatter.py
+ ┃ ┃ ┃ ┃ ┗ logger.py
+ ┃ ┃ ┃ ┗ exception_traceback.py
+ ┃ ┃ ┣ tests
+ ┃ ┃ ┃ ┣ run_simulate.py
+ ┃ ┃ ┃ ┣ run_sim_data.json
+ ┃ ┃ ┃ ┣ run_sim_data_base.json
+ ┃ ┃ ┃ ┣ run_sim_data_multiple_idle_areas.json
+ ┃ ┃ ┃ ┣ test_simulate.py
+ ┃ ┃ ┃ ┗ __init__.py
+ ┃ ┃ ┣ config.py
+ ┃ ┃ ┣ enums.py
+ ┃ ┃ ┣ events.py
+ ┃ ┃ ┣ planner.py
+ ┃ ┃ ┣ reliability.py
+ ┃ ┃ ┣ serializer.py
+ ┃ ┃ ┣ simulate.py
+ ┃ ┃ ┣ simulation_manager.py
+ ┃ ┃ ┣ states.py
+ ┃ ┃ ┣ writer.py
+ ┃ ┃ ┗ __init__.py
+ ┃ ┣ static
+ ┃ ┃ ┣ fonts
+ ┃ ┃ ┃ ┣ bootstrap-icons.woff2
+ ┃ ┃ ┃ ┣ gNMKW3F-SZuj7xmb-HYoEoeyxMI.woff2
+ ┃ ┃ ┃ ┣ gNMKW3F-SZuj7xmf-HYoEoey.woff2
+ ┃ ┃ ┃ ┣ gNMKW3F-SZuj7xmR-HYoEoeyxMI.woff2
+ ┃ ┃ ┃ ┗ gNMKW3F-SZuj7xmS-HYoEoeyxMI.woff2
+ ┃ ┃ ┣ icons
+ ┃ ┃ ┃ ┣ Excavator-broken.svg
+ ┃ ┃ ┃ ┣ Excavator.svg
+ ┃ ┃ ┃ ┣ Excavator2.svg
+ ┃ ┃ ┃ ┣ FuelStation-broken.svg
+ ┃ ┃ ┃ ┣ FuelStation.svg
+ ┃ ┃ ┃ ┣ Parking.svg
+ ┃ ┃ ┃ ┣ Truck.svg
+ ┃ ┃ ┃ ┣ Truck2-broken.svg
+ ┃ ┃ ┃ ┣ Truck2.svg
+ ┃ ┃ ┃ ┣ UnloadingSite-broken.svg
+ ┃ ┃ ┃ ┗ UnloadingSite.svg
+ ┃ ┃ ┣ images
+ ┃ ┃ ┃ ┣ icon.ico
+ ┃ ┃ ┃ ┣ logo.png
+ ┃ ┃ ┃ ┣ logo.svg
+ ┃ ┃ ┃ ┣ main.png
+ ┃ ┃ ┃ ┗ main_logo.png
+ ┃ ┃ ┣ js
+ ┃ ┃ ┃ ┗ tz_utils.js
+ ┃ ┃ ┣ bootstrap-icons.min.css
+ ┃ ┃ ┣ bootstrap.bundle.min.js
+ ┃ ┃ ┣ bootstrap.min.css
+ ┃ ┃ ┣ index.html
+ ┃ ┃ ┣ leaflet.css
+ ┃ ┃ ┣ Leaflet.Editable.min.js
+ ┃ ┃ ┣ leaflet.js
+ ┃ ┃ ┣ onest.font.css
+ ┃ ┃ ┣ script.js
+ ┃ ┃ ┣ style.css
+ ┃ ┃ ┣ vis-timeline-graph2d.min.js
+ ┃ ┃ ┗ vue.global.js
+ ┃ ┣ templates
+ ┃ ┃ ┣ map.html
+ ┃ ┃ ┣ result.html
+ ┃ ┃ ┣ scenarios.html
+ ┃ ┃ ┗ Truck.svg
+ ┃ ┣ tests
+ ┃ ┃ ┣ conftest.py
+ ┃ ┃ ┣ test_api.py
+ ┃ ┃ ┗ __init__.py
+ ┃ ┣ consts.py
+ ┃ ┣ Dockerfile
+ ┃ ┣ dxf_converter.py
+ ┃ ┣ enums.py
+ ┃ ┣ forms.py
+ ┃ ┣ geojson_schema.py
+ ┃ ┣ geo_utils.py
+ ┃ ┣ gunicorn.conf.py
+ ┃ ┣ main.py
+ ┃ ┣ models.py
+ ┃ ┣ requirements.txt
+ ┃ ┣ road_net.py
+ ┃ ┣ routes.py
+ ┃ ┣ shift.py
+ ┃ ┣ simulate_test.py
+ ┃ ┣ utils.py
+ ┃ ┣ web_entrypoint.sh
+ ┃ ┗ __init__.py
+ ┣ upload
+ ┃ ┗ .gitkeep
+ ┣ .dockerignore
+ ┣ .env
+ ┣ .gitignore
+ ┣ .gitlab-ci-deploy-templates.yml
+ ┣ .gitlab-ci.yml
+ ┣ conftest.py
+ ┣ pytest.ini
+ ┗ README.md

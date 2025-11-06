@@ -1,0 +1,139 @@
+@startuml
+title Обзор компонентов и потоков (понятно аналитику, с пояснениями)
+
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+package "API (веб-интерфейс, FastAPI Routes)" as API {
+  [Справочник карьера /api/quarry-data]
+  [Расписание /api/schedule-data-by-date-shift]
+  [Создать/обновить объект /api/object]
+  [Удалить объект /api/object (DELETE)]
+  [Запуск симуляции /api/run-simulation]
+  [Результаты симуляции /api/simulation/{id}/(meta|summary|events|batch|batches)]
+  [Дефолты /api/defaults]
+  [Файлы подложек: загрузить/получить/удалить (/api/file,* /upload/*)]
+}
+
+package "Сервисы приложения (Services)" as S {
+  [Сервис данных карьера (QuarryDataService)]
+  [Сервис расписаний (ScheduleDataService)]
+  [Сервис объектов (ObjectService)]
+  [Сервис сценариев (ScenarioService)]
+  [Сервис шаблонов (AllTemplatesListService)]
+  [Сервис времени по умолчанию (StartEndTimeGenerateService)]
+  [Сервис запуска симуляции (GetSimIdService)]
+}
+
+package "Доступ к данным (DAO)" as DAO {
+  [DAO карьера (QuarryDAO)]
+  [DAO расписаний (ScheduleDAO)]
+  [DAO симуляции (SimulationDAO)]
+  [DAO объектов (ObjectDAO)]
+  [DAO шаблонов (TemplateDAO)]
+  [DAO сценариев (ScenarioDAO)]
+}
+
+package "Бизнес-сущности (ORM, SQLAlchemy)" as ORM {
+  [Карьер (Quarry)]
+  [Экскаватор (Shovel)]
+  [Самосвал (Truck)]
+  [Пункт разгрузки (Unload)]
+  [Заправка (FuelStation)]
+  [Зона ожидания (IdleArea)]
+  [Маршрут (Trail)]
+  [Связь маршрут–самосвал–сценарий (TrailTruckAssociation)]
+  [Взрывные работы (Blasting)]
+  [Плановый простой (PlannedIdle)]
+  [Сценарий (Scenario)]
+  [Дорожная сеть (RoadNet)]
+  [Подложка карты (MapOverlay)]
+  [Загруженный файл (UploadedFile)]
+  [Отображение типов (TYPE_MODEL_MAP / TYPE_SCHEDULE_MAP)]
+  [Дефолтные значения (DefaultValuesMixin)]
+}
+
+package "Движок симуляции (Sim Engine)" as SE {
+  [Сериализация входа (SimDataSerializer)]
+  [Менеджер симуляции (SimulationManager)]
+  [Запись результатов (Writer: Batch/Dict)]
+  [Состояния/События (States/Events)]
+
+  package "Ядро симуляции (Core)" as Core {
+    [Карьер-актор (Quarry actor)]
+    [Самосвал-актор (Truck actor)]
+    [Экскаватор-актор (Shovel actor)]
+    [Пункт разгрузки-актор (Unload actor)]
+    [Заправка-актор (FuelStation actor)]
+    [Контекст/телеметрия (SimContext/TelemetryEmitter)]
+    [Расчёты (Calculations: Truck/Shovel/Unload/Base)]
+    [Поведения (Behaviors: Отказы/Топливо/Обед/Плановый простой/Взрывы)]
+    [Планировщик (Planner + решатели CP/MILP/Greedy)]
+  }
+}
+
+database "БД (PostgreSQL через ORM)" as DB
+queue "Хранилище результатов симуляции (Redis)" as REDIS
+collections "Хранилище пользовательских файлов подложек (каталог upload/)" as FILES
+
+' API → Сервисы
+[Справочник карьера /api/quarry-data] --> [Сервис данных карьера (QuarryDataService)]
+[Расписание /api/schedule-data-by-date-shift] --> [Сервис расписаний (ScheduleDataService)]
+[Создать/обновить объект /api/object] --> [Сервис объектов (ObjectService)]
+[Удалить объект /api/object (DELETE)] --> [Сервис объектов (ObjectService)]
+[Запуск симуляции /api/run-simulation] --> [Сервис запуска симуляции (GetSimIdService)]
+[Результаты симуляции /api/simulation/{id}/(meta|summary|events|batch|batches)] --> REDIS
+[Дефолты /api/defaults] --> [Дефолтные значения (DefaultValuesMixin)]
+[Файлы подложек: загрузить/получить/удалить (/api/file,* /upload/*)] --> [Загруженный файл (UploadedFile)]
+
+' Сервисы ↔ DAO ↔ ORM/DB
+[Сервис данных карьера (QuarryDataService)] --> [DAO карьера (QuarryDAO)]
+[Сервис расписаний (ScheduleDataService)] --> [DAO расписаний (ScheduleDAO)]
+[Сервис объектов (ObjectService)] --> [DAO объектов (ObjectDAO)]
+[Сервис запуска симуляции (GetSimIdService)] --> [DAO симуляции (SimulationDAO)]
+[Сервис шаблонов (AllTemplatesListService)] --> [DAO шаблонов (TemplateDAO)]
+[Сервис сценариев (ScenarioService)] --> [DAO сценариев (ScenarioDAO)]
+
+[DAO карьера (QuarryDAO)] --> ORM
+[DAO расписаний (ScheduleDAO)] --> [Взрывные работы (Blasting)]
+[DAO расписаний (ScheduleDAO)] --> [Плановый простой (PlannedIdle)]
+[DAO симуляции (SimulationDAO)] --> [Дорожная сеть (RoadNet)]
+[DAO симуляции (SimulationDAO)] --> [Взрывные работы (Blasting)]
+[DAO симуляции (SimulationDAO)] --> [Плановый простой (PlannedIdle)]
+
+ORM --> DB
+
+' Симуляция: построение входа и запуск
+[Сервис запуска симуляции (GetSimIdService)] --> [Сериализация входа (SimDataSerializer)]
+[Сервис запуска симуляции (GetSimIdService)] -> [Менеджер симуляции (SimulationManager)]
+[Менеджер симуляции (SimulationManager)] --> Core
+Core ..> [Расчёты (Calculations: Truck/Shovel/Unload/Base)]
+Core ..> [Поведения (Behaviors: Отказы/Топливо/Обед/Плановый простой/Взрывы)]
+Core ..> [Планировщик (Planner + решатели CP/MILP/Greedy)]
+[Менеджер симуляции (SimulationManager)] --> [Состояния/События (States/Events)]
+[Менеджер симуляции (SimulationManager)] --> [Запись результатов (Writer: Batch/Dict)]
+[Запись результатов (Writer: Batch/Dict)] --> REDIS
+
+' Файлы и подложки
+[Подложка карты (MapOverlay)] --> FILES : ссылка на файл (DXF/растровый)
+[Загруженный файл (UploadedFile)] --> FILES : физический файл хранится здесь
+note right of FILES
+  Пользователь загружает DXF/изображение
+  → создаётся запись "Загруженный файл (UploadedFile)"
+  → подложка карты (MapOverlay) может ссылаться
+  на этот файл или хранить GeoJSON напрямую
+end note
+
+' Карты типов
+[Отображение типов (TYPE_MODEL_MAP / TYPE_SCHEDULE_MAP)] ..> [Сервис объектов (ObjectService)]
+[Отображение типов (TYPE_MODEL_MAP / TYPE_SCHEDULE_MAP)] ..> [Сервис расписаний (ScheduleDataService)]
+
+@enduml
+
+
+
+
+
+
+

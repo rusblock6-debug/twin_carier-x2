@@ -1,0 +1,122 @@
+title Обзор компонентов и потоков
+
+// 1. API (FastAPI Routes)
+API [icon: globe, label: "API (FastAPI Routes)"] {
+  Quarry Data Endpoint [icon: database, label: "/api/quarry-data"]
+  Schedule Data Endpoint [icon: calendar, label: "/api/schedule-data-by-date-shift"]
+  "Object Create/Update Endpoint" [icon: edit, label: "/api/object"]
+  Object Delete Endpoint [icon: trash-2, label: "/api/object (DELETE)"]
+  Run Simulation Endpoint [icon: play, label: "/api/run-simulation"]
+  Simulation Results Endpoint [icon: bar-chart, label: "/api/simulation/{id}/(meta|summary|events|batch)"]
+  Defaults Endpoint [icon: settings, label: "/api/defaults"]
+  File Endpoints [icon: file, label: "/api/file, /upload/*"]
+}
+
+// 2. Application Services
+App Services [icon: server, label: "Сервисы приложения"] {
+  QuarryDataService [icon: database, label: "Сервис данных карьера"]
+  ScheduleDataService [icon: calendar, label: "Сервис расписаний"]
+  ObjectService [icon: package, label: "Сервис объектов"]
+  ScenarioService [icon: layers, label: "Сервис сценариев"]
+  AllTemplatesListService [icon: list, label: "Сервис шаблонов"]
+  StartEndTimeGenerateService [icon: clock, label: "Сервис времени по умолчанию"]
+  GetSimIdService [icon: play, label: "Сервис запуска симуляции"]
+}
+
+// 3. Data Access Objects (DAO)
+DAO [icon: database, label: "Доступ к данным (DAO)"] {
+  QuarryDAO [icon: database, label: "DAO карьера"]
+  ScheduleDAO [icon: calendar, label: "DAO расписаний"]
+  SimulationDAO [icon: bar-chart, label: "DAO симуляции"]
+  ObjectDAO [icon: package, label: "DAO объектов"]
+}
+
+// 4. ORM Entities
+ORM [icon: code, label: "Бизнес-сущности (ORM, SQLAlchemy)"] {
+  Quarry [icon: database, label: "Карьер"]
+  Shovel [icon: truck, label: "Экскаватор"]
+  Truck [icon: truck, label: "Самосвал"]
+  Unload [icon: upload, label: "Пункт разгрузки"]
+  FuelStation [icon: droplet, label: "Заправка"]
+  IdleArea [icon: pause, label: "Зона ожидания"]
+  Trail [icon: map, label: "Маршрут"]
+  TrailTruckAssociation [icon: link, label: "Связь маршрут–самосвал–сценарий"]
+  Blasting [icon: zap, label: "Взрывные работы"]
+  PlannedIdle [icon: pause-circle, label: "Плановый простой"]
+  Scenario [icon: layers, label: "Сценарий"]
+  RoadNet [icon: map-pin, label: "Дорожная сеть"]
+  MapOverlay [icon: image, label: "Подложка карты"]
+  UploadedFile [icon: file, label: "Загруженный файл"]
+  TypeModelMap [icon: tag, label: "TYPE_MODEL_MAP / TYPE_SCHEDULE_MAP"]
+  DefaultValuesMixin [icon: settings, label: "Дефолтные значения"]
+}
+
+// 5. Simulation Engine
+Sim Engine [icon: cpu, label: "Движок симуляции"] {
+  SimDataSerializer [icon: file-text, label: "Сериализация входа"]
+  SimulationManager [icon: activity, label: "Менеджер симуляции"]
+  Writer [icon: edit-3, label: "Writer: Batch/Dict"]
+  StatesEvents [icon: alert-circle, label: "Состояния/События"]
+
+  Sim Core [icon: cpu, label: "Ядро симуляции"] {
+    QuarryActor [icon: database, label: "Карьер-актор"]
+    TruckActor [icon: truck, label: "Самосвал-актор"]
+    ShovelActor [icon: truck, label: "Экскаватор-актор"]
+    UnloadActor [icon: upload, label: "Пункт разгрузки-актор"]
+    FuelStationActor [icon: droplet, label: "Заправка-актор"]
+    SimContext [icon: activity, label: "Контекст/телеметрия"]
+    Calculations [icon: divide, label: "Расчёты"]
+    Behaviors [icon: repeat, label: "Поведения"]
+    Planner [icon: target, label: "Планировщик"]
+  }
+}
+
+// 6. Databases and Storage
+PostgreSQL DB [icon: database, label: "БД (PostgreSQL через ORM)"]
+Redis [icon: database, label: "Хранилище результатов симуляции (Redis)"]
+UserFiles [icon: folder, label: "Хранилище пользовательских файлов подложек (upload/)"]
+
+// Connections
+
+// API → Services
+Quarry Data Endpoint > QuarryDataService
+Schedule Data Endpoint > ScheduleDataService
+"Object Create/Update Endpoint" > ObjectService
+Object Delete Endpoint > ObjectService
+Run Simulation Endpoint > GetSimIdService
+Simulation Results Endpoint > Redis
+Defaults Endpoint > DefaultValuesMixin
+File Endpoints > UploadedFile
+
+// Services ↔ DAO
+QuarryDataService > QuarryDAO
+ScheduleDataService > ScheduleDAO
+ObjectService > ObjectDAO
+GetSimIdService > SimulationDAO
+
+// DAO ↔ ORM
+QuarryDAO > ORM
+ScheduleDAO > Blasting
+ScheduleDAO > PlannedIdle
+SimulationDAO > RoadNet
+SimulationDAO > Blasting
+SimulationDAO > PlannedIdle
+
+// ORM → DB
+ORM > PostgreSQL DB
+
+// Simulation: input build and run
+GetSimIdService > SimDataSerializer
+GetSimIdService > SimulationManager
+SimulationManager > Sim Core
+SimulationManager > StatesEvents
+SimulationManager > Writer
+Writer > Redis
+
+// Files and overlays
+MapOverlay > UserFiles: ссылка на файл (DXF/растровый)
+UploadedFile > UserFiles: физический файл хранится здесь
+
+// Type maps
+ObjectService < TypeModelMap
+ScheduleDataService < TypeModelMap
