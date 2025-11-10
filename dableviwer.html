@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотрщик архитектуры проекта</title>
+    
+    <script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 20px; font-weight: 500; }
+        .header-controls { display: flex; gap: 10px; }
+        .btn { padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.3s; }
+        .btn:hover { background: #2980b9; }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        #cy { flex: 1; background: #f8f9fa; }
+        .sidebar { width: 400px; background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; overflow: hidden; }
+        .sidebar-header { padding: 15px; background: #ecf0f1; border-bottom: 1px solid #ddd; }
+        .sidebar-header h2 { font-size: 18px; margin-bottom: 10px; }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 15px; }
+        .sidebar-empty { text-align: center; color: #7f8c8d; padding: 40px 20px; }
+        .component-info { margin-bottom: 15px; }
+        .info-row { margin-bottom: 10px; }
+        .info-label { font-weight: 600; color: #2c3e50; font-size: 13px; margin-bottom: 4px; }
+        .info-value { color: #34495e; font-size: 14px; word-break: break-word; }
+        .code-block { background: #f4f4f4; border: 1px solid #ddd; border-radius: 4px; padding: 10px; margin-top: 10px; max-height: 400px; overflow: auto; }
+        .code-block pre { margin: 0; font-size: 12px; }
+        .file-path { font-family: 'Courier New', monospace; font-size: 12px; color: #7f8c8d; background: #ecf0f1; padding: 4px 8px; border-radius: 3px; display: inline-block; }
+        .layer-badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-top: 5px; }
+        .hidden { display: none; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-secondary { background: #95a5a6; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .stats { font-size: 12px; color: #7f8c8d; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Архитектура проекта</h1>
+        <div class="header-controls">
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+            <button class="btn" onclick="document.getElementById('fileInput').click()">Загрузить architecture.json</button>
+            <button class="btn" onclick="resetView()">Сбросить вид</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div id="cy"></div>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Информация о компоненте</h2>
+                <div class="stats" id="stats"></div>
+            </div>
+            <div class="sidebar-content" id="sidebarContent">
+                <div class="sidebar-empty">Выберите компонент на схеме для просмотра деталей</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cy;
+        let architectureData = null;
+        const expandedGroups = new Set();
+
+        function initCytoscape(data) {
+            if (cy) cy.destroy();
+            
+            const allNodes = [];
+            const allEdges = [];
+            const layers = {};
+
+            // 1. Создаем узлы-слои (группы)
+            data.components.forEach(comp => {
+                if (!layers[comp.layer]) {
+                    layers[comp.layer] = {
+                        id: `group-${comp.layer}`,
+                        label: comp.layer,
+                        layer: comp.layer,
+                        isGroup: true,
+                        children: []
+                    };
+                }
+                layers[comp.layer].children.push(comp);
+            });
+
+            // 2. Создаем межслойные связи
+            const interLayerEdges = new Set();
+            data.relationships.forEach(rel => {
+                const sourceComp = data.components.find(c => c.id === rel.source);
+                const targetComp = data.components.find(c => c.id === rel.target);
+                if (sourceComp && targetComp && sourceComp.layer !== targetComp.layer) {
+                    const edgeId = `${sourceComp.layer}-to-${targetComp.layer}`;
+                    if (!interLayerEdges.has(edgeId)) {
+                        interLayerEdges.add(edgeId);
+                        allEdges.push({
+                            data: {
+                                id: edgeId,
+                                source: `group-${sourceComp.layer}`,
+                                target: `group-${targetComp.layer}`,
+                                label: rel.type
+                            }
+                        });
+                    }
+                }
+            });
+
+            // 3. Добавляем узлы-слои в граф
+            Object.values(layers).forEach(layer => {
+                allNodes.push({
+                    data: { ...layer, bucket: layer.layer },
+                    classes: `layer-group`
+                });
+            });
+
+            cy = cytoscape({
+                container: document.getElementById('cy'),
+                elements: { nodes: allNodes, edges: allEdges },
+                style: [
+                    { selector: '.layer-group', style: { 'label': 'data(label)', 'width': '120px', 'height': '60px', 'shape': 'roundrectangle', 'text-valign': 'center', 'text-halign': 'center', 'font-size': '14px', 'font-weight': 'bold', 'color': 'white', 'border-width': 3, 'border-color': '#34495e' } },
+                    { selector: 'node[!isGroup]', style: { 'label': 'data(label)', 'width': '80px', 'height': '40px', 'shape': 'roundrectangle', 'text-valign': 'center', 'text-halign': 'center', 'font-size': '11px', 'color': '#2c3e50', 'border-width': 2, 'border-color': '#34495e', 'text-wrap': 'wrap', 'text-max-width': '70px' } },
+                    { selector: 'edge', style: { 'width': 2, 'line-color': '#95a5a6', 'target-arrow-color': '#95a5a6', 'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'label': 'data(label)', 'font-size': '10px', 'color': '#7f8c8d' } },
+                    { selector: 'node:selected', style: { 'border-color': '#3498db', 'border-width': 4 } }
+                ],
+                layout: { name: 'cose', idealEdgeLength: 150, nodeOverlap: 20, fit: true, padding: 50, randomize: false, nodeRepulsion: 500000, animate: 'end' }
+            });
+
+            // Применяем цвета к узлам-слоям
+            cy.nodes('.layer-group').forEach(node => {
+                const layerName = node.data('layer');
+                const color = data.metadata.buckets_info[layerName]?.color || '#7f8c8d';
+                node.style('background-color', color);
+            });
+
+            cy.on('tap', 'node', function(evt) {
+                const node = evt.target;
+                if (node.data('isGroup')) {
+                    toggleGroup(node);
+                } else {
+                    showComponentInfo(node.data());
+                }
+            });
+
+            cy.on('tap', function(evt) { if (evt.target === cy) clearComponentInfo(); });
+            updateStats(data);
+        }
+
+        function toggleGroup(groupNode) {
+            const groupId = groupNode.id();
+            const layerName = groupNode.data('layer');
+            const layerComponents = architectureData.components.filter(c => c.layer === layerName);
+
+            if (expandedGroups.has(groupId)) {
+                // --- СВОРАЧИВАНИЕ ---
+                expandedGroups.delete(groupId);
+                cy.remove(`node[parent = "${groupId}"]`);
+            } else {
+                // --- РАСКРЫТИЕ ---
+                expandedGroups.add(groupId);
+                
+                const childNodes = layerComponents.map(comp => ({
+                    data: { ...comp, parent: groupId }, // Связываем дочерний узел с родителем
+                    classes: `layer-child`
+                }));
+
+                const childEdges = [];
+                const childIds = new Set(childNodes.map(n => n.data.id));
+
+                architectureData.relationships.forEach(rel => {
+                    // Создаем связи только между компонентами ВНУТРИ этого слоя
+                    if (childIds.has(rel.source) && childIds.has(rel.target)) {
+                        childEdges.push({
+                            data: {
+                                id: `edge-${rel.id}`, // Уникальный ID для новой связи
+                                source: rel.source,      // Источник - ID компонента
+                                target: rel.target,      // Цель - ID компонента
+                                label: rel.type
+                            }
+                        });
+                    }
+                });
+
+                cy.add(childNodes);
+                cy.add(childEdges);
+                
+                // Перерисовываем раскладку для новых элементов
+                cy.layout({ name: 'cose', animate: true, fit: false, nodeRepulsion: 100000, randomize: false, animationDuration: 500 }).run();
+            }
+        }
+
+        function showComponentInfo(componentData) {
+            const sidebar = document.getElementById('sidebarContent');
+            const layerClass = `layer-${componentData.layer.replace(/[ /]/g, '_')}`;
+            
+            let html = `
+                <div class="component-info">
+                    <div class="info-row"><div class="info-label">Имя</div><div class="info-value">${escapeHtml(componentData.label)}</div></div>
+                    <div class="info-row"><div class="info-label">Тип</div><div class="info-value">${componentData.type === 'class' ? 'Класс' : 'Функция'}</div></div>
+                    <div class="info-row"><div class="info-label">Слой</div><div class="info-value"><span class="layer-badge" style="background-color:${architectureData.metadata.buckets_info[componentData.layer]?.color || '#7f8c8d'}">${escapeHtml(componentData.layer)}</span></div></div>
+                    <div class="info-row"><div class="info-label">Файл</div><div class="info-value"><span class="file-path">${escapeHtml(componentData.file_path)}</span></div></div>
+                `;
+            if (componentData.docstring) html += `<div class="info-row"><div class="info-label">Описание</div><div class="info-value">${escapeHtml(componentData.docstring)}</div></div>`;
+            html += `<div class="action-buttons"><button class="btn" onclick="openInIDE('${escapeHtml(componentData.file_path)}')">Открыть в IDE</button><button class="btn btn-secondary" onclick="showSourceCode('${escapeHtml(componentData.id)}')">Показать код</button></div></div>`;
+            if (componentData.source_code) html += `<div class="code-block hidden" id="sourceCode_${componentData.id}"><pre><code class="language-python">${escapeHtml(componentData.source_code)}</code></pre></div>`;
+            sidebar.innerHTML = html;
+        }
+
+        function showSourceCode(componentId) {
+            const codeBlock = document.getElementById(`sourceCode_${componentId}`);
+            if (codeBlock) {
+                codeBlock.classList.toggle('hidden');
+                if (!codeBlock.classList.contains('hidden')) hljs.highlightElement(codeBlock.querySelector('code'));
+            }
+        }
+        function openInIDE(filePath) { const url = `vscode://file/${encodeURIComponent(filePath.startsWith('qsimmine12/') ? filePath : `qsimmine12/${filePath}`)}`; window.open(url, '_blank'); }
+        function clearComponentInfo() { const sidebar = document.getElementById('sidebarContent'); sidebar.innerHTML = '<div class="sidebar-empty">Выберите компонент на схеме для просмотра деталей</div>'; if (cy) cy.elements().deselect(); }
+        function updateStats(data) { document.getElementById('stats').innerHTML = `Слоев: ${new Set(data.components.map(c=>c.layer)).size} | Компонентов: ${data.components.length} | Связей: ${data.relationships.length}`; }
+        function resetView() { if (cy) { cy.fit(); cy.center(); } }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try { architectureData = JSON.parse(e.target.result); initCytoscape(architectureData); }
+                catch (error) { alert('Ошибка загрузки файла: ' + error.message); }
+            };
+            reader.readAsText(file);
+        });
+
+        window.addEventListener('load', function() {
+            fetch('architecture.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { architectureData = data; initCytoscape(data); }).catch(() => console.log('Автозагрузка не удалась.'));
+        });
+    </script>
+</body>
+</html>
