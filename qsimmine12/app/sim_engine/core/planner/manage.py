@@ -9,21 +9,21 @@ from app.sim_engine.core.planner.entities import InputPlanningData
 from app.sim_engine.core.planner.solvers.cp import CPSolver
 from app.sim_engine.core.planner.solvers.milp import MILPSolver
 from app.sim_engine.core.props import SimData, PlannedTrip
-from app.sim_engine.enums import ObjectType
+from app.sim_engine.enums import ObjectType, SolverType
 
 logger = logging.getLogger(__name__)
 
 
 class Planner:
     SOLVERS = {
-        "CBC": MILPSolver,
-        "HIGHS": MILPSolver,
-        "CP": CPSolver
+        SolverType.CBC: MILPSolver,
+        SolverType.HIGHS: MILPSolver,
+        SolverType.CP: CPSolver
     }
 
     def __init__(
             self,
-            solver: str = None,
+            solver: SolverType = None,
             msg: bool = False,
             workers: int = 4,
             time_limit: int = 60
@@ -37,12 +37,12 @@ class Planner:
         if self.solver:
             solver = self.SOLVERS[self.solver]
         else:
-            solver = self.SOLVERS["CP"]
+            solver = self.SOLVERS[SolverType.CP]
 
-        if self.solver == "HIGHS":
-            solver.solver_type = "HIGHS"
-        elif self.solver == "CBC":
-            solver.solver_type = "CBC"
+        if self.solver == SolverType.HIGHS:
+            solver.solver_type = SolverType.HIGHS
+        elif self.solver == SolverType.CBC:
+            solver.solver_type = SolverType.CBC
 
         solver.time_limit = self.time_limit
         solver.msg_out = self.msg

@@ -142,6 +142,21 @@ def create_blasting_list(data: dict, timezone: str = TZ) -> list[Blasting]:
     return blasting_list
 
 
+def transform_road_net_3d_to_2d(road_net: dict):
+    for feature in road_net["features"]:
+        geometry = feature['geometry']
+
+        if geometry['type'] == 'LineString':
+            coords = []
+            for coord in feature["geometry"]["coordinates"]:
+                coords.append([coord[0], coord[1], 0.0])
+            geometry["coordinates"] = coords
+        if geometry['type'] == 'Point':
+            coords = geometry["coordinates"]
+            geometry["coordinates"] = [coords[0], coords[1], 0.0]
+    return road_net
+
+
 class SimDataSerializer:
     """Преобразует входной dict (как в run_simulation) в набор датаклассов."""
 
@@ -308,6 +323,10 @@ class SimDataSerializer:
         if blasting_data:
             blasting_list = create_blasting_list(data=blasting_data, timezone=timezone)
 
+        # принудительно приведём граф дорог в 2D координаты, т.к. наша симуляция пока что умеет работать только в 2D
+        # TODO: убрать, когда научим симуляцию работать с 3D координатами
+        road_net = transform_road_net_3d_to_2d(data["quarry"]["road_net"])
+
         # Примечание: trail_list/маршруты здесь намеренно не собираем —
         # твои «чистые» датаклассы их не содержат. Если нужно — добавим
         # отдельные dataclass'ы и поля в SimData.
@@ -321,9 +340,11 @@ class SimDataSerializer:
             unloads=unloads,
             fuel_stations=fuel_stations,
             routes=routes,
-            road_net=data["quarry"]["road_net"],
+            road_net=road_net,
             idle_areas=idle_areas_storage,
             lunch_times=lunch_times,
             planned_idles=planned_idles,
             blasting_list=blasting_list,
+
+            target_shovel_load=data["quarry"].get("target_shovel_load", 0.9),
         )

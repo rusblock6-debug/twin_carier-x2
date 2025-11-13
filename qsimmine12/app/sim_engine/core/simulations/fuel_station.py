@@ -38,7 +38,7 @@ class FuelStation:
 
     def refuelling(self, truck):
         with self.resource.request() as req:
-            self.trucks_queue.append(truck.name)
+            self.trucks_queue.append(truck)
             yield req
             self.push_event(event_type=EventType.REFUELING_BEGIN, truck=truck)
             fuel_needed = truck.properties.fuel_capacity - truck.fuel
@@ -52,7 +52,7 @@ class FuelStation:
             truck.fuel_empty = False
             truck.fuel = truck.properties.fuel_capacity
             truck.state = old_state
-            self.trucks_queue.remove(truck.name)
+            self.trucks_queue.remove(truck)
 
     def main_tic_process(self):
         if self.trucks_queue:
@@ -78,8 +78,8 @@ class FuelStation:
             "object_id": f"{self.id}_fuel_station",
             "object_type": ObjectType.FUEL_STATION.key(),
             "timestamp": self.current_time,
-            "refuelling_trucks": self.trucks_queue[:self.properties.num_pumps],
-            "trucks_queue": self.trucks_queue[self.properties.num_pumps:],
+            "refuelling_trucks": [truck.name for truck in self.trucks_queue[:self.properties.num_pumps]],
+            "trucks_queue": [truck.name for truck in self.trucks_queue[self.properties.num_pumps:]],
             "state": self.state.ru()
         }
         self.writer.writerow(frame_data)

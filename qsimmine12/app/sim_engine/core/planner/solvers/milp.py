@@ -7,12 +7,13 @@ from pulp import (
 
 from app.sim_engine.core.planner.entities import InputPlanningData
 from app.sim_engine.core.simulations.utils.dependency_resolver import DependencyResolver as DR
+from app.sim_engine.enums import SolverType
 
 logger = logging.getLogger(__name__)
 
 
 class MILPSolver:
-    solver_type: str
+    solver_type: SolverType
     msg_out: bool
     time_limit: int
     workers: int
@@ -211,15 +212,15 @@ class MILPSolver:
         if cls.msg_out:
             logger.info("End builing model")
 
-        if cls.solver_type == "CBC":
-            logger.info("CBC")
+        if cls.solver_type == SolverType.CBC:
+            logger.info(SolverType.CBC.key())
             cmd = PULP_CBC_CMD(
                 msg=cls.msg_out,
                 timeLimit=cls.time_limit
             )
 
-        elif cls.solver_type == "HIGHS":
-            logger.info("HIGHS")
+        elif cls.solver_type == SolverType.HIGHS:
+            logger.info(SolverType.HIGHS.key())
             cmd = HiGHS_CMD(
                 msg=cls.msg_out,
                 timeLimit=cls.time_limit,

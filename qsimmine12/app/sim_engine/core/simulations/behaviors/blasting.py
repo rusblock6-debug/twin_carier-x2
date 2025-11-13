@@ -142,7 +142,7 @@ class ShovelBlastingWatcher(BaseBehavior):
         while True:
             safe_path_exist = False  # существуют ли пути в объезд взрывных зон
             for unload in self.target.quarry.unload_map.values():
-                polygons = [zone for blasting in self.target.quarry.active_blasting for zone in blasting.zones]
+                polygons = self.target.quarry.active_blasting_polygons
 
                 # Сборка всех возможных маршрутов между пунктом отправления и пункт назначения
                 paths = find_all_route_edges_by_road_net_from_object_to_object(
@@ -199,7 +199,7 @@ class UnloadBlastingWatcher(BaseBehavior):
         while True:
             safe_path_exist = False  # существуют ли пути в объезд взрывных зон
             for shovel in self.target.quarry.shovel_map.values():
-                polygons = [zone for blasting in self.target.quarry.active_blasting for zone in blasting.zones]
+                polygons = self.target.quarry.active_blasting_polygons
 
                 # Сборка всех возможных маршрутов между пунктом отправления и пункт назнчения
                 paths = find_all_route_edges_by_road_net_from_object_to_object(

@@ -2,35 +2,31 @@
 import json
 import os
 import pathlib
-import uuid
-from datetime import datetime, timedelta
-from operator import itemgetter
+import traceback
+from typing import Optional, List, Dict
 from zoneinfo import ZoneInfo
-from typing import Optional, List, Dict, Any
 
 from fastapi import (
-    APIRouter, 
-    Depends, 
-    HTTPException, 
-    UploadFile, 
-    File, 
+    APIRouter,
+    Depends,
+    HTTPException,
+    UploadFile,
+    File,
     Form,
     Request,
 )
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, ValidationError
-# endregion
 
 # region AppImports
 from app import get_db, get_redis
-from app.consts import STORED_RESULTS_NUMBER
 from app.forms import (
     BlastingSchema,
-    PlannedIdleSchema,
+    PlannedIdleSchema, ScheduleDataResponseDTO,
 )
+from app.forms import ObjectActionRequest
 from app.models import (
     TYPE_MODEL_MAP,
     TYPE_SCHEDULE_MAP,
@@ -38,23 +34,22 @@ from app.models import (
     MapOverlay,
     RoadNet,
     UploadedFile,
-    validate_schedule_type,
+    validate_schedule_type, PlannedIdle,
 )
-
-from app.forms import ObjectActionRequest
+from app.services.blasting_service import DeleteBlastingService, BulkDeleteBlastingService
 from app.services.date_time_service import StartEndTimeGenerateService
-from app.services.template_service import AllTemplatesListService
-from app.services.quarry_data_service import QuarryDataService
-from app.services.schedule_data_service import ScheduleDataService, ScheduleDataResponseDTO
-from app.services.scenario_service import ScenarioService, ScenarioDTO
 from app.services.object_service import ObjectService
+from app.services.planned_idle_service import DeletePlannedIdleService, BulkDeletePlannedIdleService
+from app.services.quarry_data_service import QuarryDataService
+from app.services.scenario_service import ScenarioService, ScenarioDTO
+from app.services.schedule_data_service import ScheduleDataService
 from app.services.simulation_id_service import GetSimIdService, SimulationRequestDTO
-
+from app.services.template_service import AllTemplatesListService
 from app.shift import ShiftConfigDataException, ShiftConfigParseException
-from app.sim_engine.writer import BatchWriter
-from app.simulate_test import generate_simulation_data
-from app.sim_engine.simulation_manager import SimulationManager
 from app.utils import secure_filename
+
+# endregion
+
 # endregion
 
 router = APIRouter()
@@ -79,6 +74,11 @@ class DeleteObjectRequest(BaseModel):
     type: str
     id: int
 
+
+class BulkDeleteRequest(BaseModel):
+    ids: List[int]
+
+
 class ScheduleDataRequest(BaseModel):
     date: str
     quarry_id: int
@@ -86,6 +86,8 @@ class ScheduleDataRequest(BaseModel):
     shift_number: Optional[int] = None
     start_time: Optional[str] = None
     end_time: Optional[str] = None
+
+
 # endregion Pydantic models
 
 
@@ -93,6 +95,7 @@ class ScheduleDataRequest(BaseModel):
 @router.get("/handbook", response_class=HTMLResponse)
 async def index(request: Request):
     return FileResponse("static/index.html")
+
 
 @router.get("/api/quarry-data", response_model=QuarryDataResponse)
 async def quarry_data(db: Session = Depends(get_db)):
@@ -189,6 +192,7 @@ async def create_object(data: ObjectActionRequest, db: Session = Depends(get_db)
     except HTTPException:
         raise
     except Exception as e:
+        traceback.print_tb(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/api/object/{obj_id}")
@@ -207,21 +211,15 @@ async def update_object(obj_id: int, data: ObjectActionRequest, db: Session = De
 
 @router.delete("/api/object")
 async def delete_object(data: DeleteObjectRequest, db: Session = Depends(get_db)):
-    # For schedule types (blasting, planned_idle) call schedule delete helpers
     if data.type == 'blasting':
-        try:
-            form = BlastingSchema(**data.dict())
-        except ValidationError:
-            # We only need the schedule-delete behavior; instantiate minimally
-            form = BlastingSchema()
-        return form.handle_schedule_delete(data.dict(), TYPE_SCHEDULE_MAP.get('blasting'), 'blasting')
+        form = BlastingSchema(**data.model_dump())
+        service = DeleteBlastingService(db)
+        return service(form)
 
     if data.type == 'planned_idle':
-        try:
-            form = PlannedIdleSchema(**data.dict())
-        except ValidationError:
-            form = PlannedIdleSchema()
-        return form.handle_schedule_delete(data.dict(), TYPE_SCHEDULE_MAP.get('planned_idle'), 'planned_idle')
+        # form = PlannedIdleSchema(**data.model_dump())
+        service = DeletePlannedIdleService(db)
+        return service(data.model_dump(), PlannedIdle, 'planned_idle')
 
     model = TYPE_MODEL_MAP.get(data.type)
     if not model:
@@ -245,23 +243,42 @@ async def delete_object(data: DeleteObjectRequest, db: Session = Depends(get_db)
 
     db.commit()
     return {'success': True}
+
+
+@router.delete("/api/blasting/bulk")
+async def delete_object(data: BulkDeleteRequest, db: Session = Depends(get_db)):
+    service = BulkDeleteBlastingService(db)
+    service(data.ids)
+
+    return {'success': True}
+
+
+@router.delete("/api/planned-idle/bulk")
+async def delete_object(data: BulkDeleteRequest, db: Session = Depends(get_db)):
+    service = BulkDeletePlannedIdleService(db)
+    service(data.ids)
+
+    return {'success': True}
+
+
 # endregion planning
 
 # region simulation
 @router.post("/run-simulation")
 async def run_simulation(
-    data: SimulationRequestDTO,
-    db: Session = Depends(get_db),
-    redis_client=Depends(get_redis),
+        data: SimulationRequestDTO,
+        db: Session = Depends(get_db),
+        redis_client=Depends(get_redis),
 ):
     sim_id = await GetSimIdService(data, db, redis_client)()
     return RedirectResponse(url=f"/simulation_view/{sim_id}", status_code=303)
 
+
 @router.post("/api/run-simulation")
 async def api_run_simulation(
-    data: SimulationRequestDTO,
-    db: Session = Depends(get_db),
-    redis_client=Depends(get_redis),
+        data: SimulationRequestDTO,
+        db: Session = Depends(get_db),
+        redis_client=Depends(get_redis),
 ):
     try:
         sim_id = await GetSimIdService(data, db, redis_client)()
@@ -269,16 +286,17 @@ async def api_run_simulation(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error {type(e)}: {e}")
 
+
 @router.get("/api/simulation/{sim_id}/meta")
 async def get_simulation_meta(sim_id: str, redis_client=Depends(get_redis)):
     key = next(redis_client.scan_iter(f'simulation:*:{sim_id}:meta', 1), None)
     if not key:
         raise HTTPException(status_code=404, detail='Simulation not found')
-    
+
     meta_json = redis_client.get(key)
     if not meta_json:
         raise HTTPException(status_code=404, detail='Simulation not found')
-        
+
     return json.loads(meta_json)
 
 @router.get("/api/simulation/{sim_id}/batch/{batch_index}")
@@ -286,18 +304,18 @@ async def get_simulation_batch(sim_id: str, batch_index: int, redis_client=Depen
     key = next(redis_client.scan_iter(f'simulation:*:{sim_id}:batch:{batch_index}', 1), None)
     if not key:
         raise HTTPException(status_code=404, detail='Batch not found')
-        
+
     batch_data = redis_client.get(key)
     if not batch_data:
         raise HTTPException(status_code=404, detail='Batch not found')
-        
+
     return json.loads(batch_data)
 
 @router.get("/api/simulation/{sim_id}/batches")
 async def get_simulation_batches(sim_id: str, indices: List[int] = None, redis_client=Depends(get_redis)):
     if not indices:
         raise HTTPException(status_code=400, detail='No indices provided')
-        
+
     meta_key = next(redis_client.scan_iter(f'simulation:*:{sim_id}:meta', 1), None)
     if not meta_key:
         raise HTTPException(status_code=404, detail='Batches not found')
@@ -319,11 +337,11 @@ async def get_simulation_summary(sim_id: str, redis_client=Depends(get_redis)):
     key = next(redis_client.scan_iter(f'simulation:*:{sim_id}:summary', 1), None)
     if not key:
         raise HTTPException(status_code=404, detail='Summary not found')
-        
+
     summary_data = redis_client.get(key)
     if not summary_data:
         raise HTTPException(status_code=404, detail='Summary not found')
-        
+
     return json.loads(summary_data)
 
 @router.get("/api/simulation/{sim_id}/events")
@@ -331,11 +349,11 @@ async def get_simulation_events(sim_id: str, redis_client=Depends(get_redis)):
     key = next(redis_client.scan_iter(f'simulation:*:{sim_id}:events', 1), None)
     if not key:
         raise HTTPException(status_code=404, detail='Events not found')
-        
+
     events_data = redis_client.get(key)
     if not events_data:
         raise HTTPException(status_code=404, detail='Events not found')
-        
+
     return json.loads(events_data)
 # endregion simulation
 
@@ -352,7 +370,7 @@ async def handle_file_get(id_or_name: str, db: Session = Depends(get_db)):
         where_expr = UploadedFile.id == file_id
     else:
         where_expr = UploadedFile.name == file_name
-        
+
     uf = db.execute(select(UploadedFile).where(where_expr)).scalar()
     if uf is None:
         raise HTTPException(status_code=400, detail='Couldn\'t find file record by given id or name')
@@ -368,10 +386,10 @@ async def handle_file_get(id_or_name: str, db: Session = Depends(get_db)):
 
 @router.post("/api/file")
 async def handle_file_post(
-    request: Request,
-    file: UploadFile = File(...),
-    name: str = Form(None),
-    db: Session = Depends(get_db)
+        request: Request,
+        file: UploadFile = File(...),
+        name: str = Form(None),
+        db: Session = Depends(get_db)
 ):
     upload_folder = pathlib.Path(request.app.state.config['UPLOAD_FOLDER'])
 

@@ -10,9 +10,11 @@ from typing import Any
 from app.sim_engine.config import SIM_CONFIG
 from app.sim_engine.core.planner.manage import Planner
 from app.sim_engine.core.props import SimData, PlannedTrip
+from app.sim_engine.enums import SolverType
 from app.sim_engine.infra.exception_traceback import catch_errors
 from app.sim_engine.serializer import SimDataSerializer
-from app.sim_engine.simulate import run_reliability, run_simulation, run_simulation_for_planned_trips
+from app.sim_engine.simulate import Reliability, PlannedTripsSimulation, Simulation, run_simulation, \
+    run_simulation_for_planned_trips
 from app.sim_engine.writer import IWriter, DictSimpleWriter
 
 logger = logging.getLogger(__name__)
@@ -105,6 +107,9 @@ class SimulationManager:
             self.set_options(options)
 
         self._result: dict | None = None
+
+        solver_code = raw_data.get('scenario', {}).get('solver_type', SolverType.GREEDY.code())
+        self._config['solver'] = SolverType.from_code(solver_code)
 
     @property
     def simdata(self) -> SimData:
@@ -236,75 +241,71 @@ class SimulationManager:
 
         reliability_calc_enabled = self.config['reliability_calc_enabled']
 
-        # Запуск симуляции с планировщиком маршрутов
-        if mode == 'auto':
-            planned_trips = defaultdict(list)
+        planned_trips = None
+        simulation_closure = None
+        simulation_args = None
 
-            if self.config["solver"] != "GREEDY":
-                # Запускаем планировщик, планируем рейсы на все время симуляции
-                planner = Planner(
-                    solver=self.config['solver'],
-                    msg=self.config['msg'],
-                    workers=self.config['workers'],
-                    time_limit=self.config['time_limit']
-                )
-                planned = planner.run(self.simdata)
+        match mode:
+            case 'manual':
+                # Запуск симуляции с ручным определением маршрутов
+                simulation_closure = run_simulation
+                simulation_args = (self.simdata, self.writer, self.config)
 
+            case 'auto':
+                # Запуск симуляции с планировщиком маршрутов
                 planned_trips = defaultdict(list)
 
-                for trip in planned['trips']:
-                    planned_trip = PlannedTrip(
-                        truck_id=trip['truck_id'],
-                        shovel_id=trip['shovel_id'],
-                        unload_id=trip['unload_id'],
-                        order=trip['order']
+                if self.config["solver"] != SolverType.GREEDY:
+                    # Запускаем планировщик, планируем рейсы на все время симуляции
+                    planner = Planner(
+                        solver=self.config['solver'],
+                        msg=self.config['msg'],
+                        workers=self.config['workers'],
+                        time_limit=self.config['time_limit']
                     )
-                    planned_trips[planned_trip.truck_id].append(planned_trip)
+                    planned = planner.run(self.simdata)
 
-            if reliability_calc_enabled:
-                return run_reliability(
-                    run_simulation_for_planned_trips,
-                    self.simdata,
-                    self.writer,
-                    planned_trips,
-                    self.config,
-                    metric='weight',
-                    processes_number=self.config['rel_process_num'],
-                    init_runs_number=self.config['rel_init_runs_num'],
-                    step_runs_number=self.config['rel_step_runs_num'],
-                    max_runs_number=self.config['rel_max_runs_num'],
-                    alpha=self.config['rel_alpha'],
-                    r_target=self.config['rel_r_target'],
-                    delta_target=self.config['rel_delta_target'],
-                    consecutive=self.config['rel_consecutive'],
-                    boot_b=self.config['rel_boot_b'],
-                )
+                    planned_trips = defaultdict(list)
 
-            return run_simulation_for_planned_trips(self.simdata, self.writer, planned_trips, self.config)
+                    for trip in planned['trips']:
+                        planned_trip = PlannedTrip(
+                            truck_id=trip['truck_id'],
+                            shovel_id=trip['shovel_id'],
+                            unload_id=trip['unload_id'],
+                            order=trip['order']
+                        )
+                        planned_trips[planned_trip.truck_id].append(planned_trip)
 
-        # Запуск симуляции с ручным определением маршрутов
-        if mode == 'manual':
-            if reliability_calc_enabled:
-                return run_reliability(
-                    run_simulation,
-                    self.simdata,
-                    self.writer,
-                    self.config,
-                    metric='weight',
-                    processes_number=self.config['rel_process_num'],
-                    init_runs_number=self.config['rel_init_runs_num'],
-                    step_runs_number=self.config['rel_step_runs_num'],
-                    max_runs_number=self.config['rel_max_runs_num'],
-                    alpha=self.config['rel_alpha'],
-                    r_target=self.config['rel_r_target'],
-                    delta_target=self.config['rel_delta_target'],
-                    consecutive=self.config['rel_consecutive'],
-                    boot_b=self.config['rel_boot_b'],
-                )
+                simulation_closure = run_simulation_for_planned_trips
+                simulation_args = (self.simdata, self.writer, self.config, planned_trips)
 
-            return run_simulation(self.simdata, self.writer, self.config)
+        if simulation_closure is None or simulation_args is None:
+            raise RuntimeError(
+                f'PlanningAndSimulationManager has no behavior for "{mode}" value in "mode" parameter. '
+                f'Set "auto" or "manual" value.'
+            )
 
-        raise RuntimeError(
-            f'PlanningAndSimulationManager has no behavior for "{mode}" value in "mode" parameter. '
-            f'Set "auto" or "manual" value.'
+        if not reliability_calc_enabled:
+            return simulation_closure(*simulation_args)
+
+        reliability = Reliability(
+            simulation_closure,
+            self.simdata,
+            self.writer,
+            self.config,
+            metric='weight',
+            processes_number=self.config['rel_process_num'],
+            init_runs_number=self.config['rel_init_runs_num'],
+            step_runs_number=self.config['rel_step_runs_num'],
+            max_runs_number=self.config['rel_max_runs_num'],
+            alpha=self.config['rel_alpha'],
+            r_target=self.config['rel_r_target'],
+            delta_target=self.config['rel_delta_target'],
+            consecutive=self.config['rel_consecutive'],
+            boot_b=self.config['rel_boot_b'],
         )
+
+        if planned_trips is not None:
+            reliability.planned_trips = planned_trips
+
+        return reliability.run()

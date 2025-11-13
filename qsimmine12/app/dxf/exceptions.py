@@ -1,0 +1,3 @@
+
+class DXFConversionException(Exception):
+    pass

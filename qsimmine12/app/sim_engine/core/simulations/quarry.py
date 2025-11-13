@@ -9,10 +9,11 @@ from typing import Tuple
 # from app.sim_engine.core.simulations.truck import Truck
 # from app.sim_engine.core.simulations.unload import Unload
 from app.sim_engine.core.planner.manage import Planner
-from app.sim_engine.core.props import ShiftChangeArea, SimData, Blasting, IdleArea
+from app.sim_engine.core.props import SimData, Blasting, IdleArea
 from app.sim_engine.core.simulations.behaviors.blasting import QuarryBlastingWatcher
 from app.sim_engine.core.simulations.utils.dependency_resolver import DependencyResolver as DR
-from app.sim_engine.enums import ObjectType
+from app.sim_engine.core.simulations.utils.helpers import safe_int
+from app.sim_engine.enums import ObjectType, SolverType
 from app.sim_engine.events import Event, EventType
 from app.sim_engine.states import TruckState
 
@@ -26,6 +27,11 @@ class TripStartTimeNotDefinedException(Exception):
 class Quarry:
     def __init__(self):
         env = DR.env()
+        self.writer = DR.writer()
+        self.trip_service = DR.trip_service()
+        self.statistic_service = DR.statistic_service()
+        self.solver = DR.solver()
+        self.sim_conf = DR.sim_conf()
 
         self.env = env
         self.start_time = env.sim_data.start_time
@@ -36,11 +42,6 @@ class Quarry:
         self.shovel_map: dict = {}
         self.unload_map: dict = {}
         self.shift_change_area: IdleArea = None
-
-        self.writer = DR.writer()
-        self.trip_service = DR.trip_service()
-        self.solver = DR.solver()
-        self.sim_conf = DR.sim_conf()
 
         # Данные для ребилда плановых рейсов во время симуляции
         self.sim_data: SimData = None
@@ -67,6 +68,10 @@ class Quarry:
     @property
     def current_timestamp(self):
         return self.current_time.timestamp()
+
+    @property
+    def restricted_zones(self):
+        return self.active_blasting_polygons
 
     def prepare_seeded_random(self) -> None:
         """
@@ -164,7 +169,15 @@ class Quarry:
             self.update_planned_trips()
 
     def get_summary(self, end_time: datetime) -> dict:
-        return self.trip_service.get_summary(end_time)
+        summary =  self.trip_service.get_summary(end_time)
+
+        trucks_needed = self.statistic_service.calculate_trucks_needed(
+            target_shovels_utilization=self.sim_data.target_shovel_load
+        )
+        summary['trucks_needed'] = safe_int(trucks_needed)
+        logger.debug(f"SUMMARY -> trucks_needed: {summary['trucks_needed']}")
+
+        return summary
 
     def push_event(self, event_type: EventType, *args, **kwargs):
         event = Event(
@@ -190,7 +203,7 @@ class Quarry:
                 object_name=f'{blasting_start.strftime("%d-%m-%Y %H:%M:%S")} - {blasting_end.strftime("%d-%m-%Y %H:%M:%S")}',
             )
 
-            if self.sim_conf["mode"] == "auto" and self.sim_conf["solver"] == "GREEDY":
+            if self.sim_conf["mode"] == "auto" and self.sim_conf["solver"] == SolverType.GREEDY:
                 # Собираем самосвалы для добавления в планирование и исключения из него
                 trucks_to_exclude, trucks_to_include = self.blasting_proc.check_trucks_state()
                 if trucks_to_exclude or trucks_to_include:

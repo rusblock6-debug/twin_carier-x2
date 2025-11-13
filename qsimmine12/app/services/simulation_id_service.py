@@ -4,7 +4,6 @@ import uuid, json
 from operator import itemgetter
 
 from app.consts import STORED_RESULTS_NUMBER
-from app.models import RoadNet
 from app.sim_engine.writer import BatchWriter
 from app.sim_engine.simulation_manager import SimulationManager
 

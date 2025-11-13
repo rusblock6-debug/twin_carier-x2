@@ -3,7 +3,7 @@ import copy
 from dataclasses import dataclass
 from typing import Tuple
 
-from app.sim_engine.core.dummy_roadnet import *
+from roadnet.core import Edge, Vertex, RoadNetFactory
 
 from app.sim_engine.core.props import Route as SimRoute, SimData
 from app.sim_engine.enums import ObjectType
@@ -384,36 +384,6 @@ def find_nearest_point(point: Point, point_list: list[Point]):
 
 # region Build routes edges around blasting
 
-def find_route_edges_around_restricted_zones_from_base_route(
-        base_route: RouteEdge,
-        restricted_zones: Tuple[Tuple[Tuple[float, float]]] | list[list[list[float]]],
-        road_net: dict
-) -> RouteEdge | None:
-    """
-        Поиск маршрута в объезд запрещённых зон (полигонов) на основе заданного маршрута
-    """
-    all_routes = find_all_route_edges_by_road_net_from_position_to_position(
-        lon=base_route.start_point.x,
-        lat=base_route.start_point.y,
-        height=0,
-        edge_idx=base_route.edges[0].index,
-        end_lon=base_route.end_point.x,
-        end_lat=base_route.end_point.y,
-        end_height=0,
-        end_edge_idx=None,
-        road_net=road_net,
-    )
-
-    # Маршруты отсортированы по длине, выберем первый, не попадающий в запрещённые зоны
-    chosen_route = None
-    for route in all_routes:
-        if not path_intersects_polygons(route, restricted_zones):
-            chosen_route = route
-            break
-
-    return chosen_route
-
-
 def find_route_edges_around_restricted_zones_from_position_to_object(
         lon: float,
         lat: float,
@@ -446,5 +416,40 @@ def find_route_edges_around_restricted_zones_from_position_to_object(
 
     return chosen_route
 
-# endregion
 
+def find_route_edges_around_restricted_zones_from_position_to_position(
+        lon: float,
+        lat: float,
+        edge_idx: int | None,
+        end_lon: float,
+        end_lat: float,
+        end_edge_idx: int | None,
+        restricted_zones: Tuple[Tuple[Tuple[float, float]]] | list[list[list[float]]],
+        road_net: dict
+) -> RouteEdge | None:
+    """
+        Поиск маршрута в объезд запрещённых зон (полигонов) от позиции до объекта
+    """
+    # Строим маршрут к зоне ожидания
+    all_routes = find_all_route_edges_by_road_net_from_position_to_position(
+        lon=lon,
+        lat=lat,
+        height=None,
+        edge_idx=edge_idx,
+        end_lon=end_lon,
+        end_lat=end_lat,
+        end_height=None,
+        end_edge_idx=end_edge_idx,
+        road_net=road_net,
+    )
+
+    # Маршруты отсортированы по длине, выберем первый, не попадающий в запрещённые зоны
+    chosen_route = None
+    for route in all_routes:
+        if not path_intersects_polygons(route, restricted_zones):
+            chosen_route = route
+            break
+
+    return chosen_route
+
+# endregion

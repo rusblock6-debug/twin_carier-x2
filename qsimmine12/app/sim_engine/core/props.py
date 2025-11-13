@@ -206,6 +206,8 @@ class SimData:
     planned_idles: dict[tuple[str, int], PlannedIdle] = field(default_factory=dict)
     blasting_list: list[Blasting] = field(default_factory=list)
 
+    target_shovel_load: float = 0.9
+
 
 @dataclass
 class TripData:

@@ -13,7 +13,7 @@ from app.sim_engine.core.geometry import (
     build_route_edges_by_road_net_from_position,
     build_route_edges_by_road_net_from_position_to_position,
     path_intersects_polygons,
-    find_route_edges_around_restricted_zones_from_base_route
+    find_route_edges_around_restricted_zones_from_position_to_position
 )
 from app.sim_engine.core.props import TruckProperties, PlannedTrip, TripData
 from app.sim_engine.core.simulations.behaviors.base import BaseTickBehavior, BreakdownBehavior, FuelBehavior, \
@@ -24,7 +24,7 @@ from app.sim_engine.core.simulations.quarry import Quarry
 from app.sim_engine.core.simulations.shovel import Shovel
 from app.sim_engine.core.simulations.unload import Unload
 from app.sim_engine.core.simulations.utils.dependency_resolver import DependencyResolver as DR
-from app.sim_engine.enums import ObjectType, IdleAreaType
+from app.sim_engine.enums import ObjectType, IdleAreaType, SolverType
 from app.sim_engine.events import EventType, Event
 from app.sim_engine.states import TruckState
 
@@ -51,6 +51,7 @@ class Truck:
         self.writer = DR.writer()
         self.trip_service = DR.trip_service()
         self.idle_area_service = DR.idle_area_service()
+        self.statistic_service = DR.statistic_service()
         self.solver = DR.solver()
         self.sim_conf = DR.sim_conf()
 
@@ -99,7 +100,7 @@ class Truck:
         self.fuel_empty = False
         self.fuel_proc = FuelBehavior(self, properties) if self.sim_conf["refuel"] and self.fuel_stations else None
 
-        # механизм отслеживания Обеденных перерывов
+        # механизм отслеживания обеденных перерывов
         self.at_lunch = False
         self.lunch_proc = LunchBehavior(
             target=self
@@ -114,11 +115,12 @@ class Truck:
             (ObjectType.TRUCK.key(), self.id)
         ) else None
 
+        # Механизм отслеживания взрывных работ
         self.blasting_proc = TruckBlastingWatcher(
             target=self
         ) if self.sim_conf["blasting"] else None
 
-        # Базовый логика процессов каждого тика.
+        # Базовая логика процессов каждого тика.
         self.tick_proc = BaseTickBehavior(self)
 
     @property
@@ -143,6 +145,44 @@ class Truck:
             self.speed = speed
             self.position = position
 
+    def find_route_to_position(
+            self,
+            destination_lon: float,
+            destination_lat: float,
+            destination_edge_idx: int | None,
+            only_around_restricted_zones: bool = False,
+    ):
+        """Логика поиска маршрута от текущей позиции к заданной позиции в объезд или напрямую"""
+        restricted_zones = self.quarry.restricted_zones if self.state != TruckState.MOVING_LOADED else []
+
+        if restricted_zones or only_around_restricted_zones:
+            # попытка найти маршрут в объезд заданных зон
+            route = find_route_edges_around_restricted_zones_from_position_to_position(
+                lon=self.position.lon,
+                lat=self.position.lat,
+                edge_idx=self.edge.index,
+                end_lon=destination_lon,
+                end_lat=destination_lat,
+                end_edge_idx=destination_edge_idx,
+                restricted_zones=restricted_zones,
+                road_net=self.quarry.sim_data.road_net
+            )
+            if route or only_around_restricted_zones:
+                return route
+
+        # пытаемся найти хоть какой-то маршрут
+        return build_route_edges_by_road_net_from_position_to_position(
+            lon=self.position.lon,
+            lat=self.position.lat,
+            height=0,
+            edge_idx=self.edge.index,
+            end_lon=destination_lon,
+            end_lat=destination_lat,
+            end_height=0,
+            end_edge_idx=destination_edge_idx,
+            road_net=self.quarry.sim_data.road_net
+        )
+
     def broken_action(self):
         # логика поломок
         while self.broken:
@@ -161,15 +201,17 @@ class Truck:
                 to_object_type=ObjectType.FUEL_STATION,
                 road_net=self.quarry.sim_data.road_net
             )
-            yield from self.moving(route_to_refuel, forward=True, actions=[self.broken_action, self.blasting_action])
+            yield from self.moving(route_to_refuel, forward=True, actions=[self.broken_action, self.blasting_action], current_action='refuel')
             yield self.env.process(self.nearest_fuel_station.refuelling(self))
 
     def lunch_action(self):
         """ Логика обеденных перерывов """
         if self.at_lunch:
+            old_state = self.state
+
             self.state = TruckState.LUNCH
 
-            for _ in self.move_to_area(IdleAreaType.LUNCH, actions=[self.broken_action]):
+            for _ in self.move_to_area(IdleAreaType.LUNCH, actions=[self.broken_action], current_action='lunch'):
                 yield _
 
                 if not self.at_lunch:
@@ -181,6 +223,8 @@ class Truck:
                 self.state = TruckState.LUNCH
                 yield self.env.timeout(1)
 
+            self.state = old_state
+
     def planned_idle_action(self):
         """Логика плановых простоев"""
         if self.at_planned_idle:
@@ -188,7 +232,7 @@ class Truck:
 
             self.state = TruckState.PLANNED_IDLE
 
-            for _ in self.move_to_area(IdleAreaType.PLANNED_IDLE, actions=[self.broken_action]):
+            for _ in self.move_to_area(IdleAreaType.PLANNED_IDLE, actions=[self.broken_action], current_action='planned_idle'):
                 yield _
 
                 if not self.at_planned_idle:
@@ -210,84 +254,95 @@ class Truck:
 
     def blasting_action(self):
         """Логика поведения при активных взрывных работах"""
-        if self.quarry.active_blasting:
+        if self.state != TruckState.MOVING_LOADED and self.quarry.active_blasting:
             # Проверка на попадание маршрута в области взрывных работ
-            if path_intersects_polygons(self.active_route_edge, self.quarry.active_blasting_polygons):
-                # Сборка всех возможных маршрутов между пунктом отправления и пункт назнчения
-                chosen_path = find_route_edges_around_restricted_zones_from_base_route(
-                    base_route=self.active_route_edge,
-                    restricted_zones=self.quarry.active_blasting_polygons,
+            if path_intersects_polygons(self.active_route_edge, self.quarry.restricted_zones):
+                # Сборка всех возможных маршрутов между пунктом отправления и пунктом назначения
+                chosen_path = find_route_edges_around_restricted_zones_from_position_to_position(
+                    lon=self.active_route_edge.start_point.x,
+                    lat=self.active_route_edge.start_point.y,
+                    edge_idx=self.active_route_edge.edges[0].index,
+                    end_lon=self.active_route_edge.end_point.x,
+                    end_lat=self.active_route_edge.end_point.y,
+                    end_edge_idx=self.active_route_edge.edges[-1].index,
+                    restricted_zones=self.quarry.restricted_zones,
                     road_net=self.quarry.sim_data.road_net,
                 )
 
                 # Если смогли найти маршрут в объезд зоны
                 if chosen_path:
-                    # TODO: Надо проложить путь до ближайшей точки на пути, и потом уже двигаться от неё
-                    #  Пока что едем до точки начала маршрута, а потом уже едем по маршруту
-
-                    # Если наше текущее положение не совпадает с началом построенного маршрута
-                    if (self.position.lon, self.position.lat) != (chosen_path.start_point.lon,
-                                                                  chosen_path.start_point.lat):
-                        route_moving_to = build_route_edges_by_road_net_from_position_to_position(
-                            lon=self.position.lon,
-                            lat=self.position.lat,
-                            height=0,
-                            edge_idx=self.edge.index,
-                            end_lon=chosen_path.start_point.x,
-                            end_lat=chosen_path.start_point.y,
-                            end_height=0,
-                            end_edge_idx=chosen_path.edges[0].index,
-                            road_net=self.quarry.sim_data.road_net
+                    if (self.position.lon, self.position.lat) != (chosen_path.start_point.lon, chosen_path.start_point.lat):
+                        # двигаемся к началу маршрута, как можем, а оттуда сможем реализовать движение мимо взрывов
+                        route_moving_to = self.find_route_to_position(
+                            destination_lon=self.active_route_edge.start_point.x,
+                            destination_lat=self.active_route_edge.start_point.y,
+                            destination_edge_idx=self.active_route_edge.edges[0].index,
                         )
-                        # проследуем к началу этого маршрута
-                        yield from self.moving(route_moving_to, forward=True, actions=[self.broken_action])
-                    # проедем основной маршрут
-                    yield from self.moving(chosen_path, forward=True, actions=[self.broken_action])
+                        yield from self.moving(route_moving_to, forward=True, actions=[self.broken_action], current_action='blasting')
                 else:
-                    old_state = self.state
-                    self.state = TruckState.BLASTING_IDLE
+                    destination_edge = self.active_route_edge.edges[-1]
+                    safe_route_to_destination_exists = False
 
                     # запоминаем активные зоны
                     remember_zones = {blasting.id for blasting in self.quarry.active_blasting}
 
                     # Едем в зону ожидания
-                    for _ in self.move_to_area(IdleAreaType.BLAST_WAITING, actions=[self.broken_action]):
+                    for _ in self.move_to_area(IdleAreaType.BLAST_WAITING, actions=[self.broken_action], current_action='blasting'):
                         yield _
                         if remember_zones != {blasting.id for blasting in self.quarry.active_blasting}:
                             break
 
-                    # Если за время движения в зону ожидания список взрывных работ не изменился, то стоим и ждём
-                    yield from self.wait_blasting(remember_zones)
+                        if self.find_route_to_position(
+                            destination_lon=destination_edge.stop.x,
+                            destination_lat=destination_edge.stop.y,
+                            destination_edge_idx=destination_edge.index,
+                            only_around_restricted_zones=True,
+                        ):
+                            safe_route_to_destination_exists = True
+                            break
+
+                    old_state = self.state
+                    if not safe_route_to_destination_exists:
+                        # Если за время движения в зону ожидания список взрывных работ не изменился, то стоим и ждём
+                        self.state = TruckState.BLASTING_IDLE
+                        yield from self.wait_blasting(remember_zones)
                     self.state = old_state
 
     def move_to_area(
-            self,
-            area_type: IdleAreaType,
-            actions: Optional[List[Callable]] = None
+        self,
+        area_type: IdleAreaType,
+        actions: Optional[List[Callable]] = None,
+        current_action: str | None = None
     ):
         """Логика поиска ближайшей площадки выбранного типа и следование на эту площадку"""
         if not self.idle_area_service.get_areas(area_type=area_type):
             # зон указанного типа не существует, никуда не двигаемся
             return
 
+        attention_to_restricted_zones = False
+        if self.state != TruckState.MOVING_LOADED and area_type != IdleAreaType.BLAST_WAITING:
+            attention_to_restricted_zones = True
+
         while True:
             # 1. Ищем ближайшую зону подходящего типа
+            restricted_zones = self.quarry.restricted_zones if attention_to_restricted_zones else []
+
             area, route = self.idle_area_service.find_nearest(
                 area_type=area_type,
                 lon=self.position.lon,
                 lat=self.position.lat,
                 edge_idx=self.edge.index,
-                restricted_zones=self.quarry.active_blasting_polygons,
+                restricted_zones=restricted_zones,
                 road_net=self.quarry.sim_data.road_net,
             )
 
             # 2. Если нашли зону подходящего типа, отправляем двигаться по маршруту
             if area and route:
-                for _ in self.moving(route, forward=True, actions=actions):
+                for _ in self.moving(route, forward=True, actions=actions, current_action=current_action):
                     # даём возможность прекратить этот метод там, где он вызывался
                     yield _
 
-                    if path_intersects_polygons(route, self.quarry.active_blasting_polygons):
+                    if attention_to_restricted_zones and path_intersects_polygons(route, self.quarry.restricted_zones):
                         break
 
             # 3. Если подходящая зона не нашлась
@@ -298,7 +353,7 @@ class Truck:
                     lon=self.position.lon,
                     lat=self.position.lat,
                     edge_idx=self.edge.index,
-                    restricted_zones=self.quarry.active_blasting_polygons,
+                    restricted_zones=[],
                     road_net=self.quarry.sim_data.road_net,
                 )
 
@@ -306,16 +361,18 @@ class Truck:
                 remember_blasting_zones = {blasting.id for blasting in self.quarry.active_blasting}
 
                 if blast_waiting_area and route:
-                    for _ in self.moving(route, forward=True, actions=[self.broken_action]):
+                    for _ in self.moving(route, forward=True, actions=[self.broken_action], current_action=current_action):
                         # даём возможность прервать метод там, где он вызывался
                         yield _
+
+                        restricted_zones = self.quarry.active_blasting_polygons if attention_to_restricted_zones else []
 
                         area, route = self.idle_area_service.find_nearest(
                             area_type=area_type,
                             lon=self.position.lon,
                             lat=self.position.lat,
                             edge_idx=self.edge.index,
-                            restricted_zones=self.quarry.active_blasting_polygons,
+                            restricted_zones=restricted_zones,
                             road_net=self.quarry.sim_data.road_net,
                         )
                         if area and route:
@@ -329,7 +386,13 @@ class Truck:
             if area and (area.initial_lon, area.initial_lat) == (self.position.lon, self.position.lat):
                 return
 
-    def moving(self, route: RouteEdge, forward: bool, actions: Optional[List[Callable]] = None):
+    def moving(
+        self,
+        route: RouteEdge,
+        forward: bool,
+        actions: Optional[List[Callable]] = None,
+        current_action: str | None = None
+    ):
         """
             Метод, производящий перемещение самосвала по заданному маршруту с возможностью отклонения от маршрута при необходимости
         """
@@ -341,6 +404,8 @@ class Truck:
 
         # запоминаем, куда изначально хотели двигаться
         destination_point = route.end_point if forward else route.start_point
+        destination_edge = route.edges[-1]
+
         # Определяем гружёность самосвала
         is_loaded = self.state == TruckState.MOVING_LOADED
 
@@ -371,20 +436,17 @@ class Truck:
                 self.position = position
                 self.edge = edge
 
+                if current_action == 'trip':
+                    self.statistic_service.update_truck_statistics(self.id, self.state)
+
             if position_changed:
                 # Позиция поменялась, поэтому нужно построить новый маршрут от текущей позиции,
                 # если текущая позиция не совпадает с изначальным пунктом назначения
                 if (self.position.lon, self.position.lat) != (destination_point.x, destination_point.y):
-                    self.active_route_edge = build_route_edges_by_road_net_from_position_to_position(
-                        lon=self.position.lon,
-                        lat=self.position.lat,
-                        height=0,
-                        edge_idx=self.edge.index,
-                        end_lon=destination_point.lon,
-                        end_lat=destination_point.lat,
-                        end_height=0,
-                        end_edge_idx=None,
-                        road_net=self.quarry.sim_data.road_net
+                    self.active_route_edge = self.find_route_to_position(
+                        destination_lon=destination_point.lon,
+                        destination_lat=destination_point.lat,
+                        destination_edge_idx=destination_edge.index,
                     )
                     forward = True
                 else:
@@ -440,11 +502,12 @@ class Truck:
 
         while True:
             try:
-                if not self.planned_trips and self.sim_conf["solver"] == "GREEDY" and self.sim_conf["mode"] == "auto":
+                if not self.planned_trips and self.sim_conf["solver"] == SolverType.GREEDY and self.sim_conf["mode"] == "auto":
                     trip = self.solver.assign_trip(self, self.env.now)
                     if trip:
                         self.planned_trips.append(trip)
 
+                # --- Движение порожним ---
                 self.state = TruckState.MOVING_EMPTY
                 self.trip_service.begin(self.current_trip_data())
 
@@ -452,32 +515,35 @@ class Truck:
                     # Успешно произошло распределение и есть в плане рейс, строим новый маршрут
                     self.set_route()
                     self.set_start_route()
-                    yield from self.moving(self.start_route, forward=True, actions=default_actions)
-
+                    yield from self.moving(self.start_route, forward=True, actions=default_actions, current_action='trip')
                 elif not self.start_route:
                     # Распределение не произошло, но цикл прервался, нужно вывести на предыдущий маршрут
                     self.set_start_route()
-                    yield from self.moving(self.start_route, forward=True, actions=default_actions)
-
+                    yield from self.moving(self.start_route, forward=True, actions=default_actions, current_action='trip')
                 else:
-                    # Просто продолжаем двигатся по предыдущему маршруту, без изменений
-                    yield from self.moving(self.route_edge, forward=False, actions=default_actions)
+                    # Просто продолжаем двигаться по предыдущему маршруту, без изменений
+                    yield from self.moving(self.route_edge, forward=False, actions=default_actions, current_action='trip')
 
+                # --- Ожидание и погрузка ---
                 self.state = TruckState.WAITING
                 self.speed = 0
                 self.weight = 0
                 self.volume = 0
                 yield self.env.process(self.shovel.load_truck(self))
 
+                # --- Движение гружёным ---
                 self.state = TruckState.MOVING_LOADED
                 self.speed = 0
-                yield from self.moving(self.route_edge, forward=True, actions=default_actions)
+                yield from self.moving(self.route_edge, forward=True, actions=default_actions, current_action='trip')
 
+                # --- Разгрузка ---
                 self.state = TruckState.UNLOADING
                 self.speed = 0
+                trip_data = self.current_trip_data()
                 yield self.env.process(self.unload.unload_truck(self))
 
-                self.trip_service.finish(self.current_trip_data())
+                # --- Заканчиваем рейс ---
+                self.trip_service.finish(trip_data)
 
                 if self.planned_trips:
                     self.set_route()
@@ -491,13 +557,12 @@ class Truck:
                 yield self.env.timeout(5)
 
             except simpy.Interrupt as e:
-
                 # Сбрасываем начало маршрута, так как его потребуется перестроить
                 self.start_route = None
 
                 if self.req and self.req in self.shovel.resource.queue:
                     self.req.cancel()
-                    self.shovel.trucks_queue.remove(self.name)
+                    self.shovel.trucks_queue.remove(self)
                 if len(self.planned_trips) > 0:
                     self.set_route()
                     self.set_start_route()
@@ -517,7 +582,7 @@ class Truck:
         if self.sim_conf["mode"] == "auto":
             if event_type in [EventType.BREAKDOWN_BEGIN, EventType.REFUELING_BEGIN, EventType.LUNCH_BEGIN,
                               EventType.PLANNED_IDLE_BEGIN]:
-                if self.sim_conf["solver"] == "GREEDY":
+                if self.sim_conf["solver"] == SolverType.GREEDY:
                     self.solver.rebuild_planning_data(
                         start_time=self.current_time,
                         excluded_object=(self.id, ObjectType.TRUCK)
@@ -532,7 +597,7 @@ class Truck:
 
             elif event_type in [EventType.BREAKDOWN_END, EventType.REFUELING_END, EventType.LUNCH_END,
                                 EventType.PLANNED_IDLE_END]:
-                if self.sim_conf["solver"] == "GREEDY":
+                if self.sim_conf["solver"] == SolverType.GREEDY:
                     self.solver.rebuild_planning_data(
                         start_time=self.current_time,
                         included_object=(self.id, ObjectType.TRUCK)
@@ -572,3 +637,9 @@ class Truck:
             truck_weight=self.weight,
             truck_volume=self.volume,
         )
+
+    def __eq__(self, other):
+        """Переопределяем сравнение, чтобы удобно удалять из очереди нужный самосвал"""
+        if isinstance(other, Truck):
+            return self.id == other.id
+        return False

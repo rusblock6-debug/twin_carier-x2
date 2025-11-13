@@ -5,10 +5,10 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.models import Quarry
-from app.shift import ShiftLogic
+from app.shift import ShiftLogic, ShiftDTO
 from app.shift import (
     ShiftConfigDataException,
     ShiftConfigParseException,
@@ -16,14 +16,22 @@ from app.shift import (
 
 # region DTO
 class ScheduleItemDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     quarry_id: int
     start_time: datetime
     end_time: datetime
+
+
+class BlastingScheduleItemDTO(ScheduleItemDTO):
     geojson_data: Optional[Any] = None
 
-    class Config:
-        from_attributes = True
+
+class PlannedIdleScheduleItemDTO(ScheduleItemDTO):
+    vehicle_id: int
+    vehicle_type: str
+
 
 class ShiftDetailsDTO(BaseModel):
     number: int
@@ -35,7 +43,7 @@ class ScheduleDataResponseDTO(BaseModel):
     time: dict
     filters: dict
     shift_details: Optional[ShiftDetailsDTO] = None
-    items: List[ScheduleItemDTO]
+    items: List[PlannedIdleScheduleItemDTO|BlastingScheduleItemDTO]
 # endregion
 
 # region DAO
@@ -52,7 +60,7 @@ class ScheduleDAO:
         end_time_utc: datetime,
         quarry_id: int,
         schedule_type: str,
-    ) -> List[ScheduleItemDTO]:
+    ) -> List[PlannedIdleScheduleItemDTO|BlastingScheduleItemDTO]:
         """Возвращает список отфильтрованных элементов расписания в виде DTO."""
 
         stmt = (
@@ -71,14 +79,18 @@ class ScheduleDAO:
 
         for obj in res:
             obj_dict = {col: getattr(obj, col) for col in model_cols}
+
             if schedule_type == "blasting":
                 if isinstance(obj_dict.get("geojson_data"), str):
                     try:
                         obj_dict["geojson_data"] = json.loads(obj_dict["geojson_data"])
                     except json.JSONDecodeError:
                         obj_dict["geojson_data"] = None
+                dto = BlastingScheduleItemDTO(**obj_dict)
+            else:
+                dto = PlannedIdleScheduleItemDTO(**obj_dict)
 
-            items.append(ScheduleItemDTO(**obj_dict))
+            items.append(dto)
 
         return items
 # endregion
@@ -157,7 +169,7 @@ class ScheduleDataService:
         shift_number: Optional[int],
         start_time: Optional[str],
         end_time: Optional[str],
-    ):
+    ) -> tuple[datetime, datetime, Optional[ShiftDTO]]:
         """Определяет временной диапазон по номеру смены или вручную заданным временам."""
         try:
             date = datetime.strptime(date_str, "%Y-%m-%d").date()

@@ -1,7 +1,7 @@
 from collections import defaultdict
 from sqlalchemy import select
 
-from app.sim_engine.core.dummy_roadnet import *
+from roadnet.core import RoadNetGraph, BaseRoadNetCleaner
 
 from app import SessionLocal
 from app.models import FuelStation, IdleArea, Shovel, Unload, TYPE_MODEL_MAP
@@ -92,4 +92,3 @@ BINDABLE_ENTITIES: tuple[str, ...] = (
     FuelStation.__tablename__,
 )
 """Entity types that may be bound to road net junctions"""
-

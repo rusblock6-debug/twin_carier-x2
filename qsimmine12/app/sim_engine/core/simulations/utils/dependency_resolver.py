@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.sim_engine.core.planner.solvers.greedy import GreedySolver
     from app.sim_engine.core.simulations.utils.trip_service import TripService
     from app.sim_engine.core.simulations.utils.idle_area_service import IdleAreaService
+    from app.sim_engine.core.simulations.utils.statistic_service import StatisticService
 
 
 class DependencyResolver:
@@ -30,6 +31,10 @@ class DependencyResolver:
     @classmethod
     def idle_area_service(cls) -> 'IdleAreaService':
         return cls.__resolve('idle_area_service')
+
+    @classmethod
+    def statistic_service(cls) -> 'StatisticService':
+        return cls.__resolve('statistic_service')
 
     @classmethod
     def env(cls) -> 'QSimEnvironment':

@@ -40,3 +40,26 @@ class IdleAreaType(enum.Enum):
 
     def code(self) -> int:
         return self.value[0]
+
+
+class SolverType(enum.Enum):
+    GREEDY = (1, 'GREEDY')
+    CBC = (2, 'CBC')
+    HIGHS = (3, 'HIGHS')
+    CP = (4, 'CP')
+
+    def __str__(self):
+        return self.key()
+
+    def key(self) -> str:
+        return self.value[1]
+
+    def code(self) -> int:
+        return self.value[0]
+
+    @classmethod
+    def from_code(cls, code: int) -> 'SolverType':
+        for member in cls:
+            if member.code() == code:
+                return member
+        raise KeyError(f"Unknown solver code {code}")

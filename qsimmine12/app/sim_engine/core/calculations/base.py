@@ -71,7 +71,7 @@ class LunchCalc:
                 result.append(
                     (0, end_time)
                 )
-            if sim_start_time <= lunch_start < lunch_end:
+            if sim_start_time < lunch_start < lunch_end:
                 result.append(
                     (
                         (lunch_start - sim_start_time).total_seconds(),

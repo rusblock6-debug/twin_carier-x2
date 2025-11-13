@@ -1,5 +1,6 @@
 workflow:
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^(dev|staging|main)$/'
     - when: never
 
@@ -36,6 +37,6 @@ pytest:
     - pip config set global.index-url https://${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD}@nexus.dmi-msk.ru/repository/pypi-staging-group/simple
     - pip install -r app/requirements.txt
     - pytest
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   allow_failure: true

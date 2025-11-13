@@ -3,20 +3,18 @@ import pathlib
 from datetime import datetime
 from typing import Any, List, Optional
 
+from fastapi import HTTPException
 from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, Text, text
+from sqlalchemy import MetaData
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, scoped_session, mapped_column, relationship, DeclarativeBase, Session
 from sqlalchemy.sql import func, delete, or_
-
 from sqlalchemy.sql.schema import CheckConstraint, Index
-from sqlalchemy import MetaData
-
-from fastapi import HTTPException
 
 from app.consts import COMMON_SHIFT_CONFIG
 from app.enums import PayloadType, TrailType, UnloadType
+from app.sim_engine.enums import SolverType
 from app.utils import TZ, utc_now
-
 
 __all__ = (
     'BaseObject',
@@ -43,6 +41,7 @@ __all__ = (
     'PlannedIdle',
 )
 
+
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention={
         "ix": "ix_%(column_0_label)s",
@@ -51,6 +50,7 @@ class Base(DeclarativeBase):
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     })
+
 
 # region Model mixins
 
@@ -95,7 +95,7 @@ class LocationMixin:
     @property
     def initial_location(self) -> List[float]:
         return [self.initial_lat, self.initial_lon, self.initial_height]
-    
+
     location = initial_location
 
     def set_location(self, location: List[float]) -> None:
@@ -108,6 +108,7 @@ class LocationMixin:
             self.initial_lat = lat
             self.initial_lon = lon
             self.initial_height = height
+
 
 # endregion
 
@@ -145,6 +146,7 @@ class BaseVehicle(BaseObject):
     is_calc_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     """Включён ли расчёт по физическим параметрам и справочным характеристикам"""
 
+
 # endregion
 
 
@@ -169,6 +171,7 @@ class Blasting(BaseObject):
     """ID карьера"""
     quarry: Mapped['Quarry'] = relationship(back_populates='blasting_list')
     """Карьер"""
+
 
 # endregion Blasting
 
@@ -232,6 +235,7 @@ class Shovel(DefaultValuesMixin, ShovelArgsMixin, LocationMixin, BaseVehicle):
 
     trails: Mapped[List['Trail']] = relationship(back_populates='shovel')
     """Маршруты"""
+
 
 # endregion
 
@@ -302,6 +306,7 @@ class Truck(DefaultValuesMixin, TruckArgsMixin, LocationMixin, BaseVehicle):
     )
     """Маршруты"""
 
+
 # endregion
 
 
@@ -355,6 +360,7 @@ class Unload(DefaultValuesMixin, UnloadArgsMixin, LocationMixin, BaseObject):
     trails: Mapped[List['Trail']] = relationship(back_populates='unload')
     """Маршруты"""
 
+
 # endregion
 
 
@@ -395,6 +401,7 @@ class FuelStation(DefaultValuesMixin, FuelStationArgsMixin, LocationMixin, BaseO
     quarry: Mapped['Quarry'] = relationship(back_populates='fuel_stations')
     """Карьер"""
 
+
 # endregion
 
 
@@ -427,6 +434,7 @@ class IdleArea(DefaultValuesMixin, LocationMixin, BaseObject):
         if self.is_repair_area:
             types_list.append("зона ремонта")
         return types_list
+
 
 # endregion
 
@@ -487,6 +495,7 @@ class TrailTruckAssociation(Base):
     def __repr__(self):
         return f'<{self.__class__.__name__}: Trail {self.trail_id}, Truck {self.truck_id}>'
 
+
 # endregion
 
 
@@ -521,6 +530,9 @@ class Quarry(DefaultValuesMixin, BaseObject):
     """Сдвиг пересменки от начала смены, мин"""
     shift_change_duration: Mapped[int] = mapped_column(default=30, server_default='30')
     """Продолжительность пересменки, мин"""
+
+    target_shovel_load: Mapped[float] = mapped_column(default=0.9, server_default='0.9')
+    """Целевая загрузка экскаваторов"""
 
     shovels: Mapped[List['Shovel']] = relationship(back_populates='quarry')
     trucks: Mapped[List['Truck']] = relationship(back_populates='quarry')
@@ -577,6 +589,9 @@ class Scenario(DefaultValuesMixin, BaseObject):
     boot_b: Mapped[int] = mapped_column(default=5000, server_default='5000')
     """Число пересэмплирований для бутстрэпа, шт"""
 
+    solver_type: Mapped[int] = mapped_column(default=SolverType.GREEDY.code(), server_default="1")
+    """Тип солвера(алгоритма)"""
+
     quarry_id: Mapped[int] = mapped_column(ForeignKey('quarry.id', ondelete='CASCADE'))
     """ID карьера"""
     quarry: Mapped['Quarry'] = relationship(back_populates='scenarios')
@@ -628,7 +643,7 @@ class UploadedFile(Base):
 
     @classmethod
     def delete_with_file(
-        cls, session: scoped_session[Session], id_: int | None = None, name: str | None = None
+            cls, session: scoped_session[Session], id_: int | None = None, name: str | None = None
     ) -> bool:
         if not id_ and not name:
             return False
@@ -729,6 +744,7 @@ class PlannedIdle(BaseObject):
         ),
     )
 
+
 # endregion
 
 
@@ -758,6 +774,7 @@ TYPE_SCHEDULE_MAP = {
     PlannedIdle.__tablename__: PlannedIdle,
 }
 
+
 def validate_schedule_type(type: str):
     if not type or type not in TYPE_SCHEDULE_MAP:
         raise HTTPException(
@@ -765,6 +782,7 @@ def validate_schedule_type(type: str):
             detail=f"Invalid type. Valid types are: {list(TYPE_SCHEDULE_MAP.keys())}",
         )
     return type
+
 
 def validate_object_type(type: str):
     all_object_types = list(TYPE_SCHEDULE_MAP.keys()) + list(TYPE_MODEL_MAP.keys())
@@ -774,6 +792,5 @@ def validate_object_type(type: str):
             detail=f"Invalid type. Valid types are: {list(TYPE_MODEL_MAP.keys())}",
         )
     return type
-
 
 # endregion

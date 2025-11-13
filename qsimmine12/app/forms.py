@@ -1,18 +1,15 @@
-import os
 from pathlib import Path
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional, Union, Mapping, ClassVar, Type
+from typing import Any, Dict, List, Optional, Union, Mapping, ClassVar, Type, TYPE_CHECKING
 
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import HTTPException
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator, PrivateAttr
+from pydantic import BaseModel, Field, field_validator, PrivateAttr, ConfigDict
 
-from sqlalchemy import exists, select, update, delete, and_, or_
+from sqlalchemy import exists, select, update, and_, or_
 
-from app import get_db
-from app.dxf_converter import DXFConverter
+from app.dxf.dxf_converter import DXFConverter
 from app.enums import PayloadType, TrailType, UnloadType
 from app.models import (
     BaseObject,
@@ -38,8 +35,11 @@ from app.geojson_schema import FEATURE_COLLECTION_POINT_LINESTRING, FEATURE_COLL
 from app.road_net import RoadNetCleaner
 from app.shift import ShiftLogic, ShiftConfigException
 from app import SessionLocal
-from app.sim_engine.core.dummy_roadnet import *
-from app.sim_engine.core.dummy_roadnet import *
+from roadnet.core import BaseSchemaValidator, RoadNetFactory, RoadNetGraph
+from roadnet.exceptions import RoadNetException
+
+from app.sim_engine.enums import SolverType
+
 
 db = SessionLocal()
 
@@ -58,6 +58,11 @@ __all__ = (
     'FuelStationSchema',
     'MapOverlaySchema',
     'PlannedIdleSchema',
+    'ScheduleItemDTO',
+    'ShiftDetailsDTO',
+    'ScheduleDataResponseDTO',
+    'BlastingScheduleItemDTO',
+    'PlannedIdleScheduleItemDTO',
     'TYPE_SCHEMA_MAP',
 )
 
@@ -107,7 +112,12 @@ class TemplateRefMixin(BaseModel):
         db.flush()
         field_names = collect_model_field_names(self.__class__.__dict__.get('template_fields_class', type(self)))
         for field_name in field_names:
-            if hasattr(orm_obj, field_name) and hasattr(orm_obj, 'template') and getattr(orm_obj, field_name) != getattr(orm_obj.template, field_name):
+            if (
+                    hasattr(orm_obj, field_name)
+                    and hasattr(orm_obj, 'template')
+                    and getattr(orm_obj, 'template')
+                    and getattr(orm_obj, field_name) != getattr(orm_obj.template, field_name)
+            ):
                 orm_obj.template_id = None
                 break
 
@@ -122,6 +132,7 @@ class TemplateMixin(BaseModel):
         """
         if not orm_obj or not getattr(orm_obj, 'id', None):
             return
+
 
         field_names = collect_model_field_names(self.template_fields_class or type(self))
         for field_name in field_names:
@@ -138,165 +149,6 @@ class TemplateMixin(BaseModel):
 
 class QuarryRefMixin(BaseModel):
     quarry_id: Optional[int] = None
-
-
-class ScheduleMixin(BaseModel):
-    """
-    Методы для создания/удаления расписаний.
-    Эти методы возвращают JSONResponse (чтобы удобно использовать в FastAPI).
-    """
-
-    @staticmethod
-    def delete_schedule_items(obj_data: Dict[str, Any], model, enterprise_tz: ZoneInfo) -> int:
-        quarry_id = obj_data.get('quarry_id')
-        date_str = obj_data.get('startDate')
-        work_shift_info = obj_data.get('workShift')
-
-        if not all([quarry_id, date_str, work_shift_info]):
-            raise ValueError("Missing quarry_id, startDate, or workShift in obj_data for deletion")
-
-        quarry = db.get(Quarry, quarry_id)
-        if not quarry or not quarry.shift_config:
-            raise ValueError(f"Quarry {quarry_id} not found or has no shift_config")
-
-        filter_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        shift_logic = ShiftLogic.factory(quarry.shift_config)
-
-        target_begin_offset = work_shift_info.get('begin_offset')
-        target_end_offset = work_shift_info.get('end_offset')
-
-        if target_begin_offset is None or target_end_offset is None:
-            raise ValueError("workShift missing begin_offset or end_offset")
-
-        shifts_for_date = shift_logic.for_date(filter_date, enterprise_tz)
-
-        target_shift = None
-        for shift in shifts_for_date:
-            if (shift.begin_offset.total_seconds() // 60 == target_begin_offset and
-                    shift.end_offset.total_seconds() // 60 == target_end_offset):
-                target_shift = shift
-                break
-
-        if not target_shift:
-            raise ValueError(f"Shift with begin_offset {target_begin_offset} and end_offset {target_end_offset} not found for date {date_str}")
-
-        shift_start_enterprise = target_shift.begin_time
-        shift_end_enterprise = target_shift.end_time
-
-        shift_start_utc = shift_start_enterprise.astimezone(ZoneInfo('UTC'))
-        shift_end_utc = shift_end_enterprise.astimezone(ZoneInfo('UTC'))
-
-        deleted = db.execute(
-            delete(model).where(
-                model.quarry_id == quarry_id,
-                model.start_time < shift_end_utc,
-                shift_start_utc < model.end_time
-            )
-        ).rowcount
-        return deleted
-
-    def handle_schedule_create(self, obj_data: Dict[str, Any], model, schedule_type: str):
-        enterprise_tz = ZoneInfo(os.getenv('TZ', 'UTC'))
-        try:
-            deleted_count = self.delete_schedule_items(obj_data, model, enterprise_tz)
-
-            created_ids: List[int] = []
-
-            if schedule_type == 'blasting':
-                timeline_items = obj_data.get('timelineItems', [])
-                items_with_coords = []
-                for item in timeline_items:
-                    if not item.get('type') == 'background':
-                        if not item.get('coordinates'):
-                            return JSONResponse(
-                                {'success': False, 'error': f'У одной из записей отсутствуют координаты {schedule_type} работ'},
-                                status_code=400
-                            )
-                        items_with_coords.append(item)
-
-                for i, item in enumerate(items_with_coords):
-                    schedule_obj = model()
-                    schedule_obj.quarry_id = obj_data['quarry_id']
-                    start_time = datetime.fromisoformat(item['start'].replace('Z', '+00:00'))
-                    end_time = datetime.fromisoformat(item['end'].replace('Z', '+00:00'))
-                    schedule_obj.start_time = start_time
-                    schedule_obj.end_time = end_time
-                    coordinates = [
-                        [coord['lng'], coord['lat']]
-                        for coord in item.get('coordinates', [])
-                    ]
-                    if coordinates and coordinates[0] != coordinates[-1]:
-                        coordinates.append(coordinates[0])
-                    geojson = {
-                        "type": "FeatureCollection",
-                        "features": [{
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "Polygon",
-                                "coordinates": [coordinates]
-                            },
-                            "properties": {
-                                "id": item.get('id'),
-                                "group": item.get('group'),
-                                "content": item.get('content', ''),
-                                "timeline_index": i
-                            }
-                        }]
-                    }
-                    schedule_obj.geojson_data = geojson
-                    db.add(schedule_obj)
-                    created_ids.append(schedule_obj.id)
-
-            elif schedule_type == 'planned_idle':
-                equipment_timelines = obj_data.get('equipmentTimelines', [])
-                for eq_timeline in equipment_timelines:
-                    if not eq_timeline.get('items'):
-                        continue
-
-                    vehicle_type = eq_timeline.get('equipmentType')
-                    vehicle_id = eq_timeline.get('equipmentId')
-
-                    for item in eq_timeline.get('items', []):
-                        schedule_obj = model()
-                        schedule_obj.quarry_id = obj_data['quarry_id']
-                        schedule_obj.vehicle_type = vehicle_type
-                        schedule_obj.vehicle_id = vehicle_id
-
-                        start_time = datetime.fromisoformat(item['start'].replace('Z', '+00:00'))
-                        end_time = datetime.fromisoformat(item['end'].replace('Z', '+00:00'))
-                        schedule_obj.start_time = start_time
-                        schedule_obj.end_time = end_time
-
-                        db.add(schedule_obj)
-                        created_ids.append(schedule_obj.id)
-            else:
-                return JSONResponse({'success': False, 'error': f'Unsupported schedule type for creation: {schedule_type}'}, status_code=400)
-
-            db.commit()
-            return JSONResponse({
-                'success': True,
-                'ids': created_ids,
-                'count': len(created_ids),
-                'deleted_count': deleted_count
-            })
-
-        except Exception as e:
-            db.rollback()
-            return JSONResponse({'success': False, 'error': f'Error processing {schedule_type} records: {str(e)}'}, status_code=500)
-
-    def handle_schedule_delete(self, obj_data: Dict[str, Any], model, schedule_type: str):
-        enterprise_tz = ZoneInfo(os.getenv('TZ', 'UTC'))
-        try:
-            deleted_count = self.delete_schedule_items(obj_data, model, enterprise_tz)
-            db.commit()
-            return JSONResponse({
-                'success': True,
-                'deleted_count': deleted_count,
-                'message': f'Успешно удалено {deleted_count} записей {schedule_type}'
-            })
-        except Exception as e:
-            db.rollback()
-            return JSONResponse({'success': False, 'error': f'Error deleting {schedule_type} records: {str(e)}'}, status_code=500)
 
 
 # ----------------------
@@ -346,22 +198,97 @@ class BaseVehicleSchema(BaseObjectSchema):
 # Specific schemas
 # ----------------------
 
-class BlastingSchema(QuarryRefMixin, ScheduleMixin, BaseObjectSchema):
-    geojson_data: Optional[Dict] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+
+class ScheduleItemDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    quarry_id: int
+    start_time: datetime
+    end_time: datetime
+
+
+class ShiftDetailsDTO(BaseModel):
+    number: int
+    begin_time_enterprise: str
+    end_time_enterprise: str
+    day: str
+
+
+class BlastingScheduleItemDTO(ScheduleItemDTO):
+    geojson_data: Optional[Dict]
+
+
+class PlannedIdleScheduleItemDTO(ScheduleItemDTO):
+    vehicle_id: int
+    vehicle_type: str
+
+
+class ScheduleDataResponseDTO(BaseModel):
+    time: dict
+    filters: dict
+    shift_details: Optional[ShiftDetailsDTO] = None
+    items: List[PlannedIdleScheduleItemDTO | BlastingScheduleItemDTO]
+
+
+class CoordinateSchema(BaseModel):
+    lat: float
+    lng: float
+
+
+class TimelineItemSchema(BaseModel):
+    id: int
+    coordinates: List[CoordinateSchema]
+    start: datetime
+    end: datetime
+    content: str = Field(default='')
+    group: Optional[int] = Field(default=None)
+
+    def start_utc(self, enterprise_tz: ZoneInfo) -> datetime:
+        return self.__to_utc(self.start, enterprise_tz)
+
+    def end_utc(self, enterprise_tz: ZoneInfo) -> datetime:
+        return self.__to_utc(self.end, enterprise_tz)
+
+    @staticmethod
+    def __to_utc(dt: datetime, enterprise_tz: ZoneInfo) -> datetime:
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=enterprise_tz)
+
+        return dt.astimezone(ZoneInfo('UTC'))
+
+    def to_geojson(self, timeline_index: int) -> dict:
+        coordinates = [
+            [coord.lng, coord.lat] for coord in self.coordinates
+        ]
+
+        if coordinates and coordinates[0] != coordinates[-1]:
+            coordinates.append(coordinates[0])
+
+        return {
+            'type': 'FeatureCollection',
+            'features': [{
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [coordinates]
+                },
+                'properties': {
+                    'id': self.id,
+                    'group': self.group,
+                    'content': self.content or '',
+                    'timeline_index': timeline_index
+                }
+            }]
+        }
+
+
+class BlastingSchema(QuarryRefMixin, BaseObjectSchema):
+    start_date: datetime = Field(alias='startDate')
+    geojson_data: dict = None
+    timeline_items: list[TimelineItemSchema] = Field(alias='timelineItems')
 
     model: ClassVar[Type[Blasting]] = Blasting
-
-    def populate_obj(self, orm_obj):
-        if self.name is not None:
-            orm_obj.name = self.name
-        if self.geojson_data is not None:
-            orm_obj.geojson_data = self.geojson_data
-        if self.start_time is not None:
-            orm_obj.start_time = self.start_time
-        if self.end_time is not None:
-            orm_obj.end_time = self.end_time
 
 
 class ScenarioSchema(BaseObjectSchema):
@@ -369,6 +296,7 @@ class ScenarioSchema(BaseObjectSchema):
     end_time: Optional[datetime] = None
     is_auto_truck_distribution: Optional[bool] = Field(default=True)
     is_calc_reliability_enabled: Optional[bool] = Field(default=False)
+    solver_type: Optional[int] = Field(default=SolverType.GREEDY.code())
 
     quarry_id: Optional[int] = None
     trails: Optional[List[Dict]] = []
@@ -552,6 +480,7 @@ class QuarrySchema(BaseObjectSchema):
     lunch_break_duration: Optional[int] = Field(None, ge=0)
     shift_change_offset: Optional[int] = Field(None, ge=0)
     shift_change_duration: Optional[int] = Field(None, ge=0)
+    target_shovel_load: Optional[float] = Field(None, gt=0, lt=1)
 
     model: ClassVar[Type[Quarry]] = Quarry
 
@@ -599,6 +528,7 @@ class QuarrySchema(BaseObjectSchema):
         for shift in shifts_list:
             if lunch_break_offset >= shift.length or lunch_break_offset_end > shift.length:
                 raise HTTPException(status_code=400, detail='Перерыв на обед должен целиком помещаться во все смены')
+
 
         shift_change_offset = offset_td('shift_change_offset')
         shift_change_duration = offset_td('shift_change_duration')
@@ -682,6 +612,7 @@ class MapOverlaySchema(QuarryRefMixin, BaseObjectSchema):
 
     model: ClassVar[Type[MapOverlay]] = MapOverlay
 
+
     def validate_source_file_id_unique(self):
         if self.source_file_id is None:
             return
@@ -724,7 +655,7 @@ class MapOverlaySchema(QuarryRefMixin, BaseObjectSchema):
         orm_obj.geojson_data = feature_collection
 
 
-class PlannedIdleSchema(QuarryRefMixin, ScheduleMixin, BaseObjectSchema):
+class PlannedIdleSchema(QuarryRefMixin, BaseObjectSchema):
     vehicle_type: Optional[str] = None
     vehicle_id: Optional[int] = None
     start_time: Optional[datetime] = None
@@ -802,4 +733,3 @@ TYPE_SCHEMA_MAP: Dict[str, Type[BaseModel]] = {
     MapOverlay.__tablename__: MapOverlaySchema,
     PlannedIdle.__tablename__: PlannedIdleSchema,
 }
-

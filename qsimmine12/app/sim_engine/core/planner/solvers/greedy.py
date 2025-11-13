@@ -20,7 +20,8 @@ class GreedySolver:
         env = DR.env()
 
         self.sim_context = env.sim_context
-        self.sim_data = deepcopy(env.sim_data)
+        self._raw_sim_data = env.sim_data
+        self._sim_data = deepcopy(env.sim_data)
         self._planning_data = planning_data
 
         self.exclude_objects: dict[ObjectType, list] = {
@@ -29,8 +30,16 @@ class GreedySolver:
             ObjectType.UNLOAD: []
         }
 
+    def _refresh_data(self):
+        self._sim_data = deepcopy(self._raw_sim_data)
+        self._planning_data = None
+
     @property
-    def planning_data(self):
+    def sim_data(self):
+        return self._sim_data
+
+    @property
+    def planning_data(self) -> InputPlanningData:
         if not self._planning_data:
             self._planning_data = get_planning_data(self.sim_data)
         return self._planning_data
@@ -55,6 +64,16 @@ class GreedySolver:
         truck.initial_lon = sim_truck.position.lon
         truck.initial_edge_id = sim_truck.edge.index if sim_truck.edge else None
 
+    def _update_sim_data(self):
+        for truck_id in self.exclude_objects[ObjectType.TRUCK]:
+            self.sim_data.trucks.pop(truck_id, None)
+
+        for shovel_id in self.exclude_objects[ObjectType.SHOVEL]:
+            self.sim_data.shovels.pop(shovel_id, None)
+
+        for unload_id in self.exclude_objects[ObjectType.UNLOAD]:
+            self.sim_data.unloads.pop(unload_id, None)
+
     @staticmethod
     def _reset_cycle(sim_truck):
         if sim_truck.state in [
@@ -70,7 +89,7 @@ class GreedySolver:
             excluded_object: tuple[int, ObjectType] = None,
             included_object: tuple[int, ObjectType] = None
     ):
-        self._planning_data = None
+        self._refresh_data()
 
         if start_time:
             self.sim_data.start_time = start_time
@@ -83,10 +102,13 @@ class GreedySolver:
         elif included_object:
             self._included_object(object_type=included_object[1], object_id=included_object[0])
 
-        for truck_id, sim_truck in self.sim_context.trucks.items():
-            logger.debug(f"rebuild truck: {sim_truck.name}")
-            self._update_trucks_position(truck_id, sim_truck)
-            self._reset_cycle(sim_truck)
+        self._update_sim_data()
+
+        for truck_id in self.sim_data.trucks.keys():
+            truck = self.sim_context.trucks.get(truck_id)
+            logger.debug(f"rebuild truck: {truck.name} id: {truck.id}")
+            self._update_trucks_position(truck_id, truck)
+            self._reset_cycle(truck)
 
     def rebuild_planning_data_cascade(
             self,
@@ -95,7 +117,7 @@ class GreedySolver:
             excluded_objects: List[tuple[int, ObjectType]] | None = None,
             included_objects: List[tuple[int, ObjectType]] | None = None
     ):
-        self._planning_data = None
+        self._refresh_data()
 
         if start_time:
             self.sim_data.start_time = start_time
@@ -107,10 +129,13 @@ class GreedySolver:
         elif included_objects:
             self._included_objects(included_objects)
 
-        for truck_id, sim_truck in self.sim_context.trucks.items():
-            logger.debug(f"rebuild truck: {sim_truck.name}")
-            self._update_trucks_position(truck_id, sim_truck)
-            self._reset_cycle(sim_truck)
+        self._update_sim_data()
+
+        for truck_id in self.sim_data.trucks.keys():
+            truck = self.sim_context.trucks.get(truck_id)
+            logger.debug(f"rebuild truck: {truck.name}")
+            self._update_trucks_position(truck_id, truck)
+            self._reset_cycle(truck)
 
     @staticmethod
     def find_trucks_to_shovel(shovel):
@@ -126,19 +151,15 @@ class GreedySolver:
 
         choices = []
 
-        for shovel in truck.quarry.shovel_map.values():
-
-            if shovel.broken:
-                continue
+        for shovel_id in self.sim_data.shovels.keys():
+            shovel = self.sim_context.shovels[shovel_id]
 
             moving_trucks = self.find_trucks_to_shovel(shovel)
             trucks_count = len(shovel.trucks_queue) + len(moving_trucks)
             wait_shovel = trucks_count * self.planning_data.T_load[(truck.id, shovel.id)]
 
-            for unld in truck.quarry.unload_map.values():
-
-                if unld.broken:
-                    continue
+            for unload_id in self.sim_data.unloads.keys():
+                unld = self.sim_context.unloads[unload_id]
 
                 wait_unl = len(unld.trucks_queue) * self.planning_data.T_unload[(truck.id, unld.id)]
 
@@ -165,7 +186,13 @@ class GreedySolver:
 
     def assign_trip(self, truck: Truck, now: int) -> PlannedTrip | None:
         """Формирует новый PlannedTrip и обновляет маршруты для самосвала"""
-        choice = self.choose_next_trip(truck, now)
+
+        try:
+            choice = self.choose_next_trip(truck, now)
+        except KeyError:
+            logger.warning(f"Choose new trip impossible! Key error in planning data.")
+            choice = None
+
         if not choice:
             return None
 

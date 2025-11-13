@@ -200,6 +200,7 @@ def test_summary_result(input_data):
     validate_result(result)
     summary = result["summary"]
     del summary['trips_table']
+    del summary['trucks_needed']
 
     result = {
         'trips': 19,
@@ -253,6 +254,7 @@ def test_summary_result_with_breakdown(input_data):
     validate_result(result)
     summary = result["summary"]
     del summary['trips_table']
+    del summary['trucks_needed']
 
     result = result = {
         'trips': 19,
@@ -290,6 +292,7 @@ def test_summary_result_with_refuel(input_data):
     validate_result(result)
     summary = result["summary"]
     del summary['trips_table']
+    del summary['trucks_needed']
 
     result = result = {
         'trips': 19,
@@ -327,6 +330,7 @@ def test_summary_result_with_lunch(input_data):
     validate_result(result)
     summary = result["summary"]
     del summary['trips_table']
+    del summary['trucks_needed']
 
     result = result = {
         'trips': 19,
@@ -364,6 +368,7 @@ def test_summary_result_with_planned_idle(input_data):
     validate_result(result)
     summary = result["summary"]
     del summary['trips_table']
+    del summary['trucks_needed']
 
     result = {
         'trips': 19,
@@ -409,6 +414,7 @@ def test_auto_mode_summary_result(input_data):
     validate_result(result)
     summary = result["summary"]
     del summary['trips_table']
+    del summary['trucks_needed']
 
     result = {
         'trips': 19,

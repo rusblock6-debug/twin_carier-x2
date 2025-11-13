@@ -4,6 +4,7 @@ from app.sim_engine.core.planner.solvers.greedy import GreedySolver
 from app.sim_engine.core.props import SimData
 from app.sim_engine.core.simulations.entities import SimContext
 from app.sim_engine.core.simulations.utils.idle_area_service import IdleAreaService
+from app.sim_engine.core.simulations.utils.statistic_service import StatisticService
 from app.sim_engine.core.simulations.utils.service_locator import ServiceLocator
 from app.sim_engine.core.simulations.utils.trip_service import TripService
 from app.sim_engine.writer import IWriter
@@ -24,3 +25,7 @@ class QSimEnvironment(simpy.Environment):
         ServiceLocator.bind('solver', GreedySolver())
         ServiceLocator.bind('trip_service', TripService())
         ServiceLocator.bind('idle_area_service', IdleAreaService(self.sim_data.idle_areas))
+        ServiceLocator.bind(
+            'statistic_service',
+            StatisticService()
+        )

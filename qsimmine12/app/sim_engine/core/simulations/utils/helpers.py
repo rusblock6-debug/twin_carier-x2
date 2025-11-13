@@ -20,3 +20,16 @@ def sim_end_time() -> datetime:
 def sim_start_time() -> datetime:
     env = DR.env()
     return env.sim_data.start_time
+
+
+def sim_duration() -> int:
+    env = DR.env()
+    return env.sim_data.duration
+
+
+def safe_int(value, default=None):
+    """Безопасное преобразование в int"""
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default

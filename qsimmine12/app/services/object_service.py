@@ -14,6 +14,9 @@ from app.forms import (
     TYPE_SCHEMA_MAP,
     ObjectActionRequest
 )
+from app.services.blasting_service import CreateBlastingService
+from app.services.planned_idle_service import CreatePlannedIdleService
+
 
 # region DAO
 class ObjectDAO:
@@ -163,7 +166,13 @@ class ScheduleObjectService(BaseObjectService):
 
         if action == "create":
             schedule_type = "blasting" if isinstance(form, BlastingSchema) else "planned_idle"
-            return form.handle_schedule_create(obj_data, self.model, schedule_type)
+
+            if schedule_type == "blasting":
+                service = CreateBlastingService(self.db)
+                return service(form)
+            else:
+                service = CreatePlannedIdleService(self.db)
+                return service(obj_data, self.model, schedule_type)
 
         obj = self._get_or_create(obj_data.get("id"), action)
         self._apply_form(form, obj)

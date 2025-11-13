@@ -2,7 +2,7 @@ from typing import Generator
 
 import numpy as np
 
-from app.sim_engine.core.dummy_roadnet import *
+from roadnet.core import Edge
 from app.sim_engine.core.geometry import Point, interpolate_position, haversine_km, RouteEdge
 
 
@@ -125,4 +125,3 @@ class TruckCalc:
         """
         t = self.distance_km / self.speed_loaded_kmh * 3600
         return int(np.ceil(t / self.driver_skill))
-

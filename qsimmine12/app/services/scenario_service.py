@@ -1,6 +1,5 @@
 from typing import List, Dict, Any, Optional
 import json
-from datetime import datetime
 
 from pydantic import BaseModel
 from datetime import datetime
@@ -8,6 +7,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 from app.models import Scenario, Trail, Shovel
+
 
 # region DTO
 class TrailDTO(BaseModel):
@@ -26,6 +26,7 @@ class ScenarioDTO(BaseModel):
     quarry_id: int | None
     is_auto_truck_distribution: bool | None
     is_calc_reliability_enabled: bool | None
+    solver_type: int | None
     trails: List[TrailDTO]
 # endregion
 
@@ -83,6 +84,7 @@ class ScenarioService:
             quarry_id=getattr(scenario, "quarry_id", None),
             is_auto_truck_distribution=getattr(scenario, "is_auto_truck_distribution", None),
             is_calc_reliability_enabled=getattr(scenario, "is_calc_reliability_enabled", None),
+            solver_type=getattr(scenario, "solver_type", None),
             trails=trails
         )
 

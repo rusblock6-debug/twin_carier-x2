@@ -31,6 +31,7 @@
         "initial_lon": 59.82944011688233,
         "is_blast_waiting_area": true,
         "is_lunch_area": true,
+        "is_repair_area": true,
         "is_shift_change_area": true,
         "name": "Площадку пересменки 1",
         "quarry_id": 1,

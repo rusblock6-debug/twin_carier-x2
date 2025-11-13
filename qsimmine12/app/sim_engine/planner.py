@@ -22,7 +22,7 @@ from app.sim_engine.core.calculations.unload import UnloadCalc
 from app.sim_engine.core.geometry import build_route_edges_by_road_net, build_route_edges_by_road_net_from_position
 from app.sim_engine.core.props import SimData, PlannedTrip
 from app.sim_engine.core.simulations.utils.dependency_resolver import DependencyResolver as DR
-from app.sim_engine.enums import ObjectType
+from app.sim_engine.enums import ObjectType, SolverType
 
 logger = logging.getLogger(__name__)
 
@@ -253,15 +253,15 @@ def solve_and_extract(inst: InputPlanningData):
 
     sim_conf = DR.sim_conf()
 
-    if sim_conf["solver"] == "CBC":
-        logger.info("CBC")
+    if sim_conf["solver"] == SolverType.CBC:
+        logger.info(SolverType.CBC.key())
         cmd = PULP_CBC_CMD(
             msg=sim_conf["msg"],
             timeLimit=sim_conf["time_limit"]
         )
 
-    elif sim_conf["solver"] == "HIGHS":
-        logger.info("HIGHS")
+    elif sim_conf["solver"] == SolverType.HIGHS:
+        logger.info(SolverType.HIGHS.key())
         cmd = HiGHS_CMD(
             msg=sim_conf["msg"],
             timeLimit=sim_conf["time_limit"],
