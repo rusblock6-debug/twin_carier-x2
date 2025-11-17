@@ -1,0 +1,106 @@
+{
+  "start_time": "2025-09-19T01:00:00.000Z",
+  "end_time": "2025-09-19T08:00:00.000Z",
+  "quarry": {
+    "name": "Тестовый карьер",
+    "center_lat": 58.17,
+    "center_lon": 59.82,
+    "timezone": "Europe/Moscow",
+    
+    "shovel_list": [
+      {
+        "id": 1,
+        "name": "Экскаватор 1",
+        "initial_lat": 58.173741,
+        "initial_lon": 59.812746,
+        "bucket_volume": 4,
+        "payload_type": "gravel",
+        "bucket_fill_speed": 0.25,
+        "arm_turn_speed": 0.8
+      },
+      {
+        "id": 2, 
+        "name": "Экскаватор 2",
+        "initial_lat": 58.172402,
+        "initial_lon": 59.819623,
+        "bucket_volume": 4,
+        "payload_type": "gravel",
+        "bucket_fill_speed": 0.25,
+        "arm_turn_speed": 0.8
+      }
+    ],
+    
+    "truck_list": [
+      {
+        "id": 1,
+        "name": "Самосвал 1",
+        "initial_lat": 58.169888,
+        "initial_lon": 59.829998,
+        "body_capacity": 120,
+        "fuel_capacity": 200,
+        "speed_loaded": 18,
+        "speed_empty": 35
+      },
+      {
+        "id": 2,
+        "name": "Самосвал 2", 
+        "initial_lat": 58.169978,
+        "initial_lon": 59.830041,
+        "body_capacity": 120,
+        "fuel_capacity": 200,
+        "speed_loaded": 18,
+        "speed_empty": 35
+      }
+    ],
+    
+    "unload_list": [
+      {
+        "id": 1,
+        "name": "Пункт разгрузки 1",
+        "initial_lat": 58.177634,
+        "initial_lon": 59.808519,
+        "capacity": 1000000,
+        "unload_type": "hydraulic"
+      }
+    ],
+    
+    "fuel_station_list": [
+      {
+        "id": 1,
+        "name": "Заправка 1",
+        "initial_lat": 58.174351,
+        "initial_lon": 59.825770,
+        "flow_rate": 2,
+        "num_pumps": 2
+      }
+    ],
+    
+    "idle_area_list": [
+      {
+        "id": 1,
+        "name": "Зона простоя 1",
+        "initial_lat": 58.170693,
+        "initial_lon": 59.829440,
+        "is_shift_change_area": true
+      }
+    ],
+    
+    "road_net": {
+      "features": [
+        {
+          "geometry": {
+            "coordinates": [
+              [59.808519, 58.177634, 0.0],
+              [59.808068, 58.177023, 0.0]
+            ],
+            "type": "LineString"
+          },
+          "properties": {
+            "direction": "=",
+            "length": 73.0
+          }
+        }
+      ]
+    }
+  }
+}

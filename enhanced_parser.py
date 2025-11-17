@@ -353,7 +353,7 @@ def generate_business_table(entities: List[Dict]) -> str:
     return "\n".join(lines)
 
 if __name__ == "__main__":
-    project_path = r"D:\Work\twin_carier_x2\qsimmine12"
+    project_path = r"C:\Сторонние\Цифровой двойник - документация\qsimmine12"
     if not os.path.isdir(project_path):
         print(f"Ошибка: Проект не найден по пути {project_path}")
         exit(1)
