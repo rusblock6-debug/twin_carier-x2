@@ -38,60 +38,170 @@ class BusinessDataFlowParser:
             "Конфигурация": "Сценарии, ограничения и настройки",
             "Событие": "Расписания, взрывы, простои"
         }
-        self.formula_library = {
-            "entity:Shovel": "Производительность = Объем ковша × Коэффициент наполнения × Ходок/час",
-            "entity:Truck": "Время рейса = (Расстояние туда / Скорость груженого) + (Расстояние обратно / Скорость порожнего)",
-            "entity:Unload": "Пропускная способность = Кол-во позиций × 60 / Время разгрузки",
-            "entity:FuelStation": "Время заправки = Объем дозаправки / Скорость подачи топлива",
-            "simulation_core": "Цикл симуляции = Σ (время перемещения + загрузки + разгрузки + сервисные задержки)",
-            "calculations": "KPI: Производительность = Перевезённый объем / Длительность смены",
-            "results_writer": "Размер батча = Кол-во кадров за интервал × Размер кадра"
+        self.business_model_catalog = {
+            'Shovel': {'name': 'Экскаватор', 'icon': '🔧', 'category': 'Техника', 'detail_layer': 'Техника · Экскаваторы'},
+            'Truck': {'name': 'Самосвал', 'icon': '🚛', 'category': 'Техника', 'detail_layer': 'Техника · Самосвалы'},
+            'FuelStation': {'name': 'Заправка', 'icon': '⛽', 'category': 'Инфраструктура', 'detail_layer': 'Инфраструктура · Заправки'},
+            'Unload': {'name': 'Пункт разгрузки', 'icon': '📍', 'category': 'Инфраструктура', 'detail_layer': 'Инфраструктура · Пункты разгрузки'},
+            'RoadNet': {'name': 'Дорожная сеть', 'icon': '🛣️', 'category': 'Инфраструктура', 'detail_layer': 'Инфраструктура · Дороги'},
+            'Trail': {'name': 'Маршрут', 'icon': '🛤️', 'category': 'Инфраструктура', 'detail_layer': 'Инфраструктура · Маршруты'},
+            'IdleArea': {'name': 'Зона ожидания', 'icon': '⏸️', 'category': 'Инфраструктура', 'detail_layer': 'Инфраструктура · Зоны ожидания'},
+            'MapOverlay': {'name': 'Слой карты', 'icon': '🗺️', 'category': 'Инфраструктура', 'detail_layer': 'Инфраструктура · Слои карты'},
+            'Quarry': {'name': 'Карьер', 'icon': '🏭', 'category': 'Объект', 'detail_layer': 'Объект · Карьеры'},
+            'Scenario': {'name': 'Сценарий', 'icon': '📋', 'category': 'Конфигурация', 'detail_layer': 'Конфигурация · Сценарии'},
+            'Blasting': {'name': 'Взрывные работы', 'icon': '💥', 'category': 'Событие', 'detail_layer': 'События · Взрывы'},
+            'PlannedIdle': {'name': 'Плановый простой', 'icon': '⏸️', 'category': 'Событие', 'detail_layer': 'События · Простоя'},
+            'FuelStationTemplate': {'name': 'Шаблон заправки', 'icon': '🧩', 'category': 'Шаблоны', 'detail_layer': 'Шаблоны · Заправки'},
+            'ShovelTemplate': {'name': 'Шаблон экскаватора', 'icon': '🧩', 'category': 'Шаблоны', 'detail_layer': 'Шаблоны · Экскаваторы'},
+            'TruckTemplate': {'name': 'Шаблон самосвала', 'icon': '🧩', 'category': 'Шаблоны', 'detail_layer': 'Шаблоны · Самосвалы'},
+            'UnloadTemplate': {'name': 'Шаблон разгрузки', 'icon': '🧩', 'category': 'Шаблоны', 'detail_layer': 'Шаблоны · Пункты разгрузки'},
+            'TrailTruckAssociation': {'name': 'Связь маршрут-самосвал', 'icon': '🔗', 'category': 'Техника', 'detail_layer': 'Техника · Привязки'},
+            'UploadedFile': {'name': 'Загруженный файл', 'icon': '📁', 'category': 'Данные', 'detail_layer': 'Данные · Файлы'}
         }
+        self.formula_library = {
+            "entity:Shovel": {
+                "text": "Производительность = Объем ковша × Коэффициент наполнения × Ходок/час",
+                "source": {
+                    "file": "app/sim_engine/core/calculations/shovel.py",
+                    "pattern": "def calculate_cycle"
+                }
+            },
+            "entity:Truck": {
+                "text": "Время рейса = (Расстояние туда / Скорость груженого) + (Расстояние обратно / Скорость порожнего)",
+                "source": {
+                    "file": "app/sim_engine/core/calculations/truck.py",
+                    "pattern": "calculate_time_motion_by_edges"
+                }
+            },
+            "entity:Unload": {
+                "text": "Пропускная способность = Кол-во позиций × 60 / Время разгрузки",
+                "source": {
+                    "file": "app/sim_engine/core/calculations/unload.py",
+                    "pattern": "total_time"
+                }
+            },
+            "entity:FuelStation": {
+                "text": "Время заправки = Объем дозаправки / Скорость подачи топлива",
+                "source": {
+                    "file": "app/sim_engine/core/simulations/fuel_station.py",
+                    "pattern": "refuel_time"
+                }
+            },
+            "simulation_core": {
+                "text": "Цикл симуляции = Σ (время перемещения + загрузки + разгрузки + сервисные задержки)",
+                "source": {
+                    "file": "app/sim_engine/simulate.py",
+                    "pattern": "class Simulation"
+                }
+            },
+            "calculations": {
+                "text": "KPI: Производительность = Перевезённый объем / Длительность смены",
+                "source": {
+                    "file": "app/sim_engine/core/calculations/trucks_needed.py",
+                    "pattern": "T_cycle"
+                }
+            },
+            "results_writer": {
+                "text": "Размер батча = Кол-во кадров за интервал × Размер кадра",
+                "source": {
+                    "file": "app/sim_engine/writer.py",
+                    "pattern": "class DictReliabilityWriter"
+                }
+            }
+        }
+
+    def _make_snippet(self, lines: List[str], lineno: Optional[int], context: int = 2) -> str:
+        if lineno is None:
+            lineno = 1
+        start = max(lineno - context - 1, 0)
+        end = min(lineno + context, len(lines))
+        snippet = "\n".join(lines[start:end]).strip()
+        return snippet
+
+    def _resolve_formula_source(self, meta: Optional[Dict]) -> Optional[Dict]:
+        if not meta:
+            return None
+        rel_path = meta.get("file")
+        if not rel_path:
+            return None
+        file_path = self.project_root / rel_path
+        if not file_path.exists():
+            return {
+                "file": rel_path,
+                "line": None,
+                "code": "",
+                "error": "file not found"
+            }
+        try:
+            lines = file_path.read_text(encoding="utf-8").splitlines()
+        except Exception:
+            return {
+                "file": rel_path,
+                "line": None,
+                "code": "",
+                "error": "cannot read file"
+            }
+        pattern = meta.get("pattern")
+        line_no: Optional[int] = meta.get("line")
+        if pattern:
+            pattern_lower = pattern.lower()
+            for idx, line in enumerate(lines, start=1):
+                if pattern_lower in line.lower():
+                    line_no = idx
+                    break
+        snippet = self._make_snippet(lines, line_no or 1)
+        return {
+            "file": rel_path.replace("\\", "/"),
+            "line": line_no,
+            "code": snippet
+        }
+
+    def _attach_formula_metadata(self, node: Dict, formula_id: str):
+        formula_meta = self.formula_library.get(formula_id)
+        if not formula_meta:
+            return
+        node["formula"] = formula_meta.get("text", "")
+        source_payload = self._resolve_formula_source(formula_meta.get("source"))
+        if source_payload:
+            node["formula_source"] = source_payload
     
     def _extract_business_entities_from_models(self, file_path: Path):
         """Извлекает бизнес-сущности из models.py."""
         try:
             file_content = file_path.read_text(encoding='utf-8')
             tree = ast.parse(file_content)
+            lines = file_content.splitlines()
         except:
             return
         
-        # Список бизнес-сущностей
-        business_models = {
-            'Shovel': {'name': 'Экскаватор', 'icon': '🔧', 'category': 'Техника'},
-            'Truck': {'name': 'Самосвал', 'icon': '🚛', 'category': 'Техника'},
-            'Unload': {'name': 'Пункт разгрузки', 'icon': '📍', 'category': 'Инфраструктура'},
-            'FuelStation': {'name': 'Заправка', 'icon': '⛽', 'category': 'Инфраструктура'},
-            'Quarry': {'name': 'Карьер', 'icon': '🏭', 'category': 'Объект'},
-            'Scenario': {'name': 'Сценарий', 'icon': '📋', 'category': 'Конфигурация'},
-            'RoadNet': {'name': 'Дорожная сеть', 'icon': '🛣️', 'category': 'Инфраструктура'},
-            'Blasting': {'name': 'Взрывные работы', 'icon': '💥', 'category': 'Событие'},
-            'IdleArea': {'name': 'Зона ожидания', 'icon': '⏸️', 'category': 'Инфраструктура'},
-            'PlannedIdle': {'name': 'Плановый простой', 'icon': '⏸️', 'category': 'Событие'},
-        }
-        
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
-                if node.name in business_models:
+                if node.name in self.business_model_catalog:
                     entity_id = f"entity:{node.name}"
-                    business_layer = business_models[node.name]['category']
-                    self.business_entities[entity_id] = {
+                    model_info = self.business_model_catalog[node.name]
+                    business_layer = model_info['category']
+                    entity_payload = {
                         "id": entity_id,
-                        "name": business_models[node.name]['name'],
+                        "name": model_info['name'],
                         "technical_name": node.name,
-                        "icon": business_models[node.name]['icon'],
-                        "category": business_models[node.name]['category'],
+                        "icon": model_info['icon'],
+                        "category": model_info['category'],
                         "layer": business_layer,
+                        "layer_detail": model_info.get('detail_layer', business_layer),
                         "type": "business_entity",
                         "file_path": str(file_path.relative_to(self.project_root)).replace("\\", "/"),
-                        "formula": self.formula_library.get(entity_id, "")
+                        "definition_line": getattr(node, "lineno", None),
+                        "definition_snippet": self._make_snippet(lines, getattr(node, "lineno", None))
                     }
+                    self._attach_formula_metadata(entity_payload, entity_id)
+                    self.business_entities[entity_id] = entity_payload
     
     def _extract_parameters_from_forms(self, file_path: Path):
         """Извлекает параметры из forms.py."""
         try:
             file_content = file_path.read_text(encoding='utf-8')
             tree = ast.parse(file_content)
+            lines = file_content.splitlines()
         except:
             return
         
@@ -130,6 +240,7 @@ class BusinessDataFlowParser:
                             if param_name in all_params:
                                 param_id = f"param:{param_name}"
                                 param_info = all_params[param_name]
+                                line_no = getattr(item, "lineno", None)
                                 self.parameters[param_id] = {
                                     "id": param_id,
                                     "name": param_info['name'],
@@ -140,7 +251,11 @@ class BusinessDataFlowParser:
                                     "type": "parameter",
                                     "category": "Параметр",
                                     "layer": "Параметры",
-                                    "formula": param_info.get('formula', '')
+                                    "layer_detail": f"Параметры · {param_info['entity']}",
+                                    "formula": param_info.get('formula', ''),
+                                    "source_file": str(file_path.relative_to(self.project_root)).replace("\\", "/"),
+                                    "source_line": line_no,
+                                    "source_code": self._make_snippet(lines, line_no)
                                 }
     
     def _build_data_flow_chain(self):
@@ -312,6 +427,7 @@ class BusinessDataFlowParser:
                 "icon": "👤",
                 "category": "Ввод данных",
                 "layer": "Ввод данных",
+                "layer_detail": "Ввод данных · Пользователь",
                 "type": "system_component",
                 "formula": ""
             },
@@ -322,6 +438,7 @@ class BusinessDataFlowParser:
                 "icon": "✅",
                 "category": "Обработка",
                 "layer": "Валидация",
+                "layer_detail": "Валидация · Формы",
                 "type": "system_component",
                 "formula": ""
             },
@@ -332,6 +449,7 @@ class BusinessDataFlowParser:
                 "icon": "📊",
                 "category": "Хранение",
                 "layer": "Модели данных",
+                "layer_detail": "Хранение · ORM модели",
                 "type": "system_component",
                 "formula": ""
             },
@@ -342,6 +460,7 @@ class BusinessDataFlowParser:
                 "icon": "💾",
                 "category": "Хранение",
                 "layer": "Хранение",
+                "layer_detail": "Хранение · БД",
                 "type": "system_component",
                 "formula": ""
             },
@@ -352,6 +471,7 @@ class BusinessDataFlowParser:
                 "icon": "🚀",
                 "category": "Обработка",
                 "layer": "Сервис симуляции",
+                "layer_detail": "Сервис симуляции · Оркестрация",
                 "type": "system_component",
                 "formula": ""
             },
@@ -362,6 +482,7 @@ class BusinessDataFlowParser:
                 "icon": "🔄",
                 "category": "Обработка",
                 "layer": "Сериализация",
+                "layer_detail": "Сериализация · Подготовка данных",
                 "type": "system_component",
                 "formula": ""
             },
@@ -372,6 +493,7 @@ class BusinessDataFlowParser:
                 "icon": "🎮",
                 "category": "Симуляция",
                 "layer": "Симуляция",
+                "layer_detail": "Симуляция · Менеджер",
                 "type": "system_component",
                 "formula": self.formula_library.get("simulation_core", "")
             },
@@ -382,6 +504,7 @@ class BusinessDataFlowParser:
                 "icon": "⚙️",
                 "category": "Симуляция",
                 "layer": "Симуляция",
+                "layer_detail": "Симуляция · Ядро",
                 "type": "system_component",
                 "formula": self.formula_library.get("simulation_core", "")
             },
@@ -392,6 +515,7 @@ class BusinessDataFlowParser:
                 "icon": "🧮",
                 "category": "Расчеты",
                 "layer": "Расчеты",
+                "layer_detail": "Расчёты · KPI",
                 "type": "system_component",
                 "formula": self.formula_library.get("calculations", "")
             },
@@ -402,6 +526,7 @@ class BusinessDataFlowParser:
                 "icon": "📝",
                 "category": "Вывод",
                 "layer": "Результаты",
+                "layer_detail": "Результаты · Запись",
                 "type": "system_component",
                 "formula": self.formula_library.get("results_writer", "")
             },
@@ -412,12 +537,14 @@ class BusinessDataFlowParser:
                 "icon": "📦",
                 "category": "Вывод",
                 "layer": "Результаты",
+                "layer_detail": "Результаты · Хранилище",
                 "type": "system_component",
                 "formula": ""
             }
         ]
         
         for comp in system_components:
+            self._attach_formula_metadata(comp, comp["id"])
             if comp["id"] not in self.business_entities:
                 self.business_entities[comp["id"]] = comp
     
@@ -479,12 +606,22 @@ class BusinessDataFlowParser:
         lines.append(f"- Потоков данных: **{data['metadata']['total_data_flows']}**\n")
         
         lines.append("## Компоненты\n")
-        lines.append("| Компонент | Слой | Что делает | Основные входы | Основные выходы |")
-        lines.append("| --- | --- | --- | --- | --- |")
+        lines.append("| Компонент | Слой | Подслой | Что делает | Основные входы | Основные выходы | Источник |")
+        lines.append("| --- | --- | --- | --- | --- | --- | --- |")
         for entity in data["entities"]:
             inputs = ", ".join({name_map.get(flow["source"], flow["source"]) for flow in flows_to.get(entity["id"], [])})
             outputs = ", ".join({name_map.get(flow["target"], flow["target"]) for flow in flows_from.get(entity["id"], [])})
-            lines.append(f"| {entity['icon'] if entity.get('icon') else '📦'} {entity['name']} | {entity.get('layer','—')} | {entity.get('description','—')} | {inputs or '—'} | {outputs or '—'} |")
+            source_path = entity.get("file_path") or entity.get("source_file") or "—"
+            source_line = entity.get("definition_line") or entity.get("source_line")
+            if source_path != "—" and source_line:
+                source_path = f"{source_path}:{source_line}"
+            lines.append(
+                f"| {entity['icon'] if entity.get('icon') else '📦'} {entity['name']} "
+                f"| {entity.get('layer','—')} "
+                f"| {entity.get('layer_detail', entity.get('layer','—'))} "
+                f"| {entity.get('description','—')} "
+                f"| {inputs or '—'} | {outputs or '—'} | {source_path} |"
+            )
         lines.append("")
         
         lines.append("## Параметры\n")

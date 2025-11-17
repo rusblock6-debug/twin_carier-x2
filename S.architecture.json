@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "project_root": "C:\\Сторонние\\Цифровой двойник - документация\\qsimmine12",
-    "total_entities": 21,
+    "project_root": "D:\\Work\\twin_carier_x2\\qsimmine12",
+    "total_entities": 29,
     "total_parameters": 17,
-    "total_data_flows": 88
+    "total_data_flows": 96
   },
   "entities": [
     {
@@ -13,9 +13,24 @@
       "icon": "💥",
       "category": "Событие",
       "layer": "Событие",
+      "layer_detail": "События · Взрывы",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": ""
+      "definition_line": 155,
+      "definition_snippet": "# region Blasting\n\nclass Blasting(BaseObject):\n    \"\"\"Расписание взрывных работ\"\"\""
+    },
+    {
+      "id": "entity:ShovelTemplate",
+      "name": "Шаблон экскаватора",
+      "technical_name": "ShovelTemplate",
+      "icon": "🧩",
+      "category": "Шаблоны",
+      "layer": "Шаблоны",
+      "layer_detail": "Шаблоны · Экскаваторы",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 212,
+      "definition_snippet": "class ShovelTemplate(DefaultValuesMixin, ShovelArgsMixin, BaseObject):\n    \"\"\"Шаблон экскаватора\"\"\""
     },
     {
       "id": "entity:Shovel",
@@ -24,9 +39,30 @@
       "icon": "🔧",
       "category": "Техника",
       "layer": "Техника",
+      "layer_detail": "Техника · Экскаваторы",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": "Производительность = Объем ковша × Коэффициент наполнения × Ходок/час"
+      "definition_line": 221,
+      "definition_snippet": "class Shovel(DefaultValuesMixin, ShovelArgsMixin, LocationMixin, BaseVehicle):\n    \"\"\"Экскаватор\"\"\"",
+      "formula": "Производительность = Объем ковша × Коэффициент наполнения × Ходок/час",
+      "formula_source": {
+        "file": "app/sim_engine/core/calculations/shovel.py",
+        "line": 13,
+        "code": "@classmethod\n    def calculate_cycle(\n        cls,\n        props: ShovelProperties,"
+      }
+    },
+    {
+      "id": "entity:TruckTemplate",
+      "name": "Шаблон самосвала",
+      "technical_name": "TruckTemplate",
+      "icon": "🧩",
+      "category": "Шаблоны",
+      "layer": "Шаблоны",
+      "layer_detail": "Шаблоны · Самосвалы",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 280,
+      "definition_snippet": "class TruckTemplate(DefaultValuesMixin, TruckArgsMixin, BaseObject):\n    \"\"\"Шаблон самосвала\"\"\""
     },
     {
       "id": "entity:Truck",
@@ -35,9 +71,30 @@
       "icon": "🚛",
       "category": "Техника",
       "layer": "Техника",
+      "layer_detail": "Техника · Самосвалы",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": "Время рейса = (Расстояние туда / Скорость груженого) + (Расстояние обратно / Скорость порожнего)"
+      "definition_line": 289,
+      "definition_snippet": "class Truck(DefaultValuesMixin, TruckArgsMixin, LocationMixin, BaseVehicle):\n    \"\"\"Самосвал\"\"\"",
+      "formula": "Время рейса = (Расстояние туда / Скорость груженого) + (Расстояние обратно / Скорость порожнего)",
+      "formula_source": {
+        "file": "app/sim_engine/core/calculations/truck.py",
+        "line": 106,
+        "code": "@classmethod\n    def calculate_time_motion_by_edges(cls, route: RouteEdge, props, forward):\n        is_loaded = forward\n        return sum([1 for _ in cls.calculate_motion_by_edges(route, props, forward, is_loaded)])"
+      }
+    },
+    {
+      "id": "entity:UnloadTemplate",
+      "name": "Шаблон разгрузки",
+      "technical_name": "UnloadTemplate",
+      "icon": "🧩",
+      "category": "Шаблоны",
+      "layer": "Шаблоны",
+      "layer_detail": "Шаблоны · Пункты разгрузки",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 336,
+      "definition_snippet": "class UnloadTemplate(DefaultValuesMixin, UnloadArgsMixin, BaseObject):\n    \"\"\"Шаблон пункта разгрузки\"\"\""
     },
     {
       "id": "entity:Unload",
@@ -46,9 +103,30 @@
       "icon": "📍",
       "category": "Инфраструктура",
       "layer": "Инфраструктура",
+      "layer_detail": "Инфраструктура · Пункты разгрузки",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": "Пропускная способность = Кол-во позиций × 60 / Время разгрузки"
+      "definition_line": 345,
+      "definition_snippet": "class Unload(DefaultValuesMixin, UnloadArgsMixin, LocationMixin, BaseObject):\n    \"\"\"Пункт разгрузки\"\"\"",
+      "formula": "Пропускная способность = Кол-во позиций × 60 / Время разгрузки",
+      "formula_source": {
+        "file": "app/sim_engine/core/calculations/unload.py",
+        "line": 37,
+        "code": "speed = unloading_speed[props.type_unloading]\n        t_dump = truck_volume / (speed * K_ugl * K_mat * K_temp)\n        total_time = t_drive + t_stop + t_lift + t_dump + t_down + t_leave\n        return {\n            't_drive': t_drive, 't_stop': t_stop, 't_lift': t_lift,"
+      }
+    },
+    {
+      "id": "entity:FuelStationTemplate",
+      "name": "Шаблон заправки",
+      "technical_name": "FuelStationTemplate",
+      "icon": "🧩",
+      "category": "Шаблоны",
+      "layer": "Шаблоны",
+      "layer_detail": "Шаблоны · Заправки",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 378,
+      "definition_snippet": "class FuelStationTemplate(DefaultValuesMixin, FuelStationArgsMixin, BaseObject):\n    \"\"\"Шаблон заправки\"\"\""
     },
     {
       "id": "entity:FuelStation",
@@ -57,9 +135,17 @@
       "icon": "⛽",
       "category": "Инфраструктура",
       "layer": "Инфраструктура",
+      "layer_detail": "Инфраструктура · Заправки",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": "Время заправки = Объем дозаправки / Скорость подачи топлива"
+      "definition_line": 387,
+      "definition_snippet": "class FuelStation(DefaultValuesMixin, FuelStationArgsMixin, LocationMixin, BaseObject):\n    \"\"\"Заправка\"\"\"",
+      "formula": "Время заправки = Объем дозаправки / Скорость подачи топлива",
+      "formula_source": {
+        "file": "app/sim_engine/core/simulations/fuel_station.py",
+        "line": 45,
+        "code": "self.push_event(event_type=EventType.REFUELING_BEGIN, truck=truck)\n            fuel_needed = truck.properties.fuel_capacity - truck.fuel\n            refuel_time = fuel_needed / self.properties.flow_rate\n            old_state = copy.copy(truck.state)\n            for _ in range(int(refuel_time)):"
+      }
     },
     {
       "id": "entity:IdleArea",
@@ -68,9 +154,37 @@
       "icon": "⏸️",
       "category": "Инфраструктура",
       "layer": "Инфраструктура",
+      "layer_detail": "Инфраструктура · Зоны ожидания",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": ""
+      "definition_line": 410,
+      "definition_snippet": "# region IdleArea\n\nclass IdleArea(DefaultValuesMixin, LocationMixin, BaseObject):\n    \"\"\"Зона ожидания (пересменки, обеда и т.д.)\"\"\""
+    },
+    {
+      "id": "entity:Trail",
+      "name": "Маршрут",
+      "technical_name": "Trail",
+      "icon": "🛤️",
+      "category": "Инфраструктура",
+      "layer": "Инфраструктура",
+      "layer_detail": "Инфраструктура · Маршруты",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 444,
+      "definition_snippet": "# region Trail\n\nclass Trail(Base):\n    \"\"\"Маршрут\"\"\""
+    },
+    {
+      "id": "entity:TrailTruckAssociation",
+      "name": "Связь маршрут-самосвал",
+      "technical_name": "TrailTruckAssociation",
+      "icon": "🔗",
+      "category": "Техника",
+      "layer": "Техника",
+      "layer_detail": "Техника · Привязки",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 475,
+      "definition_snippet": "class TrailTruckAssociation(Base):\n    \"\"\"Ассоциация (промежуточная m2m модель) между маршрутом и самосвалом\"\"\""
     },
     {
       "id": "entity:Quarry",
@@ -79,9 +193,11 @@
       "icon": "🏭",
       "category": "Объект",
       "layer": "Объект",
+      "layer_detail": "Объект · Карьеры",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": ""
+      "definition_line": 504,
+      "definition_snippet": "# region Other general models\n\nclass Quarry(DefaultValuesMixin, BaseObject):\n    \"\"\"Карьер\"\"\""
     },
     {
       "id": "entity:Scenario",
@@ -90,9 +206,11 @@
       "icon": "📋",
       "category": "Конфигурация",
       "layer": "Конфигурация",
+      "layer_detail": "Конфигурация · Сценарии",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": ""
+      "definition_line": 557,
+      "definition_snippet": "class Scenario(DefaultValuesMixin, BaseObject):\n    \"\"\"Сценарий для моделирования\"\"\""
     },
     {
       "id": "entity:RoadNet",
@@ -101,9 +219,37 @@
       "icon": "🛣️",
       "category": "Инфраструктура",
       "layer": "Инфраструктура",
+      "layer_detail": "Инфраструктура · Дороги",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": ""
+      "definition_line": 604,
+      "definition_snippet": "class RoadNet(BaseObject):\n    \"\"\"Дорожная сеть\"\"\""
+    },
+    {
+      "id": "entity:UploadedFile",
+      "name": "Загруженный файл",
+      "technical_name": "UploadedFile",
+      "icon": "📁",
+      "category": "Данные",
+      "layer": "Данные",
+      "layer_detail": "Данные · Файлы",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 623,
+      "definition_snippet": "class UploadedFile(Base):\n    \"\"\"Загруженный файл\"\"\""
+    },
+    {
+      "id": "entity:MapOverlay",
+      "name": "Слой карты",
+      "technical_name": "MapOverlay",
+      "icon": "🗺️",
+      "category": "Инфраструктура",
+      "layer": "Инфраструктура",
+      "layer_detail": "Инфраструктура · Слои карты",
+      "type": "business_entity",
+      "file_path": "app/models.py",
+      "definition_line": 665,
+      "definition_snippet": "class MapOverlay(DefaultValuesMixin, BaseObject):\n    \"\"\"Подложка карты\"\"\""
     },
     {
       "id": "entity:PlannedIdle",
@@ -112,9 +258,11 @@
       "icon": "⏸️",
       "category": "Событие",
       "layer": "Событие",
+      "layer_detail": "События · Простоя",
       "type": "business_entity",
       "file_path": "app/models.py",
-      "formula": ""
+      "definition_line": 712,
+      "definition_snippet": "class PlannedIdle(BaseObject):\n    \"\"\"Плановый простой\"\"\""
     },
     {
       "id": "user_input",
@@ -123,6 +271,7 @@
       "icon": "👤",
       "category": "Ввод данных",
       "layer": "Ввод данных",
+      "layer_detail": "Ввод данных · Пользователь",
       "type": "system_component",
       "formula": ""
     },
@@ -133,6 +282,7 @@
       "icon": "✅",
       "category": "Обработка",
       "layer": "Валидация",
+      "layer_detail": "Валидация · Формы",
       "type": "system_component",
       "formula": ""
     },
@@ -143,6 +293,7 @@
       "icon": "📊",
       "category": "Хранение",
       "layer": "Модели данных",
+      "layer_detail": "Хранение · ORM модели",
       "type": "system_component",
       "formula": ""
     },
@@ -153,6 +304,7 @@
       "icon": "💾",
       "category": "Хранение",
       "layer": "Хранение",
+      "layer_detail": "Хранение · БД",
       "type": "system_component",
       "formula": ""
     },
@@ -163,6 +315,7 @@
       "icon": "🚀",
       "category": "Обработка",
       "layer": "Сервис симуляции",
+      "layer_detail": "Сервис симуляции · Оркестрация",
       "type": "system_component",
       "formula": ""
     },
@@ -173,6 +326,7 @@
       "icon": "🔄",
       "category": "Обработка",
       "layer": "Сериализация",
+      "layer_detail": "Сериализация · Подготовка данных",
       "type": "system_component",
       "formula": ""
     },
@@ -183,8 +337,15 @@
       "icon": "🎮",
       "category": "Симуляция",
       "layer": "Симуляция",
+      "layer_detail": "Симуляция · Менеджер",
       "type": "system_component",
-      "formula": "Цикл симуляции = Σ (время перемещения + загрузки + разгрузки + сервисные задержки)"
+      "formula": {
+        "text": "Цикл симуляции = Σ (время перемещения + загрузки + разгрузки + сервисные задержки)",
+        "source": {
+          "file": "app/sim_engine/simulate.py",
+          "pattern": "class Simulation"
+        }
+      }
     },
     {
       "id": "simulation_core",
@@ -193,8 +354,14 @@
       "icon": "⚙️",
       "category": "Симуляция",
       "layer": "Симуляция",
+      "layer_detail": "Симуляция · Ядро",
       "type": "system_component",
-      "formula": "Цикл симуляции = Σ (время перемещения + загрузки + разгрузки + сервисные задержки)"
+      "formula": "Цикл симуляции = Σ (время перемещения + загрузки + разгрузки + сервисные задержки)",
+      "formula_source": {
+        "file": "app/sim_engine/simulate.py",
+        "line": 133,
+        "code": "class Simulation(AbstractSimulation):\n    def __init__(self, sim_data: SimData, writer: IWriter, sim_conf: dict) -> None:\n        super().__init__(sim_data, writer, sim_conf)"
+      }
     },
     {
       "id": "calculations",
@@ -203,8 +370,14 @@
       "icon": "🧮",
       "category": "Расчеты",
       "layer": "Расчеты",
+      "layer_detail": "Расчёты · KPI",
       "type": "system_component",
-      "formula": "KPI: Производительность = Перевезённый объем / Длительность смены"
+      "formula": "KPI: Производительность = Перевезённый объем / Длительность смены",
+      "formula_source": {
+        "file": "app/sim_engine/core/calculations/trucks_needed.py",
+        "line": 73,
+        "code": "):\n        \"\"\"\n        Итоговая формула N = λ * T_cycle.\n        где\n          μ_load = 1/T_load,  μ_unload = 1/T_unload"
+      }
     },
     {
       "id": "results_writer",
@@ -213,8 +386,14 @@
       "icon": "📝",
       "category": "Вывод",
       "layer": "Результаты",
+      "layer_detail": "Результаты · Запись",
       "type": "system_component",
-      "formula": "Размер батча = Кол-во кадров за интервал × Размер кадра"
+      "formula": "Размер батча = Кол-во кадров за интервал × Размер кадра",
+      "formula_source": {
+        "file": "app/sim_engine/writer.py",
+        "line": 47,
+        "code": "class DictReliabilityWriter(DictSimpleWriter):\n    def __init__(self) -> None:\n        super().__init__()"
+      }
     },
     {
       "id": "results_storage",
@@ -223,6 +402,7 @@
       "icon": "📦",
       "category": "Вывод",
       "layer": "Результаты",
+      "layer_detail": "Результаты · Хранилище",
       "type": "system_component",
       "formula": ""
     }
@@ -238,7 +418,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Полезный объем = длина × ширина × глубина × коэффициент наполнения"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Полезный объем = длина × ширина × глубина × коэффициент наполнения",
+      "source_file": "app/forms.py",
+      "source_line": 316,
+      "source_code": "class ShovelArgsMixin(BaseModel):\n    bucket_volume: Optional[float] = Field(None, ge=0)\n    bucket_lift_speed: Optional[float] = Field(None, ge=0)\n    arm_turn_angle: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:bucket_lift_speed",
@@ -250,7 +434,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Время подъема = Высота подъема / Скорость"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Время подъема = Высота подъема / Скорость",
+      "source_file": "app/forms.py",
+      "source_line": 317,
+      "source_code": "class ShovelArgsMixin(BaseModel):\n    bucket_volume: Optional[float] = Field(None, ge=0)\n    bucket_lift_speed: Optional[float] = Field(None, ge=0)\n    arm_turn_angle: Optional[float] = Field(None, ge=0)\n    arm_turn_speed: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:arm_turn_speed",
@@ -262,7 +450,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Время поворота = Угол / Скорость"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Время поворота = Угол / Скорость",
+      "source_file": "app/forms.py",
+      "source_line": 319,
+      "source_code": "bucket_lift_speed: Optional[float] = Field(None, ge=0)\n    arm_turn_angle: Optional[float] = Field(None, ge=0)\n    arm_turn_speed: Optional[float] = Field(None, ge=0)\n    bucket_dig_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_speed: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:bucket_dig_speed",
@@ -274,7 +466,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Время копания = Глубина врезки / Скорость"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Время копания = Глубина врезки / Скорость",
+      "source_file": "app/forms.py",
+      "source_line": 320,
+      "source_code": "arm_turn_angle: Optional[float] = Field(None, ge=0)\n    arm_turn_speed: Optional[float] = Field(None, ge=0)\n    bucket_dig_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_coef: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:bucket_fill_speed",
@@ -286,7 +482,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Время наполнения = Объем ковша / Скорость"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Время наполнения = Объем ковша / Скорость",
+      "source_file": "app/forms.py",
+      "source_line": 321,
+      "source_code": "arm_turn_speed: Optional[float] = Field(None, ge=0)\n    bucket_dig_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_coef: Optional[float] = Field(None, ge=0)\n    arm_inertia_coef: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:bucket_fill_coef",
@@ -298,7 +498,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Полезный объем = Объем ковша × Коэффициент"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Полезный объем = Объем ковша × Коэффициент",
+      "source_file": "app/forms.py",
+      "source_line": 322,
+      "source_code": "bucket_dig_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_speed: Optional[float] = Field(None, ge=0)\n    bucket_fill_coef: Optional[float] = Field(None, ge=0)\n    arm_inertia_coef: Optional[float] = Field(None, ge=0)\n    return_move_coef: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:payload_type",
@@ -310,7 +514,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Плотность породы влияет на массу одной ходки"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Плотность породы влияет на массу одной ходки",
+      "source_file": "app/forms.py",
+      "source_line": 386,
+      "source_code": "capacity: Optional[int] = Field(None, ge=0)\n    angle: Optional[float] = None\n    payload_type: Optional[str] = None\n    trucks_at_once: Optional[int] = Field(None, ge=0)\n    initial_operating_time: Optional[int] = Field(None, ge=0)"
     },
     {
       "id": "param:initial_operating_time",
@@ -322,7 +530,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Коэффициент надежности = e^{-(время/MTBF)}"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Коэффициент надежности = e^{-(время/MTBF)}",
+      "source_file": "app/forms.py",
+      "source_line": 388,
+      "source_code": "payload_type: Optional[str] = None\n    trucks_at_once: Optional[int] = Field(None, ge=0)\n    initial_operating_time: Optional[int] = Field(None, ge=0)\n    initial_failure_count: Optional[int] = Field(None, ge=0)\n    average_repair_duration: Optional[int] = Field(None, ge=0)"
     },
     {
       "id": "param:initial_failure_count",
@@ -334,7 +546,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Вероятность отказа = Кол-во отказов / Время"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Вероятность отказа = Кол-во отказов / Время",
+      "source_file": "app/forms.py",
+      "source_line": 389,
+      "source_code": "trucks_at_once: Optional[int] = Field(None, ge=0)\n    initial_operating_time: Optional[int] = Field(None, ge=0)\n    initial_failure_count: Optional[int] = Field(None, ge=0)\n    average_repair_duration: Optional[int] = Field(None, ge=0)"
     },
     {
       "id": "param:average_repair_duration",
@@ -346,7 +562,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Потерянное время = Кол-во ремонтов × Средняя длительность"
+      "layer_detail": "Параметры · Экскаватор",
+      "formula": "Потерянное время = Кол-во ремонтов × Средняя длительность",
+      "source_file": "app/forms.py",
+      "source_line": 390,
+      "source_code": "initial_operating_time: Optional[int] = Field(None, ge=0)\n    initial_failure_count: Optional[int] = Field(None, ge=0)\n    average_repair_duration: Optional[int] = Field(None, ge=0)\n\n    @field_validator('unload_type')"
     },
     {
       "id": "param:body_capacity",
@@ -358,7 +578,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Масса загрузки = Объем × Плотность породы"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Масса загрузки = Объем × Плотность породы",
+      "source_file": "app/forms.py",
+      "source_line": 353,
+      "source_code": "class TruckArgsMixin(BaseModel):\n    body_capacity: Optional[float] = Field(None, ge=0)\n    speed_empty: Optional[float] = Field(None, ge=0)\n    speed_loaded: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:speed_empty",
@@ -370,7 +594,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Время возврата = Расстояние / Скорость"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Время возврата = Расстояние / Скорость",
+      "source_file": "app/forms.py",
+      "source_line": 354,
+      "source_code": "class TruckArgsMixin(BaseModel):\n    body_capacity: Optional[float] = Field(None, ge=0)\n    speed_empty: Optional[float] = Field(None, ge=0)\n    speed_loaded: Optional[float] = Field(None, ge=0)\n    initial_operating_time: Optional[int] = Field(None, ge=0)"
     },
     {
       "id": "param:speed_loaded",
@@ -382,7 +610,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Время движения = Расстояние / Скорость"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Время движения = Расстояние / Скорость",
+      "source_file": "app/forms.py",
+      "source_line": 355,
+      "source_code": "body_capacity: Optional[float] = Field(None, ge=0)\n    speed_empty: Optional[float] = Field(None, ge=0)\n    speed_loaded: Optional[float] = Field(None, ge=0)\n    initial_operating_time: Optional[int] = Field(None, ge=0)\n    initial_failure_count: Optional[int] = Field(None, ge=0)"
     },
     {
       "id": "param:fuel_capacity",
@@ -394,7 +626,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Ресурс без дозаправки = Емкость / Удельный расход"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Ресурс без дозаправки = Емкость / Удельный расход",
+      "source_file": "app/forms.py",
+      "source_line": 360,
+      "source_code": "average_repair_duration: Optional[int] = Field(None, ge=0)\n\n    fuel_capacity: Optional[float] = Field(None, ge=0)\n    fuel_threshold_critical: Optional[float] = Field(None, ge=0)\n    fuel_threshold_planned: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:fuel_threshold_critical",
@@ -406,7 +642,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Триггер дозаправки при достижении порога"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Триггер дозаправки при достижении порога",
+      "source_file": "app/forms.py",
+      "source_line": 361,
+      "source_code": "fuel_capacity: Optional[float] = Field(None, ge=0)\n    fuel_threshold_critical: Optional[float] = Field(None, ge=0)\n    fuel_threshold_planned: Optional[float] = Field(None, ge=0)\n    fuel_level: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:fuel_threshold_planned",
@@ -418,7 +658,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Окно плановой дозаправки = Порог плановый ± Δ"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Окно плановой дозаправки = Порог плановый ± Δ",
+      "source_file": "app/forms.py",
+      "source_line": 362,
+      "source_code": "fuel_capacity: Optional[float] = Field(None, ge=0)\n    fuel_threshold_critical: Optional[float] = Field(None, ge=0)\n    fuel_threshold_planned: Optional[float] = Field(None, ge=0)\n    fuel_level: Optional[float] = Field(None, ge=0)\n    fuel_idle_lph: Optional[float] = Field(None, ge=0)"
     },
     {
       "id": "param:fuel_specific_consumption",
@@ -430,7 +674,11 @@
       "type": "parameter",
       "category": "Параметр",
       "layer": "Параметры",
-      "formula": "Расход топлива в рейсе = Расход × Время рейса"
+      "layer_detail": "Параметры · Самосвал",
+      "formula": "Расход топлива в рейсе = Расход × Время рейса",
+      "source_file": "app/forms.py",
+      "source_line": 365,
+      "source_code": "fuel_level: Optional[float] = Field(None, ge=0)\n    fuel_idle_lph: Optional[float] = Field(None, ge=0)\n    fuel_specific_consumption: Optional[float] = Field(None, ge=0)\n    fuel_density: Optional[float] = Field(None, ge=0)\n    engine_power_kw: Optional[float] = Field(None, ge=0)"
     }
   ],
   "data_flows": [
@@ -1006,6 +1254,16 @@
       }
     },
     {
+      "id": "entity:ShovelTemplate->models_data:storage:entity:entity:ShovelTemplate",
+      "source": "entity:ShovelTemplate",
+      "target": "models_data",
+      "description": "Шаблон экскаватора обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:ShovelTemplate"
+      }
+    },
+    {
       "id": "entity:Shovel->models_data:storage:entity:entity:Shovel",
       "source": "entity:Shovel",
       "target": "models_data",
@@ -1013,6 +1271,16 @@
       "category": "storage",
       "metadata": {
         "entity": "entity:Shovel"
+      }
+    },
+    {
+      "id": "entity:TruckTemplate->models_data:storage:entity:entity:TruckTemplate",
+      "source": "entity:TruckTemplate",
+      "target": "models_data",
+      "description": "Шаблон самосвала обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:TruckTemplate"
       }
     },
     {
@@ -1026,6 +1294,16 @@
       }
     },
     {
+      "id": "entity:UnloadTemplate->models_data:storage:entity:entity:UnloadTemplate",
+      "source": "entity:UnloadTemplate",
+      "target": "models_data",
+      "description": "Шаблон разгрузки обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:UnloadTemplate"
+      }
+    },
+    {
       "id": "entity:Unload->models_data:storage:entity:entity:Unload",
       "source": "entity:Unload",
       "target": "models_data",
@@ -1033,6 +1311,16 @@
       "category": "storage",
       "metadata": {
         "entity": "entity:Unload"
+      }
+    },
+    {
+      "id": "entity:FuelStationTemplate->models_data:storage:entity:entity:FuelStationTemplate",
+      "source": "entity:FuelStationTemplate",
+      "target": "models_data",
+      "description": "Шаблон заправки обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:FuelStationTemplate"
       }
     },
     {
@@ -1053,6 +1341,26 @@
       "category": "storage",
       "metadata": {
         "entity": "entity:IdleArea"
+      }
+    },
+    {
+      "id": "entity:Trail->models_data:storage:entity:entity:Trail",
+      "source": "entity:Trail",
+      "target": "models_data",
+      "description": "Маршрут обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:Trail"
+      }
+    },
+    {
+      "id": "entity:TrailTruckAssociation->models_data:storage:entity:entity:TrailTruckAssociation",
+      "source": "entity:TrailTruckAssociation",
+      "target": "models_data",
+      "description": "Связь маршрут-самосвал обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:TrailTruckAssociation"
       }
     },
     {
@@ -1083,6 +1391,26 @@
       "category": "storage",
       "metadata": {
         "entity": "entity:RoadNet"
+      }
+    },
+    {
+      "id": "entity:UploadedFile->models_data:storage:entity:entity:UploadedFile",
+      "source": "entity:UploadedFile",
+      "target": "models_data",
+      "description": "Загруженный файл обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:UploadedFile"
+      }
+    },
+    {
+      "id": "entity:MapOverlay->models_data:storage:entity:entity:MapOverlay",
+      "source": "entity:MapOverlay",
+      "target": "models_data",
+      "description": "Слой карты обновляет модели данных",
+      "category": "storage",
+      "metadata": {
+        "entity": "entity:MapOverlay"
       }
     },
     {

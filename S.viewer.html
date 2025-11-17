@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Потоки данных системы - qsimmine12</title>
+    <title>Потоки данных системы</title>
     <script src="https://unpkg.com/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -76,6 +76,7 @@
         .flow-info { background:#f4fbf6; border-left:4px solid #2ecc71; padding:10px 12px; margin:8px 0; border-radius:4px; font-size:13px; }
         .flow-info span.unit { color:#7f8c8d; font-size:11px; }
         .formula-block { background:#1f2933; color:#f5f7fa; padding:12px; border-radius:6px; font-family:'Fira Code', monospace; font-size:13px; }
+        .code-block { background:#0f172a; color:#e5e7eb; padding:12px; border-radius:6px; font-family:'Fira Code', monospace; font-size:12px; overflow:auto; margin-top:8px; line-height:1.4; }
         .parameter-list { list-style:none; padding:0; margin:0; }
         .parameter-item { background:#f6f8fb; border-left:3px solid #3498db; padding:8px 10px; margin:4px 0; border-radius:4px; font-size:13px; }
         .legend { display:flex; flex-wrap:wrap; gap:8px; font-size:12px; }
@@ -87,7 +88,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>🔍 Потоки данных системы qsimmine12</h1>
+        <h1>Потоки данных системы</h1>
         <div class="header-controls">
             <input type="file" id="fileInput" accept=".json" style="display:none;">
             <button class="btn" onclick="document.getElementById('fileInput').click()">Загрузить JSON</button>
@@ -104,12 +105,20 @@
 
     <div class="filters-panel">
         <div>
-            <strong>Слои:</strong>
+            <strong>Слои (категории):</strong>
             <div class="layer-filters" id="layerFilters"></div>
+            <div class="layer-controls">
+                <button class="btn btn-secondary" onclick="selectAllLayers()">Показать все</button>
+                <button class="btn btn-secondary" onclick="deselectAllLayers()">Скрыть все</button>
+            </div>
         </div>
-        <div class="layer-controls">
-            <button class="btn btn-secondary" onclick="selectAllLayers()">Показать все</button>
-            <button class="btn btn-secondary" onclick="deselectAllLayers()">Скрыть все</button>
+        <div>
+            <strong>Слои сущностей:</strong>
+            <div class="layer-filters" id="detailLayerFilters"></div>
+            <div class="layer-controls">
+                <button class="btn btn-secondary" onclick="selectAllDetailLayers()">Показать все</button>
+                <button class="btn btn-secondary" onclick="deselectAllDetailLayers()">Скрыть все</button>
+            </div>
         </div>
         <div class="legend" id="layerLegend"></div>
     </div>
@@ -138,6 +147,9 @@
         let allLayers = [];
         let activeLayers = new Set();
         let layerCheckboxes = {};
+        let allDetailLayers = [];
+        let activeDetailLayers = new Set();
+        let detailLayerCheckboxes = {};
 
         const categoryColors = {
             'Ввод данных': '#3498db',
@@ -227,6 +239,11 @@
             showComponentInfo(node.data(), outgoingFlows, incomingFlows);
         }
 
+        function formatFileInfo(file, line) {
+            if (!file) return "";
+            return line ? `${file}:${line}` : file;
+        }
+
         function showComponentInfo(componentData, outgoingFlows, incomingFlows) {
             const sidebar = document.getElementById('sidebarContent');
             const categoryClass = `category-${(componentData.category || '').replace(/ /g, '_')}`;
@@ -248,6 +265,14 @@
                         <div class="info-value">${escapeHtml(componentData.layer)}</div>
                     </div>
                 `;
+                if (componentData.detailLayer) {
+                    html += `
+                        <div class="info-row">
+                            <div class="info-label">Тип</div>
+                            <div class="info-value">${escapeHtml(componentData.detailLayer)}</div>
+                        </div>
+                    `;
+                }
             }
 
             if (componentData.description) {
@@ -266,6 +291,18 @@
                         <div class="info-value formula-block">${escapeHtml(componentData.formula)}</div>
                     </div>
                 `;
+                if (componentData.formulaSourceFile || componentData.formulaSourceCode) {
+                    const fileLabel = formatFileInfo(componentData.formulaSourceFile, componentData.formulaSourceLine);
+                    html += `
+                        <div class="info-row">
+                            <div class="info-label">Источник формулы</div>
+                            <div class="info-value">
+                                ${fileLabel ? `<div>${escapeHtml(fileLabel)}</div>` : ''}
+                                ${componentData.formulaSourceCode ? `<pre class="code-block">${escapeHtml(componentData.formulaSourceCode)}</pre>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
             if (componentData.type === 'parameter') {
@@ -277,6 +314,19 @@
                                 <li class="parameter-item"><strong>Единица:</strong> ${escapeHtml(componentData.unit || '—')}</li>
                                 <li class="parameter-item"><strong>Объект:</strong> ${escapeHtml(componentData.entity || '—')}</li>
                             </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (componentData.sourceFile) {
+                const fileLabel = formatFileInfo(componentData.sourceFile, componentData.sourceLine);
+                html += `
+                    <div class="info-row">
+                        <div class="info-label">Источник компонента</div>
+                        <div class="info-value">
+                            ${fileLabel ? `<div>${escapeHtml(fileLabel)}</div>` : ''}
+                            ${componentData.sourceCode ? `<pre class="code-block">${escapeHtml(componentData.sourceCode)}</pre>` : ''}
                         </div>
                     </div>
                 `;
@@ -320,11 +370,17 @@
 
         function initLayerFilters(nodesData) {
             const layers = new Set();
+            const detailLayers = new Set();
             nodesData.forEach(node => {
-                layers.add(node.data.layer || node.data.category || 'Без слоя');
+                const baseLayer = node.data.layer || node.data.category || 'Без слоя';
+                const detailLayer = node.data.detailLayer || baseLayer;
+                layers.add(baseLayer);
+                detailLayers.add(detailLayer);
             });
             allLayers = Array.from(layers).sort();
             activeLayers = new Set(allLayers);
+            allDetailLayers = Array.from(detailLayers).sort();
+            activeDetailLayers = new Set(allDetailLayers);
             const container = document.getElementById('layerFilters');
             container.innerHTML = '';
             layerCheckboxes = {};
@@ -344,7 +400,30 @@
                 });
                 layerCheckboxes[layer] = checkbox;
             });
+            initDetailLayerFilters();
             renderLegend();
+        }
+
+        function initDetailLayerFilters() {
+            const container = document.getElementById('detailLayerFilters');
+            container.innerHTML = '';
+            detailLayerCheckboxes = {};
+            allDetailLayers.forEach(layer => {
+                const checkboxId = `detail_${layer.replace(/[^a-zA-Z0-9]/g, '_')}`;
+                const wrapper = document.createElement('label');
+                wrapper.className = 'layer-chip';
+                wrapper.innerHTML = `
+                    <input type="checkbox" id="${checkboxId}" checked>
+                    <span>${layer}</span>
+                `;
+                container.appendChild(wrapper);
+                const checkbox = wrapper.querySelector('input');
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) activeDetailLayers.add(layer); else activeDetailLayers.delete(layer);
+                    applyLayerFilter();
+                });
+                detailLayerCheckboxes[layer] = checkbox;
+            });
         }
 
         function renderLegend() {
@@ -363,7 +442,9 @@
             if (!cy) return;
             cy.nodes().forEach(node => {
                 const layer = node.data('layer') || node.data('category') || 'Без слоя';
-                node.style('display', activeLayers.has(layer) ? 'element' : 'none');
+                const detailLayer = node.data('detailLayer') || layer;
+                const show = activeLayers.has(layer) && activeDetailLayers.has(detailLayer);
+                node.style('display', show ? 'element' : 'none');
             });
             cy.edges().forEach(edge => {
                 const sourceVisible = edge.source().style('display') !== 'none';
@@ -383,6 +464,20 @@
         function deselectAllLayers() {
             activeLayers.clear();
             Object.values(layerCheckboxes).forEach(cb => cb.checked = false);
+            applyLayerFilter();
+        }
+
+        function selectAllDetailLayers() {
+            allDetailLayers.forEach(layer => {
+                activeDetailLayers.add(layer);
+              if (detailLayerCheckboxes[layer]) detailLayerCheckboxes[layer].checked = true;
+            });
+            applyLayerFilter();
+        }
+
+        function deselectAllDetailLayers() {
+            activeDetailLayers.clear();
+            Object.values(detailLayerCheckboxes).forEach(cb => cb.checked = false);
             applyLayerFilter();
         }
 
@@ -413,9 +508,16 @@
                         description: entity.description || '',
                         category: entity.category || '',
                         layer: entity.layer || entity.category || 'Без слоя',
+                        detailLayer: entity.layer_detail || entity.layer || entity.category || 'Без слоя',
                         type: entity.type || 'entity',
                         icon: entity.icon || '📦',
-                        formula: entity.formula || ''
+                        formula: entity.formula || '',
+                        sourceFile: entity.file_path || entity.source_file || '',
+                        sourceLine: entity.definition_line || entity.source_line || '',
+                        sourceCode: entity.definition_snippet || entity.source_code || '',
+                        formulaSourceFile: entity.formula_source ? entity.formula_source.file : '',
+                        formulaSourceLine: entity.formula_source ? entity.formula_source.line : '',
+                        formulaSourceCode: entity.formula_source ? entity.formula_source.code : ''
                     }
                 });
             });
@@ -428,11 +530,15 @@
                         description: `Параметр: ${param.name}${param.unit ? ` (${param.unit})` : ''}. Относится к: ${param.entity}`,
                         category: param.category || 'Параметры',
                         layer: param.layer || 'Параметры',
+                        detailLayer: param.layer_detail || `${param.category || 'Параметры'} · ${param.entity || 'Общие'}`,
                         type: param.type || 'parameter',
                         icon: '⚙️',
                         unit: param.unit || '',
                         entity: param.entity || '',
-                        formula: param.formula || ''
+                        formula: param.formula || '',
+                        sourceFile: param.source_file || '',
+                        sourceLine: param.source_line || '',
+                        sourceCode: param.source_code || ''
                     }
                 });
             });
@@ -545,7 +651,7 @@
             const stats = document.getElementById('stats');
             stats.innerHTML = `
                 элементов: ${data.entities.length} · параметров: ${data.parameters.length} · потоков: ${data.data_flows.length}<br>
-                уникальных слоев: ${allLayers.length}
+                уникальных слоев: ${allLayers.length} · типов сущностей: ${allDetailLayers.length}
             `;
         }
 
